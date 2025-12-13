@@ -793,6 +793,52 @@
     box-shadow: 0 0 40px 10px hsla(50, 100%, 55%, 0.9), inset 0 0 25px hsla(0, 0%, 0%, 0.9), 0 0 15px #ffab00;
   }
 
+  /* "Thou Shalt Always Kill" Newsprint/Ink Effect */
+  #always-kill-item {
+    position: relative;
+    overflow: hidden;
+    /* Dark black ink glow effect */
+    box-shadow: 0 0 25px 8px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 0, 0, 0.7);
+    transition: box-shadow 0.4s ease-in-out;
+  }
+
+  #always-kill-item::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: 1; /* Below the content */
+    /* Re-using a noise texture from elsewhere on the page for a newsprint feel */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    opacity: 0.08; /* Subtle effect */
+    animation: newsprint-anim 0.5s steps(1) infinite;
+  }
+
+  @keyframes newsprint-anim {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-1%, 1%); }
+    50% { transform: translate(1%, -1%); }
+    75% { transform: translate(-1%, -1%); }
+  }
+
+  #always-kill-item.playing {
+    box-shadow: 0 0 40px 12px rgba(0, 0, 0, 1), inset 0 0 25px rgba(0, 0, 0, 0.8);
+  }
+
+  #always-kill-item p {
+    position: relative;
+    z-index: 2; /* Ensure text is above the newsprint overlay */
+  }
+
+  #always-kill-item video {
+    position: relative;
+    z-index: 2; /* Ensure video is above the newsprint overlay */
+  }
+
   /* --- Gemini's "Black Tears" VHS Glitch Showcase Theme --- */
   #vhs-glitch-showcase {
     position: relative; /* Needed for pseudo-elements */
@@ -1149,6 +1195,7 @@
   <div class="jump-item"><img src="/bin/(purple)Fire.jpg" class="preview-emoji" alt="Preview"><span class="description">Audius.co Profile</span><a href="#audius-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><span class="preview-emoji">🎵</span><span class="description">Psycore Track</span><a href="#psycore-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><span class="preview-emoji">🎵</span><span class="description">Techno Mix</span><a href="#techno-item" class="jump-button">Jump</a></div>
+  <div class="jump-item"><span class="preview-emoji">🎬</span><span class="description">Always-Kill</span><a href="#always-kill-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><img src="/bin/melobytes274c8a546eceab87.jpg" class="preview-emoji" alt="Preview"><span class="description">Melobytes AI Track</span><a href="#melobytes-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><span class="preview-emoji">🎬</span><span class="description">Phone Video Archive</span><a href="#viz-radio-archive-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><img src="/bin/cover - E T emotional TRAUMA.jpg" class="preview-emoji" alt="Preview"><span class="description">E T emotional TRAUMA Tribute</span><a href="#et-trauma-showcase" class="jump-button">Jump</a></div>
@@ -1196,18 +1243,28 @@
   </a>
   <picture> <img src="/bin/(purple)Fire.jpg" alt="Audius Profile Showcase Image" class="margin-top-15"> </picture>
 </div>
+
 <div class="media-item" id="psycore-item">
   <p>06 - Manipulation of Frequencies - 175 Bpm.mp3 "TWISTED KALA" <br> 'PSYCORE' 🌀</p>
-  <audio class="audio-player" controls>
+  <audio class=audio controls>
     <source src="/06 - Manipulation of Frequencies - 175 Bpm.mp3" type="audio/mpeg">
   </audio>
 </div>
+
 <div class="media-item" id="techno-item">
   <p>The Game Is On System Shutdown #LukHash - Serato DJ Mix (n0 haRdwaRe) 2021 07 09 17 32 32.mp3 "Imortalimp-Velojun-RiverLyle" <br> 'Techno' 💾</p>
   <audio class="audio-player" controls>
     <source src="The Game Is On System Shutdown.mp3" type="audio/mpeg">
   </audio>
 </div>
+
+<div class="media-item" id="always-kill-item">
+  <p>Thou Shalt Always Kill (TRIBUTE) - dan le sac Vs Scroobius Pip TRIBUTE<br> 'Rap Music' 🌀</p>
+  <video class="video-player" controls>
+    <source src="/Thou Shalt Always Kill (TRIBUTE) - dan le sac Vs Scroobius Pip TRIBUTE.mp4" type="video/mp4">
+  </video>
+</div>
+
 <div class="media-item" id="melobytes-item">
   <p>Melobytes Generated Track 🤖</p>
   <audio class="audio-player" controls>
@@ -1913,7 +1970,9 @@ https://www.youtube.com/@devsfm , https://devs.fm/ ,
     }
   }
 </style>
-
+   <iframe src="https://www.cameraftp.com/Camera/Cameraplayer.aspx?parentID=410736266&shareID=18098981&isEmbedded=true&mode=live"
+   width="640"height="360"style="border:0px;overflow:hidden;"scrolling="no">
+   </iframe>
 </div><!-- End of main-content -->
 <script>
         document.addEventListener('DOMContentLoaded', () => {
