@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Glitch Video Fullscreen</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      user-select: none;
+      color: white;
+      /* FIX 1: Hide the default cursor */
+      cursor: none;
+    }
+
+    #canvas {
+      opacity: 0.5;
+      image-rendering: pixelated;
+      background: black;
+      border: 2px solid rgba(255, 100, 155, 0.5);
+      transition: box-shadow 0.1s ease-out;
+      max-width: 100vw;
+      max-height: 80vh;
+      position: relative;
+      cursor: pointer;
+    }
+
+    #startBtn, #muteToggle {
+      padding: 12px 24px;
+      margin: 8px;
+      font-size: 1.2em;
+      cursor: pointer;
+      z-index: 10001;
+    }
+
+    #fullscreenBtn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    #fullscreenBtn.fullscreen::before {
+      content: '\2715';
+    }
+
+    #fullscreenBtn:not(.fullscreen)::before {
+      content: '\26F6';
+    }
+
+    #exitFullscreenBtn {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10002;
+      cursor: pointer;
+    }
+
+    #video {
+      display: none;
+    }
+
+    .cursor {
+      position: fixed;
+      width: 20px; height: 20px;
+      border: 2px solid white;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: opacity 0.1s ease, background-color 0.2s ease, width 0.2s ease, height 0.2s ease, border-radius 0.2s ease, border-color 0.2s ease;
+      box-sizing: border-box;
+      opacity: 1;
+    }
+
+    .cursor.active {
+      width: 16px;
+      height: 16px;
+      border-radius: 0;
+      background-color: #00ffff;
+      border-color: #00ffff;
+    }
+
+    .cursor::before,
+    .cursor::after {
+      content: "";
+      position: absolute;
+      background: white;
+    }
+
+    .cursor::before {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+    }
+
+    .cursor::after {
+      width: 100%;
+      height: 2px;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .cursor.click {
+      animation: clickFlash 0.2s ease-out;
+    }
+
+    @keyframes clickFlash {
+      0% { filter: invert(1); }
+      100% { filter: none; }
+    }
+  </style>
+</head>
+<body>
+  <button id="startBtn">Click to Start Video + Audio</button>
+  <canvas id="canvas" title="Click to Play/Pause"></canvas>
+  <video id="video" crossorigin="anonymous" playsinline loop>
+    <source src="/bin/calarossa.mp4" type="video/mp4" />
+  </video>
+  <button id="muteToggle">Mute</button>
+  <button id="fullscreenBtn"></button>
+  <button id="exitFullscreenBtn">&#10005;</button>
+  <div class="cursor" id="customCursor"></div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const video = document.getElementById('video');
+    const ctx = canvas.getContext('2d');
+    const cursor = document.getElementById('customCursor');
+    const startBtn = document.getElementById('startBtn');
+    const muteToggle = document.getElementById('muteToggle');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+
+    let cursorInitialized = false;
+    let isPlaying = false;
+
+    function isFullScreen() {
+      return document.fullscreenElement || document.webkitFullscreenElement;
+    }
+
+    function updateUIVisibility() {
+      const fullscreen = isFullScreen();
+      // The cursor should only be shown if not in fullscreen and after the mouse has moved
+      cursor.style.display = fullscreen ? 'none' : 'block';
+      fullscreenBtn.style.display = fullscreen ? 'none' : 'flex';
+      muteToggle.style.display = fullscreen ? 'none' : 'inline-block';
+      exitFullscreenBtn.style.display = fullscreen ? 'flex' : 'none';
+    }
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      if (!cursorInitialized) {
+        cursor.style.opacity = '1';
+        cursorInitialized = true;
+      }
+    });
+
+    document.addEventListener('mousedown', () => {
+      cursor.classList.add('active');
+    });
+
+    document.addEventListener('mouseup', () => {
+      cursor.classList.remove('active');
+    });
+
+    document.addEventListener('fullscreenchange', updateUIVisibility);
+    document.addEventListener('webkitfullscreenchange', updateUIVisibility);
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        video.muted = false;
+        await video.play();
+        isPlaying = true;
+        startBtn.style.display = 'none';
+        muteToggle.style.display = 'inline-block';
+        // FIX 2: Start the draw loop here.
+        draw();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    muteToggle.addEventListener('click', () => {
+      video.muted = !video.muted;
+      muteToggle.textContent = video.muted ? 'Unmute' : 'Mute';
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!isFullScreen()) {
+        canvas.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+
+    exitFullscreenBtn.addEventListener('click', () => {
+      document.exitFullscreen?.();
+    });
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const isExitZone = isFullScreen() && x < 60 && y > rect.height - 60;
+      if (!isExitZone) {
+        if (!isPlaying) {
+          video.play();
+          isPlaying = true;
+          // FIX 2: Restart the draw loop when the video resumes.
+          draw();
+        } else {
+          video.pause();
+          isPlaying = false;
+        }
+      }
+    });
+
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Glitch Video Fullscreen</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      user-select: none;
+      color: white;
+      cursor: none; /* Add this line */
+    }
+
+    #canvas {
+      opacity: 0.5;
+      image-rendering: pixelated;
+      background: black;
+      border: 2px solid rgba(255, 100, 155, 0.5);
+      transition: box-shadow 0.1s ease-out;
+      max-width: 100vw;
+      max-height: 80vh;
+      position: relative;
+    }
+
+    #startBtn, #muteToggle {
+      padding: 12px 24px;
+      margin: 8px;
+      font-size: 1.2em;
+      cursor: none; /* Add this line */
+      z-index: 10001;
+    }
+
+    #fullscreenBtn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      cursor: none; /* Add this line */
+      pointer-events: auto;
+    }
+
+    #fullscreenBtn.fullscreen::before {
+      content: '\2715';
+    }
+
+    #fullscreenBtn:not(.fullscreen)::before {
+      content: '\26F6';
+    }
+
+    #exitFullscreenBtn {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      border-radius: 6px;
+      font-size: 20px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10002;
+      cursor: none; /* Add this line */
+    }
+
+    #video {
+      display: none;
+    }
+
+    .cursor {
+      position: fixed;
+      width: 20px; height: 20px;
+      border: 2px solid white;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: opacity 0.1s ease, background-color 0.2s ease, width 0.2s ease, height 0.2s ease, border-radius 0.2s ease, border-color 0.2s ease;
+      box-sizing: border-box;
+      opacity: 1;
+    }
+
+    .cursor.active {
+      width: 16px;
+      height: 16px;
+      border-radius: 0;
+      background-color: #00ffff;
+      border-color: #00ffff;
+    }
+
+    .cursor::before,
+    .cursor::after {
+      content: "";
+      position: absolute;
+      background: white;
+    }
+
+    .cursor::before {
+      width: 2px;
+      height: 100%;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+    }
+
+    .cursor::after {
+      width: 100%;
+      height: 2px;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .cursor.click {
+      animation: clickFlash 0.2s ease-out;
+    }
+
+    @keyframes clickFlash {
+      0% { filter: invert(1); }
+      100% { filter: none; }
+    }
+  </style>
+</head>
+<body>
+  <button id="startBtn">Click to Start Video + Audio</button>
+  <canvas id="canvas" title="Click to Play/Pause"></canvas>
+  <video id="video" crossorigin="anonymous" playsinline loop>
+    <source src="/bin/calarossa.mp4" type="video/mp4" />
+  </video>
+  <button id="muteToggle">Mute</button>
+  <button id="fullscreenBtn"></button>
+  <button id="exitFullscreenBtn">&#10005;</button>
+  <div class="cursor" id="customCursor"></div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const video = document.getElementById('video');
+    const ctx = canvas.getContext('2d');
+    const cursor = document.getElementById('customCursor');
+    const startBtn = document.getElementById('startBtn');
+    const muteToggle = document.getElementById('muteToggle');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+
+    let cursorInitialized = false;
+    let isPlaying = false;
+
+    function isFullScreen() {
+      return document.fullscreenElement || document.webkitFullscreenElement;
+    }
+
+    function updateUIVisibility() {
+      const fullscreen = isFullScreen();
+      cursor.style.display = fullscreen ? 'none' : 'block';
+      fullscreenBtn.style.display = fullscreen ? 'none' : 'flex';
+      muteToggle.style.display = fullscreen ? 'none' : 'inline-block';
+      exitFullscreenBtn.style.display = fullscreen ? 'flex' : 'none';
+    }
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      if (!cursorInitialized) {
+        cursor.style.opacity = '1';
+        cursorInitialized = true;
+      }
+    });
+
+    document.addEventListener('mousedown', () => {
+      cursor.classList.add('active');
+    });
+
+    document.addEventListener('mouseup', () => {
+      cursor.classList.remove('active');
+    });
+
+    document.addEventListener('fullscreenchange', updateUIVisibility);
+    document.addEventListener('webkitfullscreenchange', updateUIVisibility);
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        video.muted = false;
+        await video.play();
+        isPlaying = true;
+        startBtn.style.display = 'none';
+        muteToggle.style.display = 'inline-block';
+        draw();
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    muteToggle.addEventListener('click', () => {
+      video.muted = !video.muted;
+      muteToggle.textContent = video.muted ? 'Unmute' : 'Mute';
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!isFullScreen()) {
+        canvas.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+
+    exitFullscreenBtn.addEventListener('click', () => {
+      document.exitFullscreen?.();
+    });
+
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const isExitZone = isFullScreen() && x < 60 && y > rect.height - 60;
+      if (!isExitZone) {
+        if (!isPlaying) {
+          video.play();
+          isPlaying = true;
+          draw()
+        } else {
+          video.pause();
+          isPlaying = false;
+        }
+      }
+    });
+
+    function draw() {
+      if (!isPlaying) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        let r = data[i], g = data[i+1], b = data[i+2];
+
+        // Rainbow hue effect
+        const hueShift = (Date.now() % 5000) / 5000;
+        let h = (r / 255 + g / 255 + b / 255) / 3 + hueShift;
+        h = h % 1;
+        let s = 1.0, l = 0.5;
+        let angle = h * 6;
+        let c = (1 - Math.abs(2 * l - 1)) * s;
+        let x = c * (1 - Math.abs(angle % 2 - 1));
+        let m = l - c/2;
+        let rgb;
+        if (angle < 1) rgb = [c, x, 0];
+        else if (angle < 2) rgb = [x, c, 0];
+        else if (angle < 3) rgb = [0, c, x];
+        else if (angle < 4) rgb = [0, x, c];
+        else if (angle < 5) rgb = [x, 0, c];
+        else rgb = [c, 0, x];
+
+        data[i] = (rgb[0] + m) * 255;
+        data[i+1] = (rgb[1] + m) * 255;
+        data[i+2] = (rgb[2] + m) * 255;
+
+        // Add static/glitch noise
+        if (Math.random() < 0.03) {
+          data[i] = 255 * Math.random();
+          data[i+1] = 255 * Math.random();
+          data[i+2] = 255 * Math.random();
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      requestAnimationFrame(draw);
+    }
+
+    updateUIVisibility();
+  </script>
+</body>
+</html>
+
+
+    updateUIVisibility();
+  </script>
+</body>
+</html>
