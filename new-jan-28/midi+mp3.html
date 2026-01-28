@@ -980,6 +980,9 @@
 #sewerslvt-cynthoni-showcase {
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
   opacity: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #sewerslvt-cynthoni-showcase h2 {
@@ -987,7 +990,7 @@
   text-shadow: 0 0 5px #ff00ff;
 }
 
-#sewerslvt-cynthoni-showcase #audio-players {
+#sewerslvt-cynthoni-showcase .sewerslvt-cynthoni-audio-players {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -999,19 +1002,18 @@
   margin-bottom: 10px;
 }
 
-#sewerslvt-cynthoni-showcase #artwork-slideshow {
+#sewerslvt-cynthoni-showcase .sewerslvt-artwork-slideshow {
   margin-top: 20px;
 }
 
-#sewerslvt-cynthoni-showcase #slideshow-image {
-  max-width: 100%;
-  height: auto;
+#sewerslvt-cynthoni-showcase .sewerslvt-slideshow-image {
+  display: none;
   border-radius: 8px;
   border: 2px solid #eee;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
 }
 
-#audio-players {
+#sewerslvt-cynthoni-showcase .sewerslvt-cynthoni-audio-players {
   margin-bottom: 20px;
 }
 
@@ -1019,16 +1021,56 @@
   margin-bottom: 10px;
 }
 
-#artwork-slideshow {
+#sewerslvt-cynthoni-showcase .sewerslvt-artwork-slideshow {
   width: 300px;
   height: 300px;
   margin: 0 auto;
 }
 
-#slideshow-image {
-  max-width: 100%;
-  max-height: 100%;
+#sewerslvt-cynthoni-showcase .sewerslvt-slideshow-image {
+  display: none;
   object-fit: cover; /* Prevents stretching */
+}
+
+#leo-leonski-showcase {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
+  opacity: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#leo-leonski-showcase h2 {
+  color: #ffcc66;
+  text-shadow: 0 0 5px rgba(255, 204, 102, 0.9);
+}
+
+#leo-leonski-showcase .leo-leonski-audio-players {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+#leo-leonski-showcase .track h3 {
+  color: #66ccff;
+  margin-bottom: 10px;
+}
+
+#leo-leonski-showcase .leoleonski-artwork-slideshow {
+  margin-top: 20px;
+  width: 300px;
+  height: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#leo-leonski-showcase .leoleonski-slideshow-image {
+  display: none;
+  object-fit: cover; /* Prevents stretching */
+  border-radius: 8px;
+  border: 2px solid #eee;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
 }
   /* --- Gemini's "Black Tears" VHS Glitch Showcase Theme --- */
   #vhs-glitch-showcase {
@@ -1462,6 +1504,7 @@
   <div class="jump-item"><span class="preview-emoji">📼</span><span class="description">RAVE Archive</span><a href="#rave-archive-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><span class="preview-emoji">🎬</span><span class="description">Always-Kill</span><a href="#always-kill-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><img src="/Sewerslvt-Cynthoni/artworkDATA/0000.jpg" class="preview-emoji jumplist-thumb" alt="Sewerslvt/Cynthoni Thumbnail"><span class="description">Sewerslvt / Cynthoni Showcase</span><a href="#sewerslvt-cynthoni-showcase" class="jump-button">Jump</a></div>
+  <div class="jump-item"><img src="/Leo Leonski - Mas Amor Por Favor/ARTWork/(0).jpg" class="preview-emoji jumplist-thumb" alt="Leo Leonski Thumbnail"><span class="description">Leo Leonski Showcase</span><a href="#leo-leonski-showcase" class="jump-button">Jump</a></div>
   <div class="jump-item"><img src="/bin/melobytes274c8a546eceab87.jpg" class="preview-emoji jumplist-thumb" alt="Preview"><span class="description">Melobytes AI Track</span><a href="#melobytes-item" class="jump-button">Jump</a></div>
     <!-- Phone Video Archive jump removed -->
   <div class="jump-item"><img src="/bin/cover - E T emotional TRAUMA.jpg" class="preview-emoji jumplist-thumb" alt="Preview"><span class="description">E T emotional TRAUMA Tribute</span><a href="#et-trauma-showcase" class="jump-button">Jump</a></div>
@@ -1572,7 +1615,7 @@
 </div>
 
 <div class="media-item" id="sewerslvt-cynthoni-showcase">
-  <h2><p></p><a href="https://sewerslvt.bandcamp.com/music">Sewerslvt</a> / <a href="https://cynthoni.bandcamp.com/music">Cynthoni</a> Showcase,</h2></p><br>
+  <h2><p><a href="https://sewerslvt.bandcamp.com/music">Sewerslvt</a> / <a href="https://cynthoni.bandcamp.com/music">Cynthoni</a> Showcase,</h2></p><br>
   <p>YOU CAN FIND THEM ON <a href="https://bandcamp.com" target="_blank" rel="noopener">BANDCAMP</a></h2></p> 
 
   <div class="sewerslvt-cynthoni-audio-players">
@@ -1591,11 +1634,71 @@
         Your browser does not support the audio element.
       </audio>
     </div>
-    <div class="artwork-slideshow">
-      <img class="slideshow-image" src="" alt="Artwork">
+
+    <div class="track">
+      <h3>Psychosis (Sewerslvt)</h3>
+      <audio controls class="audio-player">
+        <source src="/Sewerslvt-Cynthoni/artworkDATA/Sewerslvt - Psychosis.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <div class="track">
+      <h3>Love Is A Mighty Big Word (Sewerslvt)</h3>
+      <audio controls class="audio-player">
+        <source src="/Sewerslvt-Cynthoni/artworkDATA/Sewerslvt - Love Is A Mighty Big Word.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <div class="sewerslvt-artwork-slideshow">
+      <img class="sewerslvt-slideshow-image" src="" alt="Artwork">
     </div>
   </div>
+</div>
 
+<div class="media-item" id="leo-leonski-showcase">
+  <h2><p><a href="https://leoleonski.bandcamp.com/music">Leo Leonski</a> Showcase,</h2></p><br>
+  <p>YOU CAN FIND THEM ON <a href="https://bandcamp.com" target="_blank" rel="noopener">BANDCAMP</a></h2></p> 
+
+  <div class="leo-leonski-audio-players">
+    <div class="track">
+      <h3>Mas Amor Por Favor</h3>
+      <audio controls class="audio-player">
+        <source src="/Leo Leonski - Mas Amor Por Favor/Leo Leonski - Mas Amor Por Favor - 01 Mas Amor Por Favor.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <div class="track">
+      <h3>The Logical Song (Remix)</h3>
+      <audio controls class="audio-player">
+        <source src="/Leo Leonski - Mas Amor Por Favor/Leo Leonski - The Logical Song (Remix).mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <div class="track">
+      <h3>The Pusher (Original Mix)</h3>
+      <audio controls class="audio-player">
+        <source src="/Leo Leonski - Mas Amor Por Favor/Leo Leonski - The Pusher (Original Mix).mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <div class="track">
+      <h3>Jimparro (Unofficial Raw Version)</h3>
+      <audio controls class="audio-player">
+        <source src="/Leo Leonski - Mas Amor Por Favor/Leo Leonski - Jimparro (Unofficial Raw Version).mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <div class="leoleonski-artwork-slideshow">
+      <img class="leoleonski-slideshow-image" src="" alt="Artwork">
+    </div>
+  </div>
+</div>
 
 <div class="media-item" id="melobytes-item">
   <p>Melobytes Generated Track 🤖</p>
@@ -2339,6 +2442,7 @@ Modern Usage: Because of its elegant shape and profound meaning, the infinity sy
   <div class="jump-item"><span class="preview-emoji">📼</span><span class="description">RAVE Archive</span><a href="#rave-archive-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><span class="preview-emoji">🎬</span><span class="description">Always-Kill</span><a href="#always-kill-item" class="jump-button">Jump</a></div>
   <div class="jump-item"><img src="/Sewerslvt-Cynthoni/artworkDATA/0000.jpg" class="preview-emoji jumplist-thumb" alt="Sewerslvt/Cynthoni Thumbnail"><span class="description">Sewerslvt / Cynthoni Showcase</span><a href="#sewerslvt-cynthoni-showcase" class="jump-button">Jump</a></div>
+  <div class="jump-item"><img src="/Leo Leonski - Mas Amor Por Favor/ARTWork/(0).jpg" class="preview-emoji jumplist-thumb" alt="Leo Leonski Thumbnail"><span class="description">Leo Leonski Showcase</span><a href="#leo-leonski-showcase" class="jump-button">Jump</a></div>
   <div class="jump-item"><img src="/bin/melobytes274c8a546eceab87.jpg" class="preview-emoji jumplist-thumb" alt="Preview"><span class="description">Melobytes AI Track</span><a href="#melobytes-item" class="jump-button">Jump</a></div>
     <!-- Phone Video Archive jump removed -->
   <div class="jump-item"><img src="/bin/cover - E T emotional TRAUMA.jpg" class="preview-emoji jumplist-thumb" alt="Preview"><span class="description">E T emotional TRAUMA Tribute</span><a href="#et-trauma-showcase" class="jump-button">Jump</a></div>
@@ -2805,23 +2909,43 @@ const CHAR_LIST = CHARACTERS.split("");
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  const slideshowImage = document.querySelector('.slideshow-image');
-  const imageCount = 29; // Images from 0000.jpg to 0028.jpg
-  const imagePath = '/Sewerslvt-Cynthoni/artworkDATA/';
+  const sewerslvtShowcase = document.querySelector('#sewerslvt-cynthoni-showcase');
+  const sewerslvtImageCount = 29; // Images from 0000.jpg to 0028.jpg
+  const sewerslvtImagePath = '/Sewerslvt-Cynthoni/artworkDATA/';
 
-  function getRandomImage() {
-    const randomNumber = Math.floor(Math.random() * imageCount);
+  function getRandomSewerslvtImage() {
+    const randomNumber = Math.floor(Math.random() * sewerslvtImageCount);
     const imageNumber = randomNumber.toString().padStart(4, '0'); // Ensure leading zeros
-    return imagePath + imageNumber + '.jpg';
+    return sewerslvtImagePath + imageNumber + '.jpg';
   }
 
-  function changeImage() {
-    slideshowImage.src = getRandomImage();
+  function changeSewerslvtImage() {
+    if (sewerslvtShowcase) {
+      sewerslvtShowcase.style.backgroundImage = `url('${getRandomSewerslvtImage()}')`;
+    }
   }
 
-  // Initial image and then set interval
-  changeImage();
-  setInterval(changeImage, 1500); // Change image every 1.5 seconds
+  const leoleonskiShowcase = document.querySelector('#leo-leonski-showcase');
+  const leoleonskiImageCount = 36; // Images from (0).jpg to (35).jpg
+  const leoleonskiImagePath = '/Leo Leonski - Mas Amor Por Favor/ARTWork/';
+
+  function getRandomLeoleonskiImage() {
+    const randomNumber = Math.floor(Math.random() * leoleonskiImageCount);
+    return leoleonskiImagePath + '(' + randomNumber + ').jpg';
+  }
+
+  function changeLeoleonskiImage() {
+    if (leoleonskiShowcase) {
+      leoleonskiShowcase.style.backgroundImage = `url('${getRandomLeoleonskiImage()}')`;
+    }
+  }
+
+  // Initial images and then set intervals
+  changeSewerslvtImage();
+  setInterval(changeSewerslvtImage, 1500); // Change image every 1.5 seconds
+
+  changeLeoleonskiImage();
+  setInterval(changeLeoleonskiImage, 1500); // Change image every 1.5 seconds
 });
 
 </script>
