@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Imortalimp Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- Viewport is now standards-compliant and optimized for all screens -->
+<meta property="og:image" content="https://files.bpcontent.cloud/2025/11/19/11/20251119114324-P3DRWW1X.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unica+One&display=swap" rel="stylesheet">
+  <meta name="twitter:image" content="https://files.bpcontent.cloud/2025/11/19/11/20251119114324-P3DRWW1X.png">
+  <style>
+            /* Responsive improvements for slimscreens */
+            @media (max-width: 600px) {
+              .midi-mp3-archive-btn {
+                width: 98vw;
+                font-size: 1.2em;
+                height: auto;
+                line-height: 1.2em;
+                padding: 24px 0;
+                word-break: break-word;
+                white-space: normal;
+              }
+              .main-container, .full-width-container {
+                flex-direction: column !important;
+                gap: 8px;
+                padding-top: 4px;
+                width: 100vw !important;
+                max-width: 100vw !important;
+              }
+              .link-button {
+                font-size: 1em;
+                padding: 10px 4px;
+                max-width: 98vw;
+                word-break: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+                box-sizing: border-box;
+              }
+              h1, h2, h3 {
+                font-size: 1.1em;
+                width: 98vw;
+                word-break: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+              }
+              .rounded-image, .double-oh-six-image-small, .line-art-image, .rounded-video {
+                max-width: 98vw;
+              }
+              .footer-text {
+                font-size: 0.95em;
+                padding: 8px 2px;
+                max-width: 99vw;
+                word-break: break-word;
+                white-space: normal;
+                overflow-wrap: break-word;
+              }
+              body, html {
+                overflow-x: hidden !important;
+              }
+              * {
+                box-sizing: border-box !important;
+              }
+            }
+        /* Large full-width midi+mp3 archive button */
+        .midi-mp3-archive-btn-container {
+          width: 100vw;
+          margin: 0 auto 30px auto;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .midi-mp3-archive-btn-container .text-center {
+          width: 100vw;
+          margin: 0;
+          padding: 0;
+        }
+        .midi-mp3-archive-btn {
+          display: block;
+          width: 100vw;
+          height: 250px;
+          font-size: 3em;
+          font-weight: bold;
+          text-align: center;
+          line-height: 250px;
+          background: linear-gradient(90deg, #ff00ff 0%, #00ffff 100%);
+          color: #fff;
+          border: none;
+          border-radius: 20px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+          text-decoration: none;
+          transition: transform 0.2s, box-shadow 0.2s;
+          margin: 0 auto;
+          cursor: pointer;
+          letter-spacing: 2px;
+          overflow: hidden;
+        }
+        .midi-mp3-archive-btn:hover {
+          transform: scale(1.03);
+          box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+          background: linear-gradient(90deg, #00ffff 0%, #ff00ff 100%);
+          color: #fff;
+        }
+    /* Base responsive styles */
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body {
+      font-family: 'Unica One', cursive;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      padding: 10px;
+    }
+
+    /* Widescreen and full-width as default */
+    html, body {
+      width: 100vw;
+      align-items: stretch;
+      justify-content: flex-start;
+      padding: 0;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      word-break: break-word;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100vw;
+      box-sizing: border-box;
+      text-align: left;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    h1 {
+      font-size: 2em;
+      text-align: center;
+    }
+
+    .main-container, .full-width-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      max-width: 100vw;
+      margin: 0;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding-top: 10px;
+    }
+
+    .main-container > *, .full-width-container > * {
+      flex: 1 1 320px;
+      max-width: 100%;
+      box-sizing: border-box;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      align-items: flex-start;
+    }
+
+    .link-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100%;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100vw;
+      margin: 0;
+    }
+
+    .link-button {
+      display: block;
+      margin: 10px auto; /* Center the button block itself */
+      padding: 16px 24px;
+      font-size: 1.2em;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+      text-align: center;
+      color: #f0f0f0;
+      background: linear-gradient(to right, #36454F, #2a0050);
+      width: 100%;
+      max-width: 600px;
+      box-sizing: border-box;
+    }
+
+    .link-button:hover {
+      background: linear-gradient(to right, #4a5c6d, #420080);
+      color: #ffffff;
+    }
+
+    .link-button:visited {
+      background: #4a4c52;
+    }
+
+    .rounded-image, .double-oh-six-image-small, .line-art-image, .rounded-video {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+      max-width: 100vw;
+      margin: 0;
+    }
+    
+    .rounded-video {
+      max-width: 700px;
+      object-fit: contain;
+    }
+
+    .discord-widget iframe,
+    .youtube-iframe iframe,
+    iframe.responsive-iframe {
+      width: 100%;
+      max-width: 700px;
+      min-width: 0;
+      height: 220px;
+      aspect-ratio: 16/9;
+      border: none;
+      display: block;
+      margin: 0 auto;
+      min-height: 300px;
+    }
+
+    .footer-text {
+      text-align: center;
+      color: #ffd700;
+      font-family: 'Segoe UI', 'Segoe UI Emoji', sans-serif;
+      padding: 30px 20px;
+      background: linear-gradient(to right, #889200 0%, #8b4646 25%, #8b4646 75%, #889200 100%);
+      border: 8px solid #d4af37;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+      margin: 0 auto;
+      max-width: 700px;
+      word-break: break-word;
+      width: 100vw;
+      max-width: 100vw;
+      margin: 0;
+      text-align: left;
+    }
+
+    .note-text {
+      display: block;
+      margin-top: 15px;
+      font-size: 1.1em;
+      color: #f0f0f0;
+      text-align: center;
+    }
+
+    .footer-wrapper {
+      margin-top: auto;
+    }
+
+    .full-width-container {
+      max-width: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    /* Animations */
+    @keyframes moonGlow {
+      0%, 100% { box-shadow: 0 0 6px #fdfd96, 0 0 12px rgba(253, 253, 150, 0.4); }
+      50% { box-shadow: 0 0 12px #ffffff, 0 0 25px rgba(255, 255, 255, 0.6); }
+    }
+
+    @keyframes gleam {
+      0%, 100% { text-shadow: 0 0 5px #d4af37, 0 0 10px #d4af37; }
+      50%  { text-shadow: 0 0 10px #fff8dc, 0 0 20px #d4af37; }
+    }
+
+    @keyframes floatSpin {
+      0%, 50%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      25%  { transform: translateY(-6px) rotate(8deg) scale(1.05); }
+      75%  { transform: translateY(6px) rotate(-8deg) scale(1.05); }
+    }
+
+    @keyframes rainbowGlow {
+      0%, 90%, 100% { filter: drop-shadow(0 0 6px #444) drop-shadow(0 0 12px #222); }
+      25%  { filter: drop-shadow(0 0 8px #00ff00) drop-shadow(0 0 16px #39ff14); }
+      50%  { filter: drop-shadow(0 0 10px #ccc) drop-shadow(0 0 20px #aaa); }
+      75%  { filter: drop-shadow(0 0 8px #adff2f) drop-shadow(0 0 16px #adff2f); }
+    }
+
+    @keyframes glitch-anim-1 {
+      0% { clip-path: inset(45% 0 50% 0); transform: translate(-0.05em, 0); }
+      100% { clip-path: inset(5% 0 80% 0); transform: translate(0.05em, 0); }
+    }
+
+    @keyframes glitch-anim-2 {
+      0% { clip-path: inset(70% 0 15% 0); transform: translate(0.02em, 0); }
+      100% { clip-path: inset(90% 0 5% 0); transform: translate(-0.02em, 0); }
+    }
+
+    @keyframes emoji-float {
+      0%, 50%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(5px, -10px) rotate(5deg); }
+      75% { transform: translate(-5px, 10px) rotate(-5deg); }
+    }
+
+    @keyframes emoji-glow {
+      from { text-shadow: 0 0 20px #fff, 0 0 30px #00ffff, 0 0 40px #00ffff; }
+      to { text-shadow: 0 0 30px #fff, 0 0 40px #ff00ff, 0 0 50px #ff00ff; }
+    }
+
+    @keyframes double-oh-six-pulse {
+      from { transform: scale(1.0); }
+      to { transform: scale(1.01); }
+    }
+
+    @keyframes crt-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
+    }
+
+    @keyframes gradient-animation {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes rainbow-hue-shift {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+
+    @keyframes static-noise-anim {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-2%, 2%); }
+      50% { transform: translate(2%, -2%); }
+      75% { transform: translate(-2%, -2%); }
+    }
+    
+    @keyframes power-glitch-anim {
+      0%, 50%, 100% { filter: hue-rotate(180deg) brightness(0.9) contrast(1); transform: scale(1); }
+      25% { filter: hue-rotate(90deg) brightness(1.1) contrast(1.2); transform: scale(1.01) translate(-1px, 1px); }
+      75% { filter: hue-rotate(270deg) brightness(1.2) contrast(1.3); transform: scale(1.01) translate(1px, -1px); }
+    }
+
+    @keyframes scanline-move {
+      from { background-position: 0 0; }
+      to { background-position: 0 -3px; }
+    }
+
+    @keyframes color-flash {
+      0%, 100% { box-shadow: inset 0 0 20px transparent; }
+      50% { box-shadow: inset 0 0 30px rgba(255, 0, 255, 0.5); }
+    }
+
+    @keyframes liora-rainbow-glow {
+      0%, 100% { color: #ffffaa; text-shadow: 0 0 5px #fff, 0 0 10px #ffddaa, 0 0 15px #ffcc88; }
+      25% { color: #aaffff; text-shadow: 0 0 5px #fff, 0 0 10px #88ffff, 0 0 15px #00ffff; }
+      50% { color: #ffbbff; text-shadow: 0 0 5px #fff, 0 0 10px #ff88ff, 0 0 15px #ff00ff; }
+      75% { color: #aaffaa; text-shadow: 0 0 5px #fff, 0 0 10px #88ff88, 0 0 15px #00ff00; }
+    }
+    
+    @keyframes sepia-bw-fade {
+      0%, 100% { filter: grayscale(100%) sepia(20%) brightness(0.9) contrast(1.1); }
+      50% { filter: grayscale(20%) sepia(100%) brightness(0.8) contrast(1.2); }
+    }
+    
+    @keyframes glitch-text-anim {
+      0%, 100% { transform: translate(2px, 2px); }
+      25% { transform: translate(-2px, -2px); }
+      50% { transform: translate(2px, -2px); }
+      75% { transform: translate(-2px, 2px); }
+    }
+
+    @keyframes glitch-line-anim {
+      0%   { background-color: #ff00ff; transform: scaleX(1); }
+      20%  { background-color: #0000ff; transform: scaleX(1.02); }
+      40%  { background-color: #00ffff; transform: scaleX(0.98); }
+      60%  { background-color: #00ff00; transform: scaleX(1.01); }
+      80%  { background-color: #ffff00; transform: scaleX(0.99); }
+      100% { background-color: #ff0000; transform: scaleX(1); }
+    }
+
+    @keyframes xmas-pulse {
+      from { text-shadow: 3px 3px 0 #00ff00, 0 0 10px #fff; transform: scale(1); }
+      to { text-shadow: 3px 3px 0 #00ff00, 0 0 30px #ff0000; transform: scale(1.05); }
+    }
+
+    @keyframes emoji-dance {
+      0%, 50%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+      10% { transform: translateY(-18px) scale(1.1) rotate(5deg); }
+      20% { transform: translateY(-8px) scale(1.05) rotate(-8deg); }
+      30% { transform: translateY(-22px) scale(1.12) rotate(8deg); }
+      40% { transform: translateY(-10px) scale(1.08) rotate(-5deg); }
+      60% { transform: translateY(-12px) scale(1.09) rotate(7deg); }
+      70% { transform: translateY(-6px) scale(1.04) rotate(-7deg); }
+      80% { transform: translateY(-16px) scale(1.1) rotate(5deg); }
+      90% { transform: translateY(-4px) scale(1.02) rotate(-5deg); }
+    }
+
+    /* Component Styles */
+    .footer-text p {
+      font-size: 18px;
+      animation: gleam 8s ease-in-out infinite;
+    }
+
+    .footer-text p .emoji {
+      display: inline-block;
+      font-size: 1.6em;
+      animation: floatSpin 5s ease-in-out infinite, rainbowGlow 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+      transform-origin: center;
+    }
+
+    .razer-glitch-char {
+      position: relative;
+      display: inline-block;
+      text-shadow: 2px 2px 3px #222, 0 0 5px #00ff00, 0 0 10px #00ff00;
+      animation: rainbowGlow 3s ease-in-out infinite;
+    }
+
+    .razer-spinner {
+      animation: rainbowGlow 3s ease-in-out infinite, razerGlitchSpin 5s ease-in-out infinite;
+    }
+
+    .razer-glitch-char::after,
+    .razer-glitch-char::before {
+      content: attr(data-text);
+      position: absolute;
+      top: 2px;
+      left: 0;
+      color: #00FF00;
+      background: #1e1e1e;
+      overflow: hidden;
+      clip-path: inset(0);
+      animation: none;
+    }
+
+    .razer-glitch-char::before {
+      text-shadow: -1px 0 #39ff14;
+      animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+    }
+
+    .razer-glitch-char::after {
+      text-shadow: 1px 0 #adff2f;
+      animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    }
+
+    #the-beginning-and-the-end {
+      animation: emoji-float 6s ease-in-out infinite, emoji-glow 3s ease-in-out infinite alternate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15vw;
+      background: rgba(0,0,0,0.5);
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+      padding: 2rem 0;
+    }
+    
+    #the-beginning-and-the-end a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    
+    
+    
+    .magenta-cyan-title {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(1.5em, 4vw, 2.5em);
+      font-weight: bold;
+      color: #00ffff;
+      animation: magenta-cyan-glitch-text 0.15s infinite;
+    }
+
+    .strobe-animation {
+      animation: chromatic-aberration 6s infinite alternate;
+    }
+
+    .text-glow {
+      animation: emoji-glow 3s ease-in-out infinite alternate;
+    }
+
+    #strobe-overlay, #strobe-overlay-1, #strobe-overlay-2 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    #double-oh-six-showcase {
+      position: relative;
+      overflow: hidden;
+      opacity: 1;
+      border: 2px solid hsla(180, 100%, 50%, 0.7);
+      box-shadow: 0 0 30px 6px hsla(180, 100%, 50%, 0.6), 0 0 40px 10px hsla(300, 100%, 50%, 0.4), inset 0 0 15px 4px hsla(180, 100%, 30%, 0.8), inset 0 0 25px 8px hsla(0, 0%, 0%, 0.9);
+      filter: saturate(1.1) contrast(1.1) brightness(1.0);
+      animation: double-oh-six-pulse 5s infinite alternate ease-in-out;
+      text-align: center;
+      padding: 20px;
+      text-decoration: none;
+      color: #f0f0f0;
+      display: block;
+    }
+
+    .crt-link-button {
+      background: #000;
+      color: #00ffff;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      border: 1px solid #00ffff;
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 0 0 10px rgba(0, 255, 255, 0.3), inset 0 0 8px rgba(0, 255, 255, 0.2);
+      text-shadow: 0 0 3px #00ffff, 0 0 5px #00ffff;
+      animation: crt-flicker 0.15s infinite;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .crt-link-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.2) 50%);
+      background-size: 100% 4px;
+      opacity: 0.5;
+      animation: scanline-move 4s linear infinite;
+    }
+
+    :root {
+      --botpress-webchat-background-color: #181824;
+      --botpress-webchat-text-color: #00FFFF;
+      --botpress-webchat-primary-color: #FF69B4;
+      --botpress-webchat-secondary-color: #FF00FF;
+      --botpress-webchat-bubble-background-color: rgba(0, 255, 255, 0.08);
+      --botpress-webchat-bubble-color: #00FFFF;
+      --botpress-webchat-bubble-border-color: #FF69B4;
+      --botpress-webchat-bubble-border-radius: 6px;
+      --botpress-webchat-bubble-border-width: 2px;
+      --botpress-webchat-message-user-bubble-color: #FF66CC;
+      --botpress-webchat-message-user-bubble-font-weight: bold;
+      --botpress-webchat-message-user-bubble-text-shadow: 0 0 4px #FF00FF, 0 0 2px #095c14;
+      --botpress-webchat-composer-background-color: #22223A;
+      --botpress-webchat-composer-border-color: #FF69B4;
+      --botpress-webchat-composer-text-color: #00FFFF;
+      --botpress-webchat-composer-placeholder-color: #FF00FF;
+      --botpress-webchat-send-button-background: linear-gradient(90deg, #FF69B4 0%, #FF00FF 100%);
+      --botpress-webchat-send-button-color: #181824;
+      --botpress-webchat-avatar-background-color: #FF00FF;
+      --botpress-webchat-scrollbar-thumb-color: #FF69B4;
+      --botpress-webchat-scrollbar-track-color: #181824;
+    }
+
+    #bp-embedded-webchat {
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
+      border: 2px solid #00ffff;
+      border-radius: 8px;
+      animation: crt-flicker 0.2s infinite;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 90vh;
+      min-height: 600px;
+      --gradient-angle: 0deg;
+      background: linear-gradient(var(--gradient-angle), rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1), rgba(0, 255, 255, 0.1));
+      background-size: 400% 400%;
+      animation: crt-flicker 0.2s infinite, gradient-animation 8s ease infinite;
+    }
+
+    .botpress-webchat-message--user {
+      color: var(--botpress-webchat-message-user-bubble-color);
+      font-weight: var(--botpress-webchat-message-user-bubble-font-weight, bold);
+      text-shadow: var(--botpress-webchat-message-user-bubble-text-shadow, none);
+    }
+
+    #bp-embedded-webchat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.08) 50%, rgba(0,0,0,0.25) 50%);
+      background-size: 100% 3px;
+      opacity: 0.4;
+      animation: scanline-move 5s linear infinite;
+      pointer-events: none;
+    }
+
+    .glitch-effect-container {
+      position: relative;
+      border: 2px solid rgba(255, 100, 155, 0.5);
+      overflow: hidden;
+    }
+
+    .glitch-effect-container iframe {
+      animation: rainbow-hue-shift 5s infinite linear;
+      opacity: 0.85;
+    }
+
+    .glitch-effect-container::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      pointer-events: none;
+      z-index: 1;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.05;
+      animation: static-noise-anim 0.2s steps(1) infinite;
+    }
+
+    .power-glitch-container {
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(255, 0, 255, 0.6);
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+    }
+
+    .power-glitch-container iframe {
+      opacity: 0.9;
+      animation: power-glitch-anim 15s infinite linear;
+    }
+
+    .power-glitch-container::before,
+    .power-glitch-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .power-glitch-container::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.08;
+      animation: static-noise-anim 0.2s steps(1) infinite;
+    }
+
+    .power-glitch-container::after {
+      background: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0.2) 50%);
+      background-size: 100% 3px;
+      animation: scanline-move 8s linear infinite, color-flash 2s steps(1) infinite;
+    }
+    
+    #musicForCodeCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #instructions-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #444;
+      border-radius: 12px;
+      background: rgba(20, 20, 30, 0.3);
+    }
+
+    .instructions-text {
+      flex: 1;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .instructions-image {
+      flex: 1;
+      max-width: 100%;
+    }
+
+    .liora-link {
+      font-weight: bold;
+      text-decoration: none;
+      animation: liora-rainbow-glow 4s infinite alternate ease-in-out;
+    }
+
+    #epitaph-footer {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      height: auto;
+      position: relative;
+      overflow: hidden;
+      background-color: #000;
+      padding: 40px 0;
+      margin-top: 40px;
+    }
+
+    #epitaph-footer img {
+      width: 100%;
+      height: auto;
+      display: block;
+      animation: sepia-bw-fade 20s ease-in-out infinite;
+    }
+
+    @font-face {
+      font-family: 'the_black_bloc';
+      src: url('/fonts/the_black_bloc.woff2') format('woff2'), url('/fonts/the_black_bloc.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    .big-reading-list-btn {
+      display: block;
+      margin: 60px auto;
+      padding: 60px 120px;
+      background: #111;
+      color: #fff;
+      font-family: 'the_black_bloc', Impact, Arial, sans-serif;
+      font-size: 4rem;
+      letter-spacing: 0.1em;
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    
+    .big-reading-list-btn:hover {
+        background: #222;
+        transform: scale(1.04);
+        box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    }
+
+    #glitch-canvas-container {
+      position: relative;
+      display: block;
+      margin: 60px auto;
+      padding: 60px 120px;
+      background: #111;
+      font-family: 'the_black_bloc', Impact, Arial, sans-serif;
+      font-size: 4rem;
+      letter-spacing: 0.1em;
+      border: none;
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      color: #fff;
+      transition: transform 0.1s, box-shadow 0.1s;
+      overflow: hidden;
+    }
+
+    #glitch-canvas-container span {
+      position: relative;
+      z-index: 2;
+      text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff;
+      animation: glitch-text-anim 1s infinite linear alternate-reverse;
+    }
+    
+    #glitch-canvas-container:hover {
+      transform: scale(1.04);
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    }
+
+    .glitch-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .glitch-underline {
+      text-decoration: none;
+      position: relative;
+      color: #fff;
+      display: block;
+      width: 100%;
+    }
+
+    .glitch-underline::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -9px;
+      width: 100%;
+      height: 6px;
+      background-color: #ff00ff;
+      animation: glitch-line-anim 2s linear infinite alternate;
+    }
+    
+    .audio-controls {
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .facebook-iframe {
+      border: none;
+      overflow: hidden;
+    }
+
+    #musicForCodeCanvas {
+      z-index: 3;
+    }
+
+    .glitch-link {
+      text-decoration: none;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .purple-heading {
+      color: #c300ff;
+      font-family: 'Unica One', cursive;
+      font-weight: bold;
+      font-size: 5.5em;
+      letter-spacing: 0.15em;
+    }
+
+    .purple-heading-small {
+      color: #c300ff;
+      font-family: 'Staatliches', cursive;
+      font-size: 2.5em;
+      letter-spacing: 0.05em;
+    }
+    
+    .red-cyber-heading {
+      color: #ff0019;
+      font-family: 'Courier New', Courier, monospace;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    .purple-cyber-heading {
+      color: #7700ff;
+      font-family: 'Courier New', Courier, monospace;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    .double-oh-six-image {
+      width: 75%;
+      height: auto;
+      max-width: 800px;
+      border-radius: 8px;
+      margin-top: 15px;
+      border: 1px solid hsla(180, 100%, 50%, 0.5);
+    }
+
+    .double-oh-six-image-small {
+      width: 55%;
+    }
+
+    .moon-link {
+      background: linear-gradient(to right, #fdfd96, #ffffff);
+      color: #2a0050;
+      font-weight: bold;
+    }
+
+    .moon-link p {
+      margin-top: 0;
+    }
+
+    .moon-link code {
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #c7c7c7;
+    }
+
+    .warning-text {
+      color: #ffcc00;
+      font-style: normal;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .responsive-container {
+      max-width: 100%;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    .responsive-container img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .centered-section {
+      text-align: center;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      min-height: 4em;
+    }
+
+    .green-heading {
+      color: #00FF00;
+      font-family: 'Staatliches', cursive;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+      letter-spacing: 0.05em;
+    }
+
+    .razer-spacer {
+      display: inline-block;
+      width: 0.5em;
+    }
+
+    .razer-image {
+      width: 100%;
+      height: auto;
+      max-width: 800px;
+      border-radius: 8px;
+    }
+
+    .promo-image {
+      width: 100%;
+      height: auto;
+      max-width: 600px;
+      border-radius: 8px;
+    }
+
+    .red-heading {
+      color: #ff0000;
+      font-family: 'Staatliches', cursive;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+      letter-spacing: 0.05em;
+    }
+
+    #musicForCodeContainer {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+    }
+
+    .line-art-image {
+      background-color: #333;
+    }
+
+    #bp-embedded-webchat-container {
+      width: 100vw;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-left: calc(50% - 50vw);
+    }
+
+    .no-decoration {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .crt-link-centered {
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .coffee-image {
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    #support-me-popup {
+      display: none;
+      position: fixed;
+      z-index: 10000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+    }
+
+    #support-me-popup .popup-content {
+      background: linear-gradient(to right, #36454F, #2a0050);
+      margin: 15% auto;
+      padding: 25px;
+      border: 2px solid #ffd700;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 500px;
+      color: #f0f0f0;
+      font-family: 'Unica One', cursive;
+      box-shadow: 0 0 20px #ffd700, 0 0 40px #ffea70;
+    }
+
+    #support-me-popup .close-popup {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    #support-me-popup .close-popup:hover,
+    #support-me-popup .close-popup:focus {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    #support-me-popup h2 {
+      text-align: center;
+      color: #ffd700;
+      text-shadow: 0 0 6px #ffd700;
+    }
+
+    #support-me-popup .popup-text {
+      text-align: center;
+    }
+
+    #support-me-popup .popup-footer {
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 10px;
+    }
+
+    #support-me-popup .popup-footer p {
+      font-size: 16px;
+      animation: none;
+    }
+
+    .christmas-huge {
+      font-family: 'Mountains of Christmas', cursive;
+      font-size: 6rem;
+      font-weight: 700;
+      color: #ff0000;
+      text-align: center;
+      text-shadow: 3px 3px 0 #00ff00, 0 0 20px #fff;
+      animation: xmas-pulse 2s infinite alternate;
+    }
+    
+    .christmas-huge-span {
+      display: inline-block;
+      font-family: 'Mountains of Christmas', 'Pacifico', 'Comic Sans MS', cursive, sans-serif;
+      font-size: 2.5rem;
+      color: #e60026;
+      letter-spacing: 0.08em;
+    }
+
+    .dancing-emojis {
+        display: inline-block;
+        font-size: 2.5rem;
+        animation: emoji-dance 1.2s infinite cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    
+    .main-container.full-width-container.fullscreen-section {
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #000;
+    }
+
+    .luck-puppet-container.fullscreen-section {
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      margin: 0;
+      border-radius: 0;
+      border: none;
+      padding: 0;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .luck-puppet-container.fullscreen-section h2.purple-heading {
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      padding: 20px 10px;
+      margin: 0;
+      z-index: 10;
+      text-shadow: 0 0 10px rgba(195, 0, 255, 0.8);
+      background: rgba(0,0,0,0.3);
+      width: 100%;
+      text-align: center;
+    }
+
+    .luck-puppet-container.fullscreen-section .rounded-video {
+      width: 100%;
+      height: auto;
+      max-height: 80vh;
+      max-width: 100%;
+      object-fit: contain;
+      border-radius: 0;
+    }
+
+    .responsive-iframe {
+      border: 0px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 1280px;
+      height: 220px;
+      aspect-ratio: 16/9;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .main-container, .full-width-container {
+        max-width: 100vw;
+        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .main-container > *, .full-width-container > * {
+        flex: 1 1 100%;
+      }
+      .rounded-image, .double-oh-six-image-small, .line-art-image, .rounded-video {
+        max-width: 100vw;
+      }
+      .footer-text, .link-button {
+        font-size: 1em;
+        padding: 15px 5px;
+        max-width: 100vw;
+      }
+      h1, h2, h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+      }
+      .link-button {
+        padding: 10px 8px;
+      }
+    }
+
+    @media (max-width: 900px) {
+        .main-container, .full-width-container {
+            padding: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        body { padding: 10px; }
+        h1 { font-size: 1.5em; }
+        .main-container {
+            gap: 30px;
+        }
+        .luck-puppet-container h2 {
+            font-size: 2em !important;
+            letter-spacing: 0.05em;
+        }
+        .luck-puppet-top-row {
+            flex-direction: column;
+        }
+        .luck-puppet-top-row img, .luck-puppet-container video {
+            max-width: 100%;
+        }
+        #bp-embedded-webchat {
+            min-height: 500px;
+            height: 80vh;
+        }
+        .full-width-container, #epitaph-footer, #musicForCodeContainer, #bp-embedded-webchat-container, img, video, .youtube-iframe, .glitch-effect-container, .power-glitch-container {
+            width: 100%;
+            margin-left: 0;
+            height: auto;
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 700px) {
+      html, body {
+        padding: 0;
+      }
+      .main-container, .full-width-container {
+        gap: 5px;
+        padding: 0;
+      }
+      .footer-text, .link-button {
+        font-size: 0.95em;
+        padding: 10px 2px;
+      }
+      h1, h2, h3 {
+        font-size: 1em;
+        margin-bottom: 8px;
+      }
+      .link-button {
+        padding: 8px 4px;
+      }
+      .discord-widget iframe,
+      .youtube-iframe iframe,
+      iframe.responsive-iframe {
+        height: 180px;
+      }
+    }
+    
+    @media (orientation: portrait) {
+      .main-container, .full-width-container, .footer-text, .discord-widget iframe, .youtube-iframe iframe, iframe.responsive-iframe {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 100vw;
+      }
+    }
+    
+    /* OS-specific tweaks */
+    @media screen and (min-width: 1024px) and (max-width: 2560px) {
+      body.mac, html.mac {
+        font-family: 'San Francisco', 'Unica One', 'Helvetica Neue', Arial, sans-serif;
+        letter-spacing: 0.01em;
+      }
+      .link-button {
+        font-size: 1.15em;
+        border-radius: 10px;
+      }
+      .footer-text {
+        font-size: 1.1em;
+      }
+    }
+    
+    @media only screen and (max-device-width: 1024px) and (orientation: portrait) {
+      body.ios, html.ios {
+        font-family: '-apple-system', 'San Francisco', 'Unica One', Arial, sans-serif;
+      }
+      body.android, html.android {
+        font-family: 'Roboto', 'Unica One', Arial, sans-serif;
+      }
+      .link-button {
+        font-size: 1.05em;
+        padding: 14px 10px;
+      }
+      .footer-text {
+        font-size: 1em;
+        padding: 12px 4px;
+      }
+    }
+    
+
+    @keyframes mystical-mist {
+      from { transform: translateX(-50%); }
+      to { transform: translateX(0%); }
+    }
+    @keyframes chromatic-aberration {
+      0% { text-shadow: 1px 1px 0 #ff00ff, -1px -1px 0 #00ffff; }
+      50% { text-shadow: -2px 2px 0 #ff00ff, 2px -2px 0 #00ffff; }
+      100% { text-shadow: 2px -1px 0 #ff00ff, -2px 1px 0 #00ffff; }
+    }
+    @keyframes image-float {
+      from { transform: translateY(-4px); box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
+      to { transform: translateY(4px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    }
+
+    /* New: magenta-cyan-imortalimp-showcase Theme */
+    #magenta-cyan-imortalimp-showcase {
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px;
+      background-color: #000;
+    }
+
+    #magenta-cyan-imortalimp-showcase .magenta-cyan-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      opacity: 0.85;
+    }
+
+    #magenta-cyan-imortalimp-showcase .magenta-cyan-title {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: clamp(1.5em, 4vw, 2.5em);
+      font-weight: bold;
+      color: #00ffff;
+      text-align: center;
+      position: absolute;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      z-index: 10;
+      padding: 10px 0;
+      background: rgba(0, 0, 0, 0.4);
+      animation: magenta-cyan-glitch-text 0.15s infinite;
+      position: static;
+      transform: none;
+    }
+
+    @keyframes magenta-cyan-glitch-text {
+      0% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #ffffff; }
+      50% { text-shadow: -2px 2px 0px #ff00ff, 2px -2px 0px #ffffff, 0 0 10px #00ffff; }
+      100% { text-shadow: 2px -2px 0px #ff00ff, -2px 2px 0px #ffffff; }
+    }
+    
+    @media (min-width: 768px) {
+        #instructions-container {
+            flex-direction: row;
+        }
+    }
+
+#glitch-art-btn {
+  width: 100vw;
+  max-width: 100%;
+  height: 80vh;
+  display: block;
+  font-size: 4vw;
+  font-family: 'the_black_bloc', Impact, Arial, sans-serif;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  background: linear-gradient(135deg, #ff00cc 0%, #00ffff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 32px;
+  box-shadow: 0 12px 48px rgba(0,255,255,0.25), 0 2px 8px #ff00cc;
+  margin: 0 auto 32px auto;
+  cursor: pointer;
+  text-shadow: 2px 2px 8px #000, 0 0 16px #00ffff;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
+  outline: none;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  animation: glitch-btn-glow 2s infinite alternate;
+}
+#glitch-art-btn:hover {
+  background: linear-gradient(135deg, #00ffff 0%, #ff00cc 100%);
+  color: #ff00cc;
+  transform: scale(1.03) rotate(-1deg);
+  box-shadow: 0 16px 64px #ff00cc, 0 4px 16px #00ffff;
+  text-shadow: 0 0 24px #fff, 0 0 32px #ff00cc;
+}
+@keyframes glitch-btn-glow {
+  0% { box-shadow: 0 0 24px #00ffff, 0 0 8px #ff00cc; }
+  100% { box-shadow: 0 0 48px #ff00cc, 0 0 24px #00ffff; }
+}
+  </style>
+
+</head>
+<body>
+
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTXL35MFPT"></script>
+  <!-- Add morphdom for silentRefresh DOM diffing -->
+  <script src="https://unpkg.com/morphdom@2.6.1/dist/morphdom.min.js"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-NTXL35MFPT');
+  </script>
+  <div id="the-beginning-and-the-end">
+      <a href="/Inscryption.Dos.folder/My first heading, My first paragraph.html">
+       🃏
+     </a>
+    </div>
+   
+
+  <iframe class="responsive-iframe"
+    src="https://www.youtube.com/embed/y8ZsYEXYTws"
+    title="YouTube video player"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+  </iframe>
+
+ <audio controls class="audio-controls">
+  <source src="/04. The Bridge.ogg" type="audio/ogg">
+  <source src="/04 - The Bridge.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+
+
+<div id="glitch-canvas-container" class="power-glitch-container">
+  <a href="/glitch-canvas-html/glitch-canvas-youtube-video.html" class="glitch-link">
+    <span class="glitch-underline">Glitch Video Canvas 4 Youtube!</span>
+  </a>
+  <canvas class="glitch-canvas"></canvas>
+</div>
+  
+
+ 
+<div class="midi-mp3-archive-btn-container">
+  <p class="text-center">
+  <a href="/midi+mp3.html" class="midi-mp3-archive-btn" id="midi-mp3-archive-link">🎵🎶🎧📀🎬 midi+mp3 ARCHIVE PAGE</a>
+  </p>
+</div>
+ 
+ <div>
+ <a href="/botnet-html/botnet.html" class="big-reading-list-btn">READING LIST</a>
+</div>
+ 
+  <div id="strobe-overlay-1"></div>
+<div class="main-container full-width-container fullscreen-section">
+  <div class="luck-puppet-container fullscreen-section">
+    <h2 class="purple-heading strobe-animation">~Imortalimp~</h2>
+    <img src="/River Lyle 22-12-2025.jpg" autoplay loop muted playsinline class="rounded-video" title="~Imortalimp~"></img>
+  </div>
+</div>
+
+  <div id="strobe-overlay-2"></div>
+  <div class="main-container full-width-container">
+      <div class="luck-puppet-top-row">
+        <h2 class="purple-heading-small strobe-animation">
+          Geluks pop in een flesje/Luck puppet in a bottle
+        </h2>
+        <img src="/bin/17904166_1899754223641429_1503663586101388229_n.jpg" alt="Geluks pop in een flesje/Luck puppet in a bottle" class="rounded-image">
+      </div>
+  </div>
+
+
+  <!-- New Double-OH Six Showcase -->
+ 
+  <div class="main-container">
+
+     <!-- New Double-OH Six Showcase&jumptoinpage -->
+
+   <div class="main-container full-width-container">
+  
+  <a href="#bp-embedded-webchat-container" id="double-oh-six-showcase-2" class="media-item align-center">
+      <h2 class="purple-cyber-heading strobe-animation align-center-text">
+        soooo.. YOU want ME?!(006)? (scroll down OR CLICK THIS HERE!<)
+      </h2>
+      <img src="/bin/006here.jpg" alt="A conversation with Double-OH SIX" class="double-oh-six-image-small">
+    </a>
+  </div>
+<div class="full-width align-center">
+  <p class="text-center">
+    <a href="/glitch-canvas-html/glitch-canvas-youtube-video.html" class="link-button magenta-cyan-title">Glitch Video Canvas 4 Youtube!</a>
+  </p>
+</div>
+  <div class="main-container justify-center">
+
+    <div class="discord-widget">
+      <iframe src="https://discord.com/widget?id=1391982241004916786&theme=dark"
+              allowtransparency="true"
+              sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+              title="Discord Server Widget">
+      </iframe>
+    </div>
+
+    <div class="link-list">
+      <a href="/midi+mp3.html" class="link-button magenta-cyan-title">🎵🎶🎧📀🎬 midi+mp3 ARCHIVE PAGE</a>      <a href="/botnet-html/botnet.html" class="link-button magenta-cyan-title">Reading List</a>
+      <a href="https://ramdisk.radio12345.com/" class="link-button magenta-cyan-title" target="_blank" rel="noopener noreferrer">RamDisk.Radio12345.com</a>
+      <a href="https://twitch.tv/riverimortal" class="link-button magenta-cyan-title">twitch.tv/RIVERIMORTAL</a>
+      <a href="https://poe.com/Donnie_Gonna-Say1T" class="link-button magenta-cyan-title">Apmnt. 301 Bunker Hill ; (Donnies Place)</a>
+      <a href="/chatbase.html" class="link-button magenta-cyan-title">CHATBASE LEARN DUTCH</a>
+      <a href="/double-oh-six.html" class="link-button magenta-cyan-title">Double-OH SiX HOME</a>
+      <a href="https://discord.gg/psMEFtVZya" class="link-button magenta-cyan-title"> 💻 .Data.Discord.Server 💻</a>
+      <a href="/moon.html" class="link-button moon-link magenta-cyan-title">🌙 🌗 🌕 🌓 🌙 POETRY & MOON (Geolocation Required)
+        <p>This page will one day contain a full set of moon poems for each continent. <br><em>(Not all languages will be included, sorry!)</em></p>
+        <p><strong>Currently Supported Regions:</strong></p>
+        <code>
+en: UK & Ireland<br>
+de: Germany<br>
+it: Italy<br>
+hu: Hungary<br>
+fi: Finland<br>
+ru: Russia<br>
+ku: Kurdistan<br>
+he: Israel<br>
+ar: Arab World<br>
+hi: India<br>
+zn: China<br>
+jp: Japan<br>
+jv: Java (Indonesia)<br>
+vi: Vietnam<br>
+ko: Korea
+        </code>
+      </a>
+      <a href="/audio_and_music_mobile_android_apps.html" class="link-button magenta-cyan-title">🤖 Usefull Mobile Music Apps for Android</a>
+      <a href="/simplehealthysoups.html" class="link-button magenta-cyan-title">🍲🥔🥬 Healthy Soups & Recipies</a>
+      <a href="/calarossa.html" class="link-button magenta-cyan-title">FUN! Cala Rossa Video</a>
+      <a href="/powerloader.html" class="link-button magenta-cyan-title">POWERLOADER! Music Video</a>
+    </div>
+  </div>
+  <div class="christmas-huge">
+<span class="christmas-huge-span">
+    <div id="glitch-canvas-container" class="glitch-effect-container">
+    <button id="glitch-art-btn" onclick="location.href='/glitch-test.html'">GLITCH TEST PAGE</button>
+    <a href="/glitch-test.html">Glitch Test Page</a>
+    <canvas class="glitch-canvas"></canvas>
+  </div>
+</span>
+
+  
+  </div>
+   
+
+    <div class="youtube-iframe">
+      <p class="warning-text">
+        <strong>Heads-up:</strong> The YouTube embed might be glitching out. If it's not working, you can <a href="https://www.youtube.com/playlist?list=PL6vDYQYImrPdebVg_SSVOL-0pCUZzC7qZ" target="_blank" rel="noopener">watch the playlist directly on YouTube</a>.
+      </p>
+      <iframe title="YouTube Playlist: Imortalimp" src="https://www.youtube.com/embed/videoseries?list=PL6vDYQYImrPdebVg_SSVOL-0pCUZzC7qZ&loop=1"
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <p class="note-text">SUGGESTED HIDDEN LINK: " www.imortalimp.nl/botnet.html "</p>
+  <p class="note-text">SUGGESTED VIDEO FOR THE 'GLITCH VIDEO CANVAS': " https://www.youtube.com/watch?v=DmStNF35o1w "</p>
+  <p class="note-text">SUGGESTED ARCHIVE.ORG PAGE (media) " https://archive.org/details/archive.org-double-ohh-six-reference/01+James+Bond+theme+from+Dr.+No.wma "</p>
+
+  <div class="youtube-iframe footer-iframe">
+    <p class="warning-text">
+      <strong>Heads-up:</strong> The YouTube embed might be glitching out. If it's not working, you can <a href="https://www.youtube.com/playlist?list=PL6vDYQYImrPfhsxKDzLUHygjQAMHthipm" target="_blank" rel="noopener">watch the playlist directly on YouTube</a>.
+    </p>
+    <iframe title="YouTube Playlist: Imortalimp 2"
+      src="https://www.youtube.com/embed/videoseries?list=PL6vDYQYImrPfhsxKDzLUHygjQAMHthipm&loop=1"
+      title="YouTube video player"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen>
+      </iframe>
+  </div>
+
+  <div class="responsive-container">
+    <picture>
+      <source media="(min-width: 720px)" srcset="bin/BeatTheCock-GTASA-Poster-1.jpg" />
+      <source media="(min-width: 690px)" srcset="bin/BeatTheCock-GTASA-Poster-1-small.jpg" />
+      <img
+        src="bin/BeatTheCock-GTASA-Poster-1.jpg"
+        alt="Beat The Cock GTASA Poster"
+      />
+    </picture>
+  </div>
+
+  <div class="footer-text footer-wrapper">
+    <p>
+      DONATIONS are welcome via PayPal:
+      <a href="mailto:reuveni.river.lyle.reuveni@gmail.com" class="footer-link">
+        reuveni.river.lyle.reuveni@gmail.com
+      </a>
+      © 2026 Imortalimp ~ All Rights Reserved
+      <br><br>
+
+      <span class="emoji">🌈</span><span class="emoji">✨</span><span class="emoji">🌟</span><span class="emoji">🌞</span>
+      <span class="emoji">🌜</span><span class="emoji">💫</span>
+      Crafted with creativity, curiosity, and Copilot
+      <span class="emoji">🌠</span><span class="emoji">🌈</span><span class="emoji">✨</span><span class="emoji">🌟</span>
+      <br>
+      Code edited and refined in collaboration with Microsoft's AI Companion.
+      <br>ᴚᴚᴚ ᴚᴚᴚᴚᴚᴚᴚ→
+    </p>
+  </div>
+  <div class="centered-section">
+    <h2 class="green-heading">
+      <span class="razer-glitch-char" data-text=".">.</span><span class="razer-glitch-char razer-spinner" data-text="R">R</span><span class="razer-glitch-char" data-text="Λ">Λ</span><span class="razer-glitch-char razer-spinner" data-text="Z">Z</span><span class="razer-glitch-char" data-text="Ξ">Ξ</span><span class="razer-glitch-char razer-spinner" data-text="R">R</span>
+      <span class="razer-spacer"></span>
+      <span class="razer-glitch-char" data-text=".">.</span><span class="razer-glitch-char" data-text="A">A</span><span class="razer-glitch-char" data-text="U">U</span>
+      <span class="razer-spacer"></span>
+      <span class="razer-glitch-char" data-text=":">:</span><span class="razer-glitch-char" data-text="|">|</span>
+    </h2>
+    <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3587703824">
+      <img src="/bin/steamwebhelper_7gjo0GwiHh.png" alt=".RΛZΞR .AU :||" class="razer-image">
+    </a>
+  </div>
+
+    <div class="main-container">
+      <h2 class="green-heading"> --EMOTIONAL DAMAGE--
+      </h2>
+       <a href="https://www.youtube.com/watch?v=HO0bR1dNek0">
+         <img id="promo-image" src="/etgifextractjpegs/E.T.gifextract_000000.jpeg" alt="E T (Emotional Trauma - Innerspace Promo)" class="promo-image">
+       </a>
+       <script>
+          // --- Random Promo Image Logic (runs immediately) ---
+          const promoImage = document.getElementById('promo-image');
+          
+          // The total number of frames is 28853 (from 000000 to 028852).
+          const totalFrames = 28853;
+          
+          // 1. Generate a random number between 0 and 28852.
+          const randomIndex = Math.floor(Math.random() * totalFrames);
+          
+          // 2. Format the number to have 6 digits with leading zeros (e.g., 5 -> "000005").
+          const paddedIndex = String(randomIndex).padStart(6, '0');
+          
+          // 3. Construct the full filename and set the image source.
+          promoImage.src = '/etgifextractjpegs/E.T.gifextract_' + paddedIndex + '.jpeg';
+       </script>
+    </div>
+
+      <div class="main-container">
+      <h2 class="green-heading"> <--Zuider Zee Brug-->
+      </h2>
+       <a href="https://www.youtube.com/watch?v=eEVZRYwHKJ4">
+         <img src="/bin/IMG20251022100427.jpg" alt="(Zuiderzee Brug)" class="promo-image">
+       </a>
+    </div>
+
+      <div class="main-container">
+      <h2 class="red-heading">Geluks poppetjes in een flesje/Luck puppets in a bottle
+      </h2>
+         <img src="/bin/IMG20251023001245.jpg" alt="(Geluks poppetjes in een flesje/Luck puppets in a bottle)" class="promo-image">
+         <img src="/bin/IMG20251023143353.jpg" alt="Geluks poppetjes in een flesje/Luck puppets in a bottle" class="promo-image">
+         <img src="/bin/IMG20251023143413.jpg" alt="Geluks poppetjes in een flesje/Luck puppets in a bottle" class="promo-image">
+    </div>
+
+  <div id="musicForCodeContainer" class="youtube-iframe footer-iframe power-glitch-container">
+      <p class="warning-text">
+        <strong>Music For Code:</strong> If the embed isn't working, you can <a href="https://youtube.com/playlist?list=OLAK5uy_m03HqHvTnyx_ENXw9chAJxqL3aRj9rHm0" target="_blank" rel="noopener">watch the playlist directly on YouTube</a>.
+      </p>
+      <iframe src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m03HqHvTnyx_ENXw9chAJxqL3aRj9rHm0&loop=1" title="Music For Code YouTube Playlist" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <canvas class="glitch-canvas"></canvas>
+  </div>
+<div id="instructions-container">
+  <div class="instructions-image">
+    <img src="/bin/AnyConv.com__line art.jpg" alt="Double-OH-SIX Image (LINE ART) Placeholder" class="line-art-image">
+  </div>
+  <div class="instructions-text">
+
+    <p>(℗ / "All Rights Reserved") ;
+       ™ / ® Trademark Symbols ;
+        ©River Lyle Reuveni & double-OH-SiX/@/botpress.com
+      <a href="https://www.imortalimp.nl/liora/Liorá-(Artist).html" class="liora-link">AND PROFILE PICTURE ART FOR THE BOT WAS DONE BY AN ARTIST NAMED Liorá THIS link here</a> 
+      <br><br><br>
+      2025 © Imortalimp ~ All Rights Reserved ;<br><br><br>
+      { <a href='https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/07/16/18/20250716182151-XO49EAP9.json'>Test Page Trial Version [free use at own risk] </a> }™/®</p>
+  </div>
+</div>
+  <div id="bp-embedded-webchat-container">
+    <!-- The Botpress chat widget will be injected here by its script -->
+    <div id="bp-embedded-webchat">
+      <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+      <script src="https://files.bpcontent.cloud/2025/07/16/18/20250716182151-D4S5G5R5.js" defer></script>
+      <script>
+              const customPayload = {
+    "test": "test"
+}
+
+window.botpress.sendEvent(customPayload)
+
+      </script>
+
+    </div>
+<div>
+  <div class="centered-section">
+    <a href="https://www.imortalimp.nl/powerloader-pages/glitch-canvas-youtube-video.html" class="no-decoration">
+      <h2 class="green-heading">Glitch Video Canvas 4 Youtube</h2>
+    </a>
+    
+            <a href="https://devs.fm/" class="link-button crt-link-button crt-link-centered">
+               a shoutout! visit https://devs.fm/*.*!
+            </a>
+
+    <a href="https://archive.org/details/glitch-canvas-youtube-video" class="link-button crt-link-button crt-link-centered">
+              Glitch Video Canvas 4 Youtube Description and full file (HTML) for use on your own DOMAIN(s) just gimme a shoutout!
+            </a>
+</div>
+<div class="text-center">
+         <img src="/bin/River by the Palms And Maja by the Garden ~Siged~ with filters!.jpg" alt="(Geluks poppetjes in een flesje/Luck puppets in a bottle  ~  River by the Palms And Maja by the Garden.jpg)" class="rounded-image">
+</div>
+
+           <div class="youtube-iframe footer-iframe glitch-effect-container">
+        <strong>Music For Code:</strong> If the embed isn't working, you can <a href="https://youtube.com/playlist?list=OLAK5uy_m03HqHvTnyx_ENXw9chAJxqL3aRj9rHm0" target="_blank" rel="noopener">watch the playlist directly on YouTube</a>.
+      </p>
+      <iframe src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_m03HqHvTnyx_ENXw9chAJxqL3aRj9rHm0&loop=1" title="Music For Code YouTube Playlist" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <canvas id="musicForCodeCanvas"></canvas>
+      <canvas class="glitch-canvas"></canvas>
+  </div>
+
+
+
+    <script>
+    // --- Support Me Popup Logic ---
+    document.addEventListener('DOMContentLoaded', () => {
+      const glitchLink = document.querySelector('a[href="/powerloader-pages/glitch-canvas-youtube-video.html"]');
+      const popup = document.getElementById('support-me-popup');
+      const closeBtn = document.getElementById('close-popup');
+
+      if (glitchLink && popup && closeBtn) {
+        glitchLink.addEventListener('click', function(event) {
+          event.preventDefault(); // Stop the link from navigating immediately
+          popup.style.display = 'block'; // Show the popup
+        });
+
+        closeBtn.addEventListener('click', function() {
+          popup.style.display = 'none'; // Hide the popup
+          window.location.href = glitchLink.href; // Proceed to the link's destination
+        });
+      }
+    });
+
+    // --- Smart Page Refresh Logic ---
+    let isPageActive = false;
+
+    // Listen for focus on any input element
+    document.addEventListener('focusin', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+            isPageActive = true;
+        }
+    });
+    document.addEventListener('focusout', () => {
+        isPageActive = false;
+    });
+
+    // Set a flag if the mouse is over the botpress widget container
+    const botpressContainer = document.getElementById('bp-embedded-webchat-container');
+    if (botpressContainer) {
+        botpressContainer.addEventListener('mouseenter', () => isPageActive = true);
+        botpressContainer.addEventListener('mouseleave', () => isPageActive = false);
+    }
+
+    async function silentRefresh() {
+        if (isPageActive || document.visibilityState !== 'visible') {
+            return;
+        }
+
+        try {
+            const response = await fetch(window.location.href, { cache: 'no-store' });
+            const newHtml = await response.text();
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(newHtml, 'text/html');
+
+            morphdom(document.body, newDoc.body, {
+                onBeforeElUpdated: function(fromEl, toEl) {
+                    if (fromEl.tagName === 'INPUT' || fromEl.tagName === 'TEXTAREA') {
+                        toEl.value = fromEl.value;
+                    }
+                    if (fromEl.id === 'bp-embedded-webchat-container') {
+                        return false; // Don't update the botpress container or its children
+                    }
+                    return true;
+                }
+            });
+            // Re-initialize the glitch canvases after the DOM has been updated.
+            if (window.initializeGlitchCanvases) {
+                window.initializeGlitchCanvases();
+            }
+            console.log("Silent refresh complete.");
+        } catch (error) {
+            console.error('Silent refresh failed:', error);
+        }
+    }
+
+    setInterval(() => {
+        silentRefresh();
+    }, 150000);
+    document.addEventListener('DOMContentLoaded', () => {
+        const cycleDuration = 300000; // 300 seconds for a very slow, ambient cycle
+
+        // Select all elements that will receive the shadow/illumination effect
+        const illuminatedElements = document.querySelectorAll('.link-button, .discord-widget, .youtube-iframe, .footer-text, h1');
+
+        const strobeOverlay = document.getElementById('strobe-overlay-1');
+
+        // --- Strobe Effect every 60 seconds ---
+        setInterval(() => {
+            if (strobeOverlay) {
+                strobeOverlay.style.transition = 'opacity 0.05s ease-out';
+                strobeOverlay.style.opacity = 0.7;
+                setTimeout(() => {
+                    strobeOverlay.style.transition = 'opacity 0.5s ease-out';
+                    strobeOverlay.style.opacity = 0;
+                }, 50);
+            }
+        }, 60000);
+
+
+        // --- Parallax & Animation Logic ---
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateBackground() {
+            const now = Date.now();
+            const timeHueShift = (now % cycleDuration) / cycleDuration * 360;
+
+            // Calculate parallax shifts
+            const parallaxX = (mouseX / window.innerWidth - 0.5) * 30;
+            const parallaxY = (mouseY / window.innerHeight - 0.5) * 30;
+            const scrollMax = document.body.scrollHeight - window.innerHeight;
+            const scrollPercentage = window.scrollY / (scrollMax > 0 ? scrollMax : 1);
+            const scrollParallax = scrollPercentage * 45;
+
+            const totalHueShift = (timeHueShift + parallaxX + parallaxY + scrollParallax);
+
+            // 1. Apply a darker, moodier gradient to the page background (parallax still active)
+            const purple = `hsl(${(275 + totalHueShift) % 360}, 70%, 12%)`; // Deep purple base
+            const lilac = `hsl(${(290 + totalHueShift) % 360}, 60%, 18%)`;  // Lilac accent
+            const hotpink = `hsl(${(335 + totalHueShift) % 360}, 75%, 20%)`;// Hot pink accent
+            document.body.style.background = `linear-gradient(45deg, ${purple}, ${lilac}, ${hotpink})`;
+
+            // 2. Apply a RANDOMIZED shadow and illumination effect that shifts over time
+            const randomAngle = now / 2000; // Slow rotation
+            const shadowX = Math.cos(randomAngle) * 15;
+            const shadowY = Math.sin(randomAngle) * 15;
+            const glowHue = (280 + timeHueShift) % 360; // Glow cycles with the base timer
+
+            illuminatedElements.forEach(el => {
+                const textShadow = `${shadowX / 2}px ${shadowY / 2}px 5px hsla(0, 0%, 0%, 0.5)`;
+                const boxShadow = `${shadowX}px ${shadowY}px 20px hsla(0, 0%, 0%, 0.4), inset 0 0 15px hsla(${glowHue}, 50%, 20%, 0.5), 0 0 10px hsla(${glowHue}, 80%, 50%, 0.3)`;
+                el.style.boxShadow = boxShadow;
+                el.style.textShadow = textShadow;
+            });
+
+            requestAnimationFrame(animateBackground);
+        }
+        animateBackground(); // Start the color cycling animation
+    });
+
+
+  </script>
+  <script src="glitch-script.js"></script>
+  <div id="epitaph-footer">
+    <img src="/bin/IMG-20251112-WA0011 - kopie 006.webp" alt="Double-OH-SIX Image Footer-Placeholder" class="rounded-image">
+     <a href="https://files.bpcontent.cloud/2025/11/19/11/20251119114324-P3DRWW1X.png">
+       <img src="/bin/20251119114324-P3DRWW1X (1).png" alt="Double-OH-SIX Image Gen NOW!-Placeholder" class="rounded-image">
+     </a>
+  </div>
+</div>
+
+ <!-- Support Me Popup Modal -->
+  <div id="support-me-popup">
+    <div class="popup-content">
+      <span id="close-popup" class="close-popup">&times;</span>
+      <h2>Support My Work!</h2>
+      <p class="popup-text">If you enjoy this content, please consider making a donation. Every little bit helps!</p>
+      <div class="popup-footer">
+        <p>
+          DONATIONS are welcome via PayPal:
+          <a href="mailto:reuveni.river.lyle.reuveni@gmail.com" class="footer-link">
+            reuveni.river.lyle.reuveni@gmail.com
+          </a>
+          <br><br>
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+
+<script>
+  // Detect if device is a phone or tablet (iOS/Android or small screen)
+  function isMobileOrTablet() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    // Check for iOS/Android phones and tablets, including iPad and Android tablets
+    const isMobile = /android|iphone|ipod|ipad|tablet|sm-t|samsung|kindle|silk|playbook|nexus 7|nexus 10|xoom|sch-i800|gt-p1000/i.test(ua);
+    // Also check for small or mid-size screens
+    const isSmallScreen = window.innerWidth <= 1024;
+    return isMobile || isSmallScreen;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Select all archive links that need this mobile-redirection logic
+    const archiveLinks = document.querySelectorAll(
+      '#midi-mp3-archive-link, a.link-button.magenta-cyan-title[href="/midi+mp3.html"]'
+    );
+
+    if (isMobileOrTablet()) {
+      archiveLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var proceed = confirm('You are using a mobile or tablet device. You will be redirected to a mobile-friendly version of the archive (mp3 only). Continue?');
+          if (proceed) {
+            window.location.href = '/mp3.html';
+          }
+        });
+      });
+    }
+  });
+</script>
+</body>
+</html>

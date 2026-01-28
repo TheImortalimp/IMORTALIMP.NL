@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WATCH_DOGS Effect - www.imortalimp.nl</title>
+    <link rel="stylesheet" href="watch_dog.css">
+</head>
+<body>
+    <div id="watch-dogs-container"></div>
+    
+    <!-- Control Panel -->
+    <div id="control-panel">
+        <div class="panel-header">
+            <h2>WATCH_DOGS CONTROL PANEL</h2>
+            <button id="toggle-panel-btn">HIDE</button>
+        </div>
+        
+        <div class="panel-content">
+            <div class="control-group">
+                <label>Layer Visibility</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="toggle-logo" checked>
+                        Logo
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggle-ascii" checked>
+                        ASCII Grid
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggle-scanlines" checked>
+                        Scanlines
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggle-hexgrid" checked>
+                        Hex Grid
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggle-datastreams" checked>
+                        Data Streams
+                    </label>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="glitch-intensity">Glitch Intensity</label>
+                <input type="range" id="glitch-intensity" min="0" max="1" step="0.1" value="0.7">
+                <span id="glitch-intensity-value">0.7</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Colors</label>
+                <div class="color-inputs">
+                    <div>
+                        <label for="primary-color">Primary (Cyan)</label>
+                        <input type="color" id="primary-color" value="#00d9ff">
+                    </div>
+                    <div>
+                        <label for="secondary-color">Secondary (White)</label>
+                        <input type="color" id="secondary-color" value="#ffffff">
+                    </div>
+                    <div>
+                        <label for="bg-color">Background</label>
+                        <input type="color" id="bg-color" value="#000000">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <button id="trigger-glitch" class="action-btn">TRIGGER GLITCH</button>
+                <button id="add-hack-text" class="action-btn">ADD HACK TEXT</button>
+                <button id="restart-effect" class="action-btn">RESTART</button>
+            </div>
+            
+            <div class="control-group">
+                <label for="custom-text">Custom Hack Text</label>
+                <input type="text" id="custom-text" placeholder="Enter your text...">
+                <button id="send-custom-text" class="action-btn">SEND</button>
+            </div>
+            
+            <div class="info-section">
+                <h3>INTEGRATION CODE</h3>
+                <pre><code>&lt;script src="watch_dog.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const effect = new WatchDogsEffect('your-container-id', {
+    primaryColor: '#00d9ff',
+    secondaryColor: '#ffffff',
+    backgroundColor: '#000000',
+    glitchIntensity: 0.7,
+    autoStart: true,
+    loopAnimation: true
+  });
+&lt;/script&gt;</code></pre>
+            </div>
+            
+            <div class="info-section">
+                <h3>AVAILABLE METHODS</h3>
+                <ul>
+                    <li><code>effect.start()</code> - Start animations</li>
+                    <li><code>effect.stop()</code> - Stop animations</li>
+                    <li><code>effect.triggerGlitch(duration)</code> - Manual glitch trigger</li>
+                    <li><code>effect.addHackingText(text, x, y)</code> - Add custom text</li>
+                    <li><code>effect.setColors(primary, secondary, bg)</code> - Change colors</li>
+                    <li><code>effect.toggleLayer(name, visible)</code> - Toggle layers</li>
+                    <li><code>effect.destroy()</code> - Clean up and remove</li>
+                </ul>
+            </div>
+            
+            <div class="footer">
+                <p>Created for <a href="https://www.imortalimp.nl" target="_blank">www.imortalimp.nl</a></p>
+                <p>Inspired by Ubisoft's WATCH_DOGS franchise</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="watch_dog.js"></script>
+    <script>
+        // Initialize Watch_Dogs effect
+        let watchDogsEffect = new WatchDogsEffect('watch-dogs-container', {
+            primaryColor: '#00d9ff',
+            secondaryColor: '#ffffff',
+            backgroundColor: '#000000',
+            glitchIntensity: 0.7,
+            animationSpeed: 1.0,
+            showLogo: true,
+            showASCII: true,
+            showScanlines: true,
+            autoStart: true,
+            loopAnimation: true
+        });
+
+        // Control panel toggle
+        const togglePanelBtn = document.getElementById('toggle-panel-btn');
+        const controlPanel = document.getElementById('control-panel');
+        const panelContent = controlPanel.querySelector('.panel-content');
+        
+        togglePanelBtn.addEventListener('click', () => {
+            panelContent.classList.toggle('hidden');
+            togglePanelBtn.textContent = panelContent.classList.contains('hidden') ? 'SHOW' : 'HIDE';
+        });
+
+        // Layer toggles
+        document.getElementById('toggle-logo').addEventListener('change', (e) => {
+            watchDogsEffect.toggleLayer('logo', e.target.checked);
+        });
+        
+        document.getElementById('toggle-ascii').addEventListener('change', (e) => {
+            watchDogsEffect.toggleLayer('asciiGrid', e.target.checked);
+        });
+        
+        document.getElementById('toggle-scanlines').addEventListener('change', (e) => {
+            watchDogsEffect.toggleLayer('scanlines', e.target.checked);
+        });
+        
+        document.getElementById('toggle-hexgrid').addEventListener('change', (e) => {
+            watchDogsEffect.toggleLayer('hexGrid', e.target.checked);
+        });
+        
+        document.getElementById('toggle-datastreams').addEventListener('change', (e) => {
+            watchDogsEffect.toggleLayer('dataStreams', e.target.checked);
+        });
+
+        // Glitch intensity
+        const glitchIntensity = document.getElementById('glitch-intensity');
+        const glitchIntensityValue = document.getElementById('glitch-intensity-value');
+        
+        glitchIntensity.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            glitchIntensityValue.textContent = value.toFixed(1);
+            watchDogsEffect.setGlitchIntensity(value);
+        });
+
+        // Color controls
+        document.getElementById('primary-color').addEventListener('change', (e) => {
+            const primary = e.target.value;
+            const secondary = document.getElementById('secondary-color').value;
+            const bg = document.getElementById('bg-color').value;
+            watchDogsEffect.setColors(primary, secondary, bg);
+            
+            // Restart to apply changes
+            watchDogsEffect.destroy();
+            watchDogsEffect = new WatchDogsEffect('watch-dogs-container', {
+                primaryColor: primary,
+                secondaryColor: secondary,
+                backgroundColor: bg,
+                autoStart: true,
+                loopAnimation: true
+            });
+        });
+        
+        document.getElementById('secondary-color').addEventListener('change', (e) => {
+            const primary = document.getElementById('primary-color').value;
+            const secondary = e.target.value;
+            const bg = document.getElementById('bg-color').value;
+            watchDogsEffect.setColors(primary, secondary, bg);
+            
+            watchDogsEffect.destroy();
+            watchDogsEffect = new WatchDogsEffect('watch-dogs-container', {
+                primaryColor: primary,
+                secondaryColor: secondary,
+                backgroundColor: bg,
+                autoStart: true,
+                loopAnimation: true
+            });
+        });
+        
+        document.getElementById('bg-color').addEventListener('change', (e) => {
+            const primary = document.getElementById('primary-color').value;
+            const secondary = document.getElementById('secondary-color').value;
+            const bg = e.target.value;
+            watchDogsEffect.setColors(primary, secondary, bg);
+        });
+
+        // Action buttons
+        document.getElementById('trigger-glitch').addEventListener('click', () => {
+            watchDogsEffect.triggerGlitch(Math.random() * 400 + 200);
+        });
+        
+        document.getElementById('add-hack-text').addEventListener('click', () => {
+            const texts = [
+                'SYSTEM ACCESS GRANTED',
+                'DECRYPTING DATA...',
+                'ctOS NETWORK BREACH',
+                'FIREWALL BYPASSED',
+                'ROOT ACCESS OBTAINED',
+                'DOWNLOADING FILES...',
+                'UPLOADING PAYLOAD...',
+                'CONNECTION SECURED'
+            ];
+            const randomText = texts[Math.floor(Math.random() * texts.length)];
+            watchDogsEffect.addHackingText(randomText);
+        });
+        
+        document.getElementById('restart-effect').addEventListener('click', () => {
+            const primary = document.getElementById('primary-color').value;
+            const secondary = document.getElementById('secondary-color').value;
+            const bg = document.getElementById('bg-color').value;
+            
+            watchDogsEffect.destroy();
+            watchDogsEffect = new WatchDogsEffect('watch-dogs-container', {
+                primaryColor: primary,
+                secondaryColor: secondary,
+                backgroundColor: bg,
+                autoStart: true,
+                loopAnimation: true
+            });
+        });
+        
+        // Custom text
+        document.getElementById('send-custom-text').addEventListener('click', () => {
+            const customText = document.getElementById('custom-text').value;
+            if (customText.trim()) {
+                watchDogsEffect.addHackingText(customText);
+                document.getElementById('custom-text').value = '';
+            }
+        });
+        
+        document.getElementById('custom-text').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('send-custom-text').click();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'g' || e.key === 'G') {
+                watchDogsEffect.triggerGlitch(200);
+            }
+            if (e.key === 'h' || e.key === 'H') {
+                document.getElementById('add-hack-text').click();
+            }
+            if (e.key === 'p' || e.key === 'P') {
+                togglePanelBtn.click();
+            }
+        });
+
+        // Log initialization
+        console.log('%cWATCH_DOGS Effect Initialized', 'color: #00d9ff; font-size: 20px; font-weight: bold;');
+        console.log('%cKeyboard Shortcuts:', 'color: #00d9ff; font-weight: bold;');
+        console.log('G - Trigger Glitch');
+        console.log('H - Add Hacking Text');
+        console.log('P - Toggle Control Panel');
+    </script>
+</body>
+</html>

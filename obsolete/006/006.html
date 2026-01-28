@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>006 Chatbot - Enhanced CRT Edition</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    .botpress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2000;
+      padding: 0;
+      margin: 0;
+      border-radius: 0;
+      overflow: hidden;
+      
+      /* Fancier CRT Effects */
+      --crt-glow-color: #00ffcc;
+      border: 3px solid var(--crt-glow-color);
+      box-shadow: 
+        0 0 5px var(--crt-glow-color),
+        0 0 15px var(--crt-glow-color),
+        0 0 30px var(--crt-glow-color),
+        inset 0 0 20px rgba(0, 255, 204, 0.4);
+      
+      animation: 
+        crt-flicker 0.1s infinite,
+        crt-color-pulse 10s linear infinite,
+        horizontal-shake 0.05s infinite,
+        glitch-skew 12s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    }
+
+    /* Scanline overlay */
+    .botpress-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 50%, transparent 50%);
+      background-size: 100% 4px;
+      opacity: 0.7;
+      animation: scanline-move 0.8s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    /* Vignette / Screen burn overlay */
+    .botpress-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0 0 40px #000, inset 0 0 80px #000;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #bp-embedded-webchat {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      z-index: 0;
+    }
+
+    /* Media Query for larger screens */
+    @media (min-width: 769px) {
+      .botpress-container {
+        top: auto;
+        left: auto;
+        bottom: 40px;
+        right: 40px;
+        width: min(90vw, 450px);
+        height: 650px;
+        border-radius: 15px;
+      }
+    }
+
+    /* Keyframe Animations */
+    @keyframes crt-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
+      75% { opacity: 0.95; }
+    }
+
+    @keyframes scanline-move {
+      from { background-position-y: 0; }
+      to { background-position-y: 8px; }
+    }
+    
+    @keyframes crt-color-pulse {
+      0%, 100% { --crt-glow-color: #00ffcc; }
+      33% { --crt-glow-color: #00eaff; }
+      66% { --crt-glow-color: #00c2ff; }
+    }
+    
+    @keyframes horizontal-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-1px); }
+      50% { transform: translateX(1px); }
+      75% { transform: translateX(-0.5px); }
+    }
+
+    @keyframes glitch-skew {
+      0%, 100% { transform: skewX(0deg); }
+      20% { transform: skewX(0.5deg); }
+      40% { transform: skewX(-0.5deg); }
+      60% { transform: skewX(0.2deg); }
+      80% { transform: skewX(-0.2deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Responsive container for the embedded Botpress widget -->
+  <div class="botpress-container">
+    <div id="bp-embedded-webchat">
+      <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+      <script src="https://files.bpcontent.cloud/2025/07/16/18/20250716182151-D4S5G5R5.js" defer></script>
+    </div>
+  </div>
+</body>
+</html>

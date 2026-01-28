@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterchurn Online Preset Test</title>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #canvas { width: 100vw; height: 100vh; display: block; }
+        #controls {
+            position: absolute; top: 20px; left: 20px; z-index: 10;
+            background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 8px;
+        }
+        button { cursor: pointer; padding: 8px 16px; font-size: 14px; }
+        #status { margin-top: 10px; font-size: 12px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <h3>Butterchurn Preset Tester</h3>
+    <p>Loads presets from online CDN (esm.sh)</p>
+    <button id="btn-start">Start / Change Preset</button>
+    <div id="status">Waiting for start...</div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script type="module">
+    // 1. Import Butterchurn and Presets directly from the online mirror (CDN)
+    import butterchurn from 'https://esm.sh/butterchurn@2.6.7';
+    import butterchurnPresets from 'https://esm.sh/butterchurn-presets@2.4.7';
+
+    const canvas = document.getElementById('canvas');
+    const statusEl = document.getElementById('status');
+    const btnStart = document.getElementById('btn-start');
+
+    let visualizer = null;
+    let audioContext = null;
+    let sourceNode = null;
+
+    // 2. Fetch the preset collection from the package
+    const presets = butterchurnPresets.getPresets();
+    const presetKeys = Object.keys(presets);
+    
+    console.log(`Loaded ${presetKeys.length} presets from online source.`);
+
+    async function startVisualizer() {
+        // AudioContext requires user interaction first
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Initialize Butterchurn
+            visualizer = butterchurn.createVisualizer(audioContext, canvas, {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                pixelRatio: window.devicePixelRatio || 1,
+                textureRatio: 1,
+            });
+
+            // Get audio input (Microphone) for testing
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                sourceNode = audioContext.createMediaStreamSource(stream);
+                visualizer.connectAudio(sourceNode);
+                statusEl.innerText = "Microphone connected. Rendering...";
+                renderLoop();
+            } catch (err) {
+                statusEl.innerText = "Error accessing microphone: " + err.message;
+                console.error(err);
+                return;
+            }
+        }
+
+        // Load a random preset
+        loadRandomPreset();
+    }
+
+    function loadRandomPreset() {
+        if (!visualizer) return;
+        
+        const randomKey = presetKeys[Math.floor(Math.random() * presetKeys.length)];
+        const preset = presets[randomKey];
+        
+        // Load the preset into the visualizer
+        // 2.0 is the blend time in seconds
+        visualizer.loadPreset(preset, 2.0); 
+        
+        statusEl.innerText = `Playing: ${randomKey}`;
+        console.log("Loaded preset:", randomKey);
+    }
+
+    function renderLoop() {
+        requestAnimationFrame(renderLoop);
+        if (visualizer) {
+            visualizer.render();
+        }
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (visualizer) {
+            visualizer.setRendererSize(window.innerWidth, window.innerHeight);
+        }
+    });
+
+    btnStart.addEventListener('click', startVisualizer);
+</script>
+
+</body>
+</html>

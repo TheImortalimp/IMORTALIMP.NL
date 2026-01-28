@@ -1,0 +1,443 @@
+/**
+ * WATCH_DOGS Effect Styling
+ * www.imortalimp.nl
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    background: #000;
+    color: #00d9ff;
+}
+
+#watch-dogs-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Control Panel Styling */
+#control-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 400px;
+    max-height: 90vh;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00d9ff;
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+}
+
+#control-panel::-webkit-scrollbar {
+    width: 10px;
+}
+
+#control-panel::-webkit-scrollbar-track {
+    background: #000;
+}
+
+#control-panel::-webkit-scrollbar-thumb {
+    background: #00d9ff;
+    border: 1px solid #000;
+}
+
+#control-panel::-webkit-scrollbar-thumb:hover {
+    background: #00fff7;
+}
+
+.panel-header {
+    background: #00d9ff;
+    color: #000;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #000;
+}
+
+.panel-header h2 {
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+#toggle-panel-btn {
+    background: #000;
+    color: #00d9ff;
+    border: 2px solid #00d9ff;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+#toggle-panel-btn:hover {
+    background: #00d9ff;
+    color: #000;
+}
+
+.panel-content {
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.panel-content.hidden {
+    display: none;
+}
+
+.control-group {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #00d9ff33;
+}
+
+.control-group:last-child {
+    border-bottom: none;
+}
+
+.control-group label {
+    display: block;
+    color: #00d9ff;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.control-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: #000;
+    border: 1px solid #00d9ff;
+    outline: none;
+    -webkit-appearance: none;
+    margin: 10px 0;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #00d9ff;
+    cursor: pointer;
+    border: 2px solid #000;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #00d9ff;
+    cursor: pointer;
+    border: 2px solid #000;
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.8);
+}
+
+#glitch-intensity-value {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #00d9ff;
+}
+
+.color-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.color-inputs > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.color-inputs label {
+    font-size: 12px;
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.color-inputs input[type="color"] {
+    width: 60px;
+    height: 35px;
+    border: 2px solid #00d9ff;
+    background: #000;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.color-inputs input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.color-inputs input[type="color"]::-webkit-color-swatch {
+    border: 1px solid #00d9ff;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    color: #00d9ff;
+    border: 2px solid #00d9ff;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn:last-child {
+    margin-bottom: 0;
+}
+
+.action-btn:hover {
+    background: #00d9ff;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.8);
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.control-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    background: #000;
+    color: #00d9ff;
+    border: 2px solid #00d9ff;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    margin-bottom: 10px;
+    outline: none;
+}
+
+.control-group input[type="text"]:focus {
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+}
+
+.control-group input[type="text"]::placeholder {
+    color: #00d9ff55;
+}
+
+.info-section {
+    background: rgba(0, 217, 255, 0.05);
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #00d9ff33;
+}
+
+.info-section h3 {
+    color: #00d9ff;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.info-section pre {
+    background: #000;
+    padding: 15px;
+    border: 1px solid #00d9ff;
+    overflow-x: auto;
+    margin-bottom: 0;
+}
+
+.info-section pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.info-section pre::-webkit-scrollbar-track {
+    background: #000;
+}
+
+.info-section pre::-webkit-scrollbar-thumb {
+    background: #00d9ff;
+}
+
+.info-section code {
+    color: #fff;
+    font-size: 11px;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+}
+
+.info-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info-section li {
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.info-section li:before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #00d9ff;
+    font-weight: bold;
+}
+
+.info-section li code {
+    color: #00d9ff;
+    background: rgba(0, 217, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.footer {
+    text-align: center;
+    padding: 15px;
+    border-top: 1px solid #00d9ff33;
+    margin-top: 20px;
+}
+
+.footer p {
+    color: #fff;
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.footer a {
+    color: #00d9ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    #control-panel {
+        width: 90%;
+        right: 5%;
+        max-height: 80vh;
+    }
+    
+    .panel-header h2 {
+        font-size: 12px;
+    }
+    
+    #toggle-panel-btn {
+        font-size: 10px;
+        padding: 4px 10px;
+    }
+}
+
+/* Animation Effects */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 217, 255, 0.8);
+    }
+}
+
+#control-panel {
+    animation: pulse 3s infinite;
+}
+
+/* Glitch text effect for headers */
+.panel-header h2 {
+    position: relative;
+}
+
+.panel-header h2::before,
+.panel-header h2::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(0, 217, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.action-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Loading animation */
+@keyframes scan {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+/* Console log styling */
+.console-log {
+    color: #00d9ff;
+    font-family: 'Courier New', monospace;
+}

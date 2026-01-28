@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Moon Phase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+
+        <style>
+        /* --- ASCII Art CRT Effect --- */
+        .ascii-art-container {
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(255, 0, 255, 0.1); /* 90% transparent magenta */
+            color: #00FF00; /* Default CRT green */
+            padding: 2em;
+            border: 2px solid #222;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center; /* Center the text */
+            position: relative;
+            overflow: hidden;
+            white-space: pre-wrap; /* Respects <br> tags and wraps text */
+            animation: crt-flicker 0.15s infinite;
+        }
+
+        /* Scanline Overlay */
+        .ascii-art-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+            animation: scanline-move 6s linear infinite;
+        }
+
+        /* Individual character animation */
+        .ascii-char {
+            display: inline-block;
+            animation: ascii-float 10s infinite ease-in-out;
+        }
+
+        .ascii-art-container strong {
+            color: #39ff14; /* Bright Green */
+            text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14;
+            display: block;
+        }
+
+        .ascii-art-container p {
+            color: #00FFFF; /* Cyan */
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+            display: block;
+            font-size: 1.1em;
+        }
+
+        @keyframes crt-flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+        @keyframes scanline-move { from { background-position: 0 0; } to { background-position: 0 -4px; } }
+        @keyframes ascii-float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(1px, -1px) rotate(0.5deg); }
+            50% { transform: translate(-1px, 1px) rotate(-0.5deg); }
+            75% { transform: translate(0.5px, 0.5px) rotate(0.2deg); }
+        }
+
+ :root {
+    --hue: 45; /* Deze variabele wordt in de JavaScript-code ingesteld voor de kleur van de gloed. */
+    --main-color: hsl(var(--hue), 80%, 60%);
+}
+
+#moonSVG {
+    /* DROP SHADOW VAN DE MAAN */
+    filter: drop-shadow(0 0 8px var(--main-color));
+}
+
+/* ... (andere stijlen blijven hetzelfde) ... */
+
+#moonBodySVG {
+    /* De basis van de maan, dit wordt de schaduwkant */
+    fill: #000; 
+}
+#moonIlluminatedPath {
+    /* Het verlichte deel van de maan */
+    fill: rgb(245, 255, 151); /* Een zachtgele kleur */
+}
+#earthshine {
+    /* De aardschijn op de donkere kant van de maan */
+    fill: #000; 
+    opacity: 0.08; 
+}
+
+/* ... (andere stijlen, zoals de gloed, blijven hetzelfde) ... */
+#moonContainer {
+            width: 90%;
+            max-width: 320px;
+            aspect-ratio: 1 / 1;
+            margin: 1em auto;
+            display: block;
+            border-radius: 50%;
+            background: #111;
+            position: relative;
+            /* KLEUR VAN DE MAAN GLOED */
+            box-shadow: 0 0 15px 5px hsla(var(--hue), 80%, 60%, 0.3), 
+                        0 0 25px 10px hsla(var(--hue), 80%, 60%, 0.2);
+        }
+        
+        #moonSVG {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* Make SVG visible */
+            border-radius: 50%;
+            background-color: transparent; /* Ensure container background is visible through SVG */
+            filter: drop-shadow(0 0 8px var(--main-color));
+        }
+
+/* ... (andere stijlen blijven hetzelfde) ... */
+/* ... (rest van de stijlen) ... */
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #0b0c1a;
+            color: #fff;
+            font-family: 'Segoe UI Emoji', 'Noto Color Emoji', Arial, sans-serif;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 90%;
+            width: 600px;
+            padding: 1em;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        #stars, #shooting {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .twinkle {
+            width: 2px;
+            height: 2px;
+            background: white;
+            position: absolute;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+            opacity: 0.8;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .shooting {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, white, rgba(255,255,255,0));
+            transform: rotate(-45deg);
+            animation: shoot 1s linear forwards;
+        }
+
+        @keyframes shoot {
+            0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+            100% { transform: translate(-1000px, 1000px) rotate(-45deg); opacity: 0; }
+        }
+        
+        #phaseName {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 1.7em;
+            margin: 0.5em 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #poem {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.4em, 5vw, 2.4em);
+            line-height: 1.6;
+            color: rgba(255, 253, 112, 0.932);
+            margin: 1.9em auto;
+            padding: 0.5em 1em;
+            background: rgba(29, 35, 36, 0.0);
+            border-left: 4px solid rgba(165, 175, 70, 0.685);
+            border-radius: 6px;
+            white-space: pre-wrap;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        #location, #localClock, #fullMoonCountdown {
+            font-family: 'Segoe UI Emoji', 'Noto Color Emoji', Arial, sans-serif;
+            font-size: 0.9em;
+            opacity: 0.85;
+            margin-top: 1em;
+            text-align: center;
+        }
+
+ footer {
+            margin-top: 2em;
+            font-size: 0.8em;
+            color: #888;
+        }
+        .footer-text {
+  position: relative; /* Change this to relative or static */
+  background: rgba(0, 0, 0, 0.75);
+  color: gold;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  text-align: center;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  max-width: 90%;
+  line-height: 1.4;
+  font-family: 'Unica One', cursive;
+  animation: glowText 2s ease-in-out infinite alternate;
+}
+
+.footer-text p {
+  margin: 0;
+}
+
+.footer-text p .emoji {
+  display: inline-block;
+  animation: shimmer 1.8s infinite ease-in-out;
+}
+
+    </style>
+</head>
+<body>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NTXL35MFPT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-NTXL35MFPT');
+</script>
+    <div id="stars"></div>
+    <div id="shooting"></div>
+    
+    <div class="container">
+        <h1>🌙 The Moon</h1>
+        
+        <div id="moonContainer">
+            <svg id="moonSVG" width="500" height="500" viewBox="0 0 500 500">
+                <defs>
+                    <clipPath id="moon-clip">
+                        <circle cx="250" cy="250" r="240"/>
+                    </clipPath>
+                </defs>
+                <circle id="moonBodySVG" cx="250" cy="250" r="240"></circle>
+                
+                <circle id="earthshine" cx="250" cy="250" r="240" clip-path="url(#moon-clip)"></circle>
+        
+                <path id="moonIlluminatedPath" clip-path="url(#moon-clip)"></path>
+            </svg>
+        </div>  
+        <div id="moonInfo">
+            <p id="phaseName"></p>
+            <p id="poem"></p>
+            <p id="location"></p>
+            <p id="localClock"></p>
+            <p id="fullMoonCountdown"></p>
+        </div>
+    </div>
+  <div class="footer-text">
+    <p>This code was created with the help of Gemini & 🚀®Double-OH-Six🚀.<br>
+      © 2025 ®Imortalimp ~ All Rights Reserved <br>
+      © Thanks to Open-Ai's Chat-GPT✨<br>
+    <span class="emoji">🌈</span><span class="emoji">⭐</span>Crafted with creativity, curiosity, and Copilot<span class="emoji">🌠</span><span class="emoji">🌟</span><br>
+      Code edited and refined in collaboration with Microsoft's AI Companion.
+    </p>
+    </div>
+    <div class="ascii-art-container">
+
+
+                                                                   ==-       ==                     
+                       =-:-+   +                                        =-:=+                       
+                      +=::-++                                         -=+::-=                       
+                        ++   -=                                      -   +++                        
+                               -:                                  :                                
+                                 -:                              :                                  
+  +=++=-                           -                           -                           +####*#  
+##**+++==+++  ::                    =                          -                      +*++*******## 
+#*=+=-----====  -=                   :  --                   :-                   **+++==-=======*#*
+##*+--::::::::=+==++-                                                         =*++*==::-::---:==+##+
+=#*+=---::::::::--+*+=                -     :: :  =-        --              ==+*+=-::::-::----=+*#* 
+***=--:::::::::..:::-=-=              --=::::::--:=:-:::: ---             -=--=-:::.:::::::::--+**  
+ ***===---:::::....:::=+++==     : ::++*-:..::::::::::::::=#+-:  :-     -:==-::::.:::::::---==+-++  
+  *#*++==---::::.:::::.:=++=-    =-:::-*+----===--=--=----=+::::::    ++**=-::::::::::----==++*#--  
+   **#*=-::::::::::::::::--+*=  :.::-==+#*++++=====+++++++*=---:..:  ***=-::.:::::::::::::-=+##*    
+   ++#*+=-::::::::::::::::::==+:::--=+++**++===+=======++**====---::-+==:::::::::.:.:::::--+*##*    
+    ++**+=-:::::::::::::::::-::+#%%%#**++++++++======+=++*+++*#%##*-::=-:..::::::::::::::=+*##      
+     =*#*+--::::::::.....::::+*%#=:-%%#*+++==----------=+++*##++#%%#*-:::::::::::::-:::--=+*+=      
+       #*++=-=------:-----::=#%%=:.-#%%#*+==============++*%#-..:#%%##=:-----::----=-====+*##*      
+      =+*+=---:=--::--:::-:=#%%%%=#%@@%#***++++++++++++++**%%#*+#%@%%#*::---:::-:-------=***+       
+        ##*+++=+++=------=-+%%@@@@#%@@%#***++++=====++++*+*%%@%%%@@@%#=--=-----==+++===+***         
+         *##*+++++==---===-+#%@@@@**@@%%#********=+*+******%%%+=%@@@%%*-====---==++++++*#*          
+          *###*+++=----==+==*%*%@@@@@@%#*******************#%@@@@@@%#**==+-----===++**###           
+            *#*#***+==-==+-=+*#%@@@@@%#**#########*######***#%@@@@@%#++-++======***#**==            
+               *##*###*+++++****%%%%%**####################**#%%%%#**#+=++=+**##****#=              
+                  ##*#*##=+***##*****#########%##*%###########******##*+*+## **#**                   
+                           -=++####################################*+=+**                           
+                          -=#*+*#################################**+**+-                            
+                            +-+=+#*##*##########################*#+=#=::                            
+                              ::- +#+#%#################**###*##+++-=                               
+                             ::+  ---####**#############*+*####+-  --+                              
+                            :+* ::-  :   +*+***+*=***=+#*   :-  +=- ---                             
+                           -=+  :-  :-   -=      : :    +-- =-:   -  ::                             
+                                    :   :-               :::  :       =                             
+                                <strong>hello world!</strong>
+<p>
+something big is about to happen i can feel it, its that time of year,
+where the leaves start to empty on the trees,
+and nothing but bare branches and brush show on their stems,
+the time we pray for thanks giving will come, but untill then,
+please take care of your loved ones, spirits and ghost,
+you are but a mortal as I am, yet we interdepend,
+there is no other way but to go with the stream of life,
+with the flow, one day peace unto all each in their time,
+and what is time but an empty vessel to fill with what we desire need or want,
+but it is what we want that is most important, take care ! 
+</p>
+    </div>
+    <script src="https://unpkg.com/suncalc@1.9.0/suncalc.js"></script>
+    <script>
+        // Inject Botpress Webchat
+        const botpressScript1 = document.createElement('script');
+        botpressScript1.src = 'https://cdn.botpress.cloud/webchat/v3.3/inject.js';
+        document.body.appendChild(botpressScript1);
+        const botpressScript2 = document.createElement('script');
+        botpressScript2.src = 'https://files.bpcontent.cloud/2025/07/16/18/20250716182151-D4S5G5R5.js';
+        botpressScript2.defer = true;
+        document.body.appendChild(botpressScript2);
+
+        const allPoems = {
+        // ... (your existing allPoems object remains unchanged) ...
+        "en": {
+    0: [
+        `🌑 Born in darkness, yet whispers take flight,  
+        a promise unseen beneath the quiet night.  
+        The moon hides her face, but dreams still grow,  
+        roots of light waiting under shadow’s glow.`,
+        
+        `🌑 The cradle of night wraps the world in black,  
+        no silver, no shimmer, just stars keeping track.  
+        A silent seed of moonlight sleeps unseen,  
+        waiting for a sliver to pierce the screen.`,
+        
+        `🌑 Darkness reigns where the moon is shy,  
+        no curve of silver lights the sky.  
+        Yet in this hollow, the future hums low,  
+        as night prepares for the coming glow.`
+    ],
+    1: [
+        `🌒 A sliver of light breaks the woven dark,  
+        soft as breath, a single spark.  
+        The crescent leans on shadow's edge,  
+        promising dawn on night's black ledge.`,
+        
+        `🌒 A thread of moonlight stretches thin,  
+        pulling the dark where dreams begin.  
+        A whisper says the tide will turn,  
+        and fading stars in wonder burn.`,
+        
+        `🌒 From the gloom, a silver arc appears,  
+        too fragile for the weight of fears.  
+        A promise lingers, faint but near,  
+        that growing light will soon be clear.`
+    ],
+    2: [
+        `🌓 The moon splits the night in half,  
+        shadow and light share a single path.  
+        A balance neither day nor dream,  
+        a fleeting hour in twilight’s gleam.`,
+        
+        `🌓 Held between the sun and shade,  
+        two worlds of silver softly laid.  
+        A balance stands, both dusk and dawn,  
+        until the night or day moves on.`,
+        
+        `🌓 A half-lit coin hangs in the sky,  
+        the universe holding its quiet sigh.  
+        Not yet whole, not yet erased,  
+        a fleeting moment twilight traced.`
+    ],
+    3: [
+        `🌔 The moon grows bold on the ocean’s rim,  
+        a pearl of light where waters swim.  
+        She gathers silence, builds her crown,  
+        and softly pulls the starlight down.`,
+        
+        `🌔 The swelling glow calls out the tide,  
+        a widening path where secrets hide.  
+        Almost full, but holding back,  
+        a promise not yet on its track.`,
+        
+        `🌔 A lantern hung above the sea,  
+        growing bright, yet tenderly.  
+        A slow ascent, a patient flame,  
+        the moon prepares to stake her claim.`
+    ],
+    4: [
+        `🌕 A radiant lantern above the deep,  
+        the earth lies quiet in silver sleep.  
+        The full moon sings without a sound,  
+        her light a spell on all around.`,
+        
+        `🌕 The sky breathes wide beneath her glow,  
+        tides and hearts begin to flow.  
+        A queenly gaze in silent reign,  
+        eternity in a fleeting chain.`,
+        
+        `🌕 A perfect circle on velvet night,  
+        holding the weight of endless light.  
+        The moon commands, yet tenderly,  
+        a beacon for all who dare to see.`
+    ],
+    5: [
+        `🌖 The silver wanes, a soft retreat,  
+        a tired lamp where shadows meet.  
+        The moon gives back what once she stole,  
+        light returning to the endless whole.`,
+        
+        `🌖 A fading glow, a whispered end,  
+        the night prepares to turn and bend.  
+        Old wisdom drips from lunar hands,  
+        scattering seeds across the lands.`,
+        
+        `🌖 The brilliance dims but leaves a mark,  
+        a memory etched into the dark.  
+        The moon bows low, yet not in vain,  
+        her silver threads still line the plain.`
+    ],
+    6: [
+        `🌗 Half a ghost remains in the sky,  
+        a dim farewell to passing light.  
+        The moon divides the night once more,  
+        a fleeting step from what came before.`,
+        
+        `🌗 A single edge of light holds on,  
+        refusing to admit it’s gone.  
+        A pause before the final fade,  
+        a breath of silver softly laid.`,
+        
+        `🌗 The moon is halved, a torn refrain,  
+        a shadow song of sweet remain.  
+        The stars keep watch as darkness grows,  
+        the last of moonlight softly goes.`
+    ],
+    7: [
+        `🌘 The grin of light is almost gone,  
+        a farewell whisper before the dawn.  
+        The night reclaims what once was bright,  
+        tucking the moon from mortal sight.`,
+        
+        `🌘 A quiet hush, the silver dies,  
+        the dark takes back the starless skies.  
+        Only a trace of glow remains,  
+        a final thread through shadow’s veins.`,
+        
+        `   The moon slips under velvet deep,  
+        surrendering dreams to endless sleep.  
+        A dark embrace, the cycle ends,  
+        until the newborn crescent bends.`
+    ]
+},
+"de": {
+    0: [
+        `🌑 Aus tiefer Nacht erwächst ein stiller Traum,  
+        kein Licht verrät den Himmelssaum.  
+        Die Sterne flüstern leis im Wind,  
+        dass bald die neue Zeit beginnt.  
+        Doch heut ruht selbst der Mond – unsichtbar, blind.`,
+        
+        `🌑 Schwarze Stille trägt die Welt,  
+        kein Silber, das den Himmel erhellt.  
+        Nur Hoffnung wie ein ferner Hauch,  
+        verborgen tief im Zeitenbauch.  
+        Die Nacht ist König – und bleibt es auch.`,
+        
+        `🌑 Kein Schimmer bricht durch Himmels Tor,  
+        der Mond verschwindet, schweigt empor.  
+        In tiefer Nacht liegt still das Feld,  
+        nur Traum und Finsternis sind Welt.  
+        Doch Neues reift, noch unbestellt.`
+    ],
+    1: [
+        `🌒 Ein schmaler Bogen Licht erwacht,  
+        ein erstes Lächeln in der Nacht.  
+        Der Mond erprobt den jungen Schein,  
+        verspricht den Sternen: „Bald bin ich dein.“  
+        Ein zarter Anfang, kaum zu sehen,  
+        doch alles will dem Silber zugehen.`,
+        
+        `   Ein Hauch von Silber bricht das Dunkel sacht,  
+        als hätte Himmel still gelacht.  
+        Die Sichel weckt im Traum das Meer,  
+        ein neues Lied, ein leises Begehr.  
+        Die Nacht verliert ihr altes Schwer.`,
+        
+        `🌒 Ein Streifen Licht am Firmament,  
+        als Zeichen, dass die Zeit sich trennt.  
+        Die Schatten zittern, weichen weit,  
+        der Mond gewinnt die Dunkelheit.  
+        Ein stiller Anfang voller Zeit.`
+    ],
+    2: [
+        `🌓 Halb geteilt die Himmelskraft,  
+        Tag und Nacht in sanfter Haft.  
+        Der Mond verweilt in Zwischenzeit,  
+        ein Spiegelbild von Fern und Weit.  
+        Gleichgewicht so zart gefasst,  
+        ein Augenblick, der ewig passt.`,
+        
+        `🌓 Die Hälfte schweigt, die Hälfte strahlt,  
+        als hätte Zeit den Lauf gemalt.  
+        Zwei Welten küssen sich im Raum,  
+        ein stiller Tanz, ein halber Traum.  
+        Der Mond hält an den leisen Saum.`,
+        
+        `🌓 Halb Licht, halb Nacht, ein goldner Schnitt,  
+        der Himmel hält den Atem mit.  
+        Es scheint, als ob die Welt nun ruht,  
+        in Gleichgewicht, in sanfter Glut.`
+    ],
+    3: [
+        `🌔 Der Mond wächst an, ein goldner Stern,  
+        der ferne Himmel hält ihn gern.  
+        Die Nächte atmen tief und weit,  
+        ein Glanz durchströmt die Einsamkeit.  
+        Noch fehlt ein Stück, doch bald wird’s rund,  
+        der volle Kreis schon nah im Bund.`,
+        
+        `🌔 Ein Licht, das wächst wie eine Saat,  
+        der Mond tritt auf den Himmelspfad.  
+        Ein Schweigen liegt auf Meer und Land,  
+        als hielte Gott die Welt in Hand.  
+        Fast ganz, doch hält er seinen Stand.`,
+        
+        `🌔 Die Flamme wächst am Himmelsrand,  
+        wie Liebe, die im Dunkel stand.  
+        Bald wird die Nacht in Silber sein,  
+        ein Traum von Glanz, von großem Schein.`
+    ],
+    4: [
+        `🌕 Der volle Mond, ein Silberthron,  
+        regiert die Nacht wie Königslohn.  
+        Die Welt im Glanz, so still, so klar,  
+        als wäre Gott dem Himmel nah.  
+        Die Herzen heben sich im Licht,  
+        vergessen Zeit, vergessen Pflicht.`,
+        
+        `🌕 Der Himmel atmet Mondeswein,  
+        ein Fluss aus Gold und Silberein.  
+        Die Erde hält den Atem fest,  
+        in dieser Nacht, wo Licht uns lässt.  
+        Der volle Kreis – ein Himmelsfest.`,
+        
+        `🌕 Vollmondlicht auf Wald und Flur,  
+        geheimnisvoll und doch so pur.  
+        Die Seelen träumen groß und weit,  
+        verlieren sich in Ewigkeit.`
+    ],
+    5: [
+        `🌖 Der Glanz beginnt sich leis zu neigen,  
+        der Mond verbeugt sich ohne Schweigen.  
+        Die Nacht verliert das helle Kleid,  
+        Erinnerung bleibt – ein stiller Geleit.  
+        Verblassend zieht das Silber fort,  
+        ein sanftes Lebewohl im Ort.`,
+        
+        `🌖 Das Licht erlischt wie müder Tanz,  
+        der Mond verliert den letzten Glanz.  
+        Ein letzter Kuss auf Fluss und Stein,  
+        die Nacht nimmt ihren Atem ein.  
+        Vergehen trägt ein stilles Sein.`,
+        
+        `🌖 Der Himmel trägt den Abschied fort,  
+        vom hellen Lied bleibt nur ein Wort.  
+        Doch wer das Licht im Herzen fand,  
+        behält den Mond im eignen Land.`
+    ],
+    6: [
+        `🌗 Halb verweht das Silberlicht,  
+        der Himmel trägt ein fern Gesicht.  
+        Der Mond, er teilt die Nacht entzwei,  
+        ein stummes Lied zieht leis vorbei.  
+        Bald wird die Dunkelheit allein  
+        der Welt ihr schwarzes Tuch verleihn.`,
+        
+        `🌗 Die Hälfte schweigt, die Hälfte bleibt,  
+        ein Übergang, der leis entgleit.  
+        Die Sterne wachen still im Kreis,  
+        die Nacht ist tief, der Himmel leis.  
+        Der Mond verliert den letzten Preis.`,
+        
+        `🌗 Halb und halb, ein Traum verfliegt,  
+        der Abend still im Atem liegt.  
+        Ein letzter Gruß der fahlen Zeit,  
+        bevor das Schwarz den Rest verschneit.`
+    ],
+    7: [
+        `🌘 Der letzte Glanz verglüht im Blau,  
+        ein sanfter Abschied, trüb und rau.  
+        Der Mond verschwindet still und leis,  
+        als ob er nie am Himmel sei.  
+        Die Nacht verschluckt den letzten Rest,  
+        bis Morgen neues Licht uns lässt.`,
+        
+        `🌘 Ein Hauch von Licht, dann tiefe Nacht,  
+        der Mond hat seinen Kreis vollbracht.  
+        Die Dunkelheit wird wieder Herr,  
+        die Sterne flackern leise, leer.  
+        Ein Ende, das den Anfang nährt.`,
+        
+        `🌘 Die Sichel stirbt im Himmelsraum,  
+        der Mond versinkt wie alter Traum.  
+        Die Erde schweigt, der Himmel friert,  
+        bis neue Zeit das Licht gebiert.`
+    ]
+},
+"it": {
+    0: [
+        `🌑 Nato nel buio, dove il sogno s'innalza,  
+        senza luce, solo ombre in danza.  
+        Nel silenzio profondo della notte scura,  
+        il tempo attende una nuova ventura.  
+        Ma il cielo tace, la luna è nascosta.`,
+        
+        `🌑 L'oscurità avvolge ogni pensiero,  
+        un velo fitto, un muto sentiero.  
+        Nessun bagliore a rischiarar la via,  
+        solo il cuore che spera in armonia.  
+        L'attesa cresce nell'ombra infinita.`,
+        
+        `🌑 Nel ventre della notte senza stelle,  
+        il sogno si cela, fragile e ribelle.  
+        La luna tace e il mondo riposa,  
+        in un abbraccio di pace silenziosa,  
+        pronto a nascere un’alba luminosa.`
+    ],
+    1: [
+        `🌒 Una falce sottile tra ombra e luce,  
+        il cielo accenna un sorriso che induce  
+        a credere nella nuova speranza,  
+        che piano svela la sua danza.  
+        La luna svela il suo primo sorriso.`,
+        
+        `🌒 Il bagliore tenue rompe il silenzio,  
+        un delicato ponte di argento e incanto.  
+        La notte si veste di luce nascente,  
+        e il cuore si apre alla vita nascente.  
+        Il sogno si fa promessa ardente.`,
+        
+        `🌒 Un filo d'argento, sottile e lieve,  
+        disegna l'attesa in un cielo breve.  
+        La luna canta un’antica melodia,  
+        che risveglia l'anima e la fantasia,  
+        segno di rinascita e di poesia.`
+    ],
+    2: [
+        `🌓 Mezzaluna divisa tra luce e ombra,  
+        equilibrio fragile che il cuore assomma.  
+        Il giorno e la notte si sfiorano appena,  
+        in un ballo sospeso di luna serena.  
+        Un attimo eterno di pace piena.`,
+        
+        `🌓 Tra il chiarore e il buio si cela,  
+        una luna che al mondo si rivela.  
+        La quiete danza in un tempo sospeso,  
+        un sogno che appare, mai compreso.  
+        Nel mezzo il cielo resta atteso.`,
+        
+        `🌓 Luna divisa, simbolo d’amore,  
+        metà luce e metà cuore.  
+        In questo spazio di tensione e pace,  
+        la notte si fa dolce e tace,  
+        mentre il cielo lentamente tace.`
+    ],
+    3: [
+        `🌔 La luna cresce, un lume d’oro,  
+        che bacia il mare con un decoro.  
+        Le acque si increspano al suo passaggio,  
+        e il cielo si tinge di dolce coraggio.  
+        La notte si fa viva, in un dolce assaggio.`,
+        
+        `🌔 L’aura della luna si espande chiara,  
+        portando pace a chi la guarda cara.  
+        La luce avanza, il buio si ritrae,  
+        e l’anima nel cielo si perde e si scambia.  
+        Un canto d’amore che mai si frange.`,
+        
+        `🌔 La luna è un faro nell’oscurità,  
+        un sogno di luce e di libertà.  
+        Cresce piano nel cuore della notte,  
+        e dona a tutti dolci doti e lotte.  
+        È promessa di gioia e di lotte.`
+    ],
+    4: [
+        `🌕 Luna piena, regina del cielo,  
+        splende alta, corona d’argento e velo.  
+        Il mondo si inchina al suo splendore,  
+        e il cuore si riempie di ardore.  
+        Il tempo si ferma in questo fulgore.`,
+        
+        `🌕 Il plenilunio illumina la terra,  
+        come un faro nella notte serra.  
+        La luce danza su boschi e mare,  
+        sussurra storie di antichi amori e mare.  
+        La notte si veste di un magico chiarore.`,
+        
+        `🌕 Piena e rotonda, la luna sorride,  
+        in un abbraccio che tutto decide.  
+        Il cielo si apre in festa e canto,  
+        e il tempo si perde in un dolce incanto.  
+        La luce guida ogni santo e incanto.`
+    ],
+    5: [
+        `🌖 La luce cala, un lento addio,  
+        la luna si ritira nel suo rio.  
+        Il mondo sospira sotto il suo velo,  
+        una dolce malinconia nel cielo.  
+        L’ombra avanza, un dolce gelo.`,
+        
+        `🌖 Il plenilunio si spegne piano,  
+        e l’oscurità prende la mano.  
+        La notte cambia veste e forma,  
+        mentre il cuore ancora si informa.  
+        Una tregua dolce che si trasforma.`,
+        
+        `🌖 La luna si nasconde tra le nuvole,  
+        come un sogno che svanisce nelle onde.  
+        Il tempo si piega, lento e grave,  
+        e il cuore attende una nuova chiave.  
+        L’ombra vince, ma mai si sclave.`
+    ],
+    6: [
+        `🌗 Mezza luna, ombra e luce insieme,  
+        un confine che il cuore sostiene.  
+        Tra il giorno e la notte si perde il canto,  
+        un sospiro che aspetta il suo incanto.  
+        Un momento fragile, senza rimpianto.`,
+        
+        `🌗 La luna si spezza, ma non si spegne,  
+        un’eco che nell’aria si allunga e regna.  
+        Il cielo si tinge di grigi e di blu,  
+        mentre il mondo si prepara al più.  
+        Una pausa che annuncia il di più.`,
+        
+        `🌗 Ombra e luce in danza lenta,  
+        la notte tiene la sua lenta festa.  
+        Il tempo si ferma, il respiro cala,  
+        un attimo di silenzio, la luna parla.  
+        Un’ultima luce che non si disfa.`
+    ],
+    7: [
+        `🌘 La luna svanisce nel manto scuro,  
+        un ultimo sussurro, un respiro puro.  
+        La notte riporta il suo regno silente,  
+        un ciclo che si chiude, lento e paziente.  
+        Aspettando la nuova luce ardente.`,
+        
+        `🌘 Un filo di luce che si spegne piano,  
+        un addio dolce, quasi lontano.  
+        Il cielo tace sotto il suo velo,  
+        mentre il mondo sogna in un dolce gelo.  
+        Il ciclo torna, come un anello.`,
+        
+        `🌘 L’ombra avanza, la luce si perde,  
+        un silenzio che il cuore apprende.  
+        La notte chiude il suo cerchio antico,  
+        per rinascere in un tempo amico.  
+        La luna ritorna, è il suo ricovero.`
+    ],
+},
+"hu": {
+    0: [
+        `🌑 Sötét éjben születik az álom,  
+        hol csend honol, s nincs fény a tájon.  
+        A csillagok susognak halkan,  
+        új időre vár a mély sötétség,  
+        hol a Hold még rejtezik mélyen.`,
+
+        `🌑 Néma éj takarja a világot,  
+        sehol egy ezüst fény, csak a csönd hangja.  
+        A természet vár, lélegzik lassan,  
+        hogy az új fény eljöjjön végre,  
+        s a Hold újra ragyogjon majd.`,
+
+        `🌑 Fekete ködbe burkolózik az ég,  
+        nincs holdfény, csak álmodozó csend.  
+        De mélyen szívünkben már ég egy láng,  
+        mely egyszer majd felragyog,  
+        s a sötétből fényt fakaszt.`  
+    ],
+    1: [
+        `🌒 Vékony sarló villan a sötétben,  
+        mint régi dal, mi a lelket ébreszti.  
+        A Hold első mosolya hívogat,  
+        új reményt hoz az éjszakába,  
+        s a természet megújuló dalát.`,
+
+        `🌒 Az ezüstös ív ébred a sötétben,  
+        mint hajnal első, gyenge fénye.  
+        A föld és ég közti híd,  
+        hol az álmok életre kelnek,  
+        s a Hold fényétől él a világ.`,
+
+        `🌒 Szél susog, az erdő mélyén rezzen,  
+        megjelenik a Hold karcsú íve.  
+        Az élet újra megindul,  
+        s a természet ünnepli a fényt,  
+        mely lassan átszövi az éjt.`  
+    ],
+    2: [
+        `🌓 Félhold áll az égbolt közepén,  
+        hol fény és árnyék tánca egybefonódik.  
+        Az idő megáll, az éj és nappal között,  
+        s a természet csendben figyel,  
+        míg a Hold felkészül a növekedésre.`,
+
+        `🌓 Hold fény és árnyék játékában,  
+        két világ szövetsége az égen.  
+        A félhold sugara titkokat rejt,  
+        melyek a természet szívében élnek,  
+        és az éj leple alatt őrződnek.`,
+
+        `🌓 Egyensúlyban áll a fény és árnyék,  
+        fél a Hold, de mégis ragyog.  
+        Az éjszaka és nappal ölelése,  
+        egy pillanatnyi béke,  
+        mely átjárja a világot.`  
+    ],
+    3: [
+        `🌔 A Hold növekszik, mint égi láng,  
+        fényével megvilágítja az erdőt.  
+        A természet felébred, susog a fák között,  
+        és az éj puha leple alatt,  
+        a Hold titkos táncot jár.`,
+
+        `🌔 A fény egyre nő, mint a szív dobbanása,  
+        az éjszaka lüktet, új reménnyel tele.  
+        Az erdő zöldje ragyog a Hold alatt,  
+        és a természet minden lélegzetvétele,  
+        a fény növekedését ünnepli.`,
+
+        `🌔 Növekszik a Hold, mint lassú dallam,  
+        mely a csillagokat megérinti.  
+        Az éjszaka titkai felszabadulnak,  
+        s a természet új életre kel,  
+        a fény útján haladva.`  
+    ],
+    4: [
+        `🌕 Teljes fényében ragyog a Hold,  
+        ezüst koronát visel az égen.  
+        Az éj és föld egybeolvad,  
+        a természet ünnepel, és a szél susog,  
+        a telihold varázsát énekli.`,
+
+        `🌕 A Hold a világító torony,  
+        mely megvilágítja a sötét vizeket.  
+        Az erdő mélyén és a hegyeken át,  
+        a fény útján minden lélek szabad,  
+        a telihold fényében újul.`,
+
+        `🌕 A telihold fényében összefonódik minden,  
+        az élet ritmusa megáll egy pillanatra.  
+        A természet lélegzik és táncol,  
+        és a Hold ragyogása vezeti,  
+        mint egy örök őrző.`  
+    ],
+    5: [
+        `🌖 A Hold fénye lassan visszahúzódik,  
+        mint egy álom, mely véget ér.  
+        Az éj csendjében búcsúzik a fény,  
+        és a természet megpihen,  
+        hogy újra erőre kapjon.`,
+
+        `🌖 Csökken a fény, a Hold félre hajol,  
+        az éjszaka mélyén nyugalom honol.  
+        Az erdő elcsendesül, a szelek halkulnak,  
+        a természet türelmesen vár,  
+        míg újra világosság gyúl.`,
+
+        `🌖 A Hold fényének búcsúja lágy,  
+        mint az esti szellő érintése.  
+        Az éjszaka ölelésében megnyugszik minden,  
+        és a természet álmodik,  
+        hogy holnap újra ragyogjon.`  
+    ],
+    6: [
+        `🌗 Félhold fény és árnyék között,  
+        a természet titka megmarad.  
+        Az éj varázsa elhalványul,  
+        de a remény még ott ragyog,  
+        hogy a Hold visszatér.`,
+
+        `🌗 Az égbolt egy újabb titok,  
+        ahol a Hold fele megpihen.  
+        A természet mély csendben vár,  
+        hogy újra teljes legyen,  
+        és fényével ragyogjon.`,
+
+        `🌗 Az árnyék és fény tánca,  
+        a Hold fél arcát mutatja.  
+        Az éj mélyén megpihen minden,  
+        hogy újra kezdődjön a kör,  
+        a természet örök meséje.`  
+    ],
+    7: [
+        `🌘 Az utolsó fény elhalványul,  
+        az éj visszahódítja az eget.  
+        A Hold eltűnik a sötétben,  
+        de a természet türelmesen vár,  
+        hogy újra megjelenjen.`,
+
+        `🌘 A sarló kihuny, csend lesz minden,  
+        az éjszaka mélyén új élet vár.  
+        A Hold búcsúzik, de ígéretet hordoz,  
+        hogy a fény egyszer visszatér,  
+        és megújul a világ.`,
+
+        `🌘 Az éj elfedi a Holdat,  
+        a természet álomba szenderül.  
+        De a csillagok vigyázzák az álmokat,  
+        és a Hold újra felkél,  
+        hogy fénye beragyogja a földet.`  
+    ]
+},
+"fi": {
+    0: [
+        `🌑 Synkän yön sylissä syntyy uni,  
+        hiljaisuus kietoo maan ja taivaan.  
+        Tähtien kuiskaus kantaa salaisuuden,  
+        uusi valo kypsyy pimeyden keskellä,  
+        hiljainen lupaus vielä kätkeytyy.`,
+
+        `🌑 Musta verho peittää taivaan,  
+        ei hopeaa, ei hehkua missään.  
+        Luonto lepää, odottaa hetkeä,  
+        jolloin varjoista syntyy valo,  
+        ja kuu nostaa uuden päivän.`,
+
+        `🌑 Pimeys kietoo maailman uneen,  
+        missä unelmat varttuvat hiljaa.  
+        Kuunkajo ei vielä paljasta kasvojaan,  
+        mutta sydän sykkää toivossa,  
+        ja hiljainen valo valmistuu.`
+    ],
+    1: [
+        `🌒 Kapea sirppi viiltää taivasta,  
+        kuin ensituulen kosketus kasvoilla.  
+        Kuun ensivalo herättää metsän,  
+        lupaus uudesta alusta,  
+        joka kantaa läpi yön.`,
+
+        `🌒 Hopeinen viiva ilmestyy pimeään,  
+        kuin tarina, joka alkaa taas.  
+        Metsän hiljaisuus vastaa valolle,  
+        ja unelmat saavat siivet,  
+        kun kuu kasvaa hiljalleen.`,
+
+        `🌒 Siro viiva taivaan reunalla,  
+        joka valoa varjojen keskellä kantaa.  
+        Kuu kuiskaa tarinoita yölle,  
+        luonnon sykkeen ja uuden toivon,  
+        jotka heräävät hiljalleen.`
+    ],
+    2: [
+        `🌓 Puolikuu hymyilee sinisellä taivaalla,  
+        valo ja varjo tanssivat keskenään.  
+        Yön ja päivän rajapinnalla,  
+        hiljaisuus kantaa salaisuuksia,  
+        ja luonto kuuntelee varovasti.`,
+
+        `🌓 Kuu jakautuu kahteen maailmaan,  
+        valo kohtaa varjon rajalla.  
+        Metsän hiljaisuus peittää kaiken,  
+        mutta kuu loistaa kauniina,  
+        kuin hopeinen silta.`,
+
+        `🌓 Puolikuun valossa maailma lepää,  
+        valo ja varjo sulautuvat yhteen.  
+        Hetken tasapaino kantaa toivoa,  
+        ja yö jatkaa matkaansa,  
+        hiljaa, lempeästi.`
+    ],
+    3: [
+        `🌔 Kuu kasvaa, kuin kultainen liekki,  
+        joka valaisee hiljaiset metsät.  
+        Vesi hohtaa kuun kirkkaudessa,  
+        ja yö täyttyy rauhan sävelistä,  
+        lupausta valosta ja uudesta.`,
+
+        `🌔 Kuun loiste vahvistuu hiljalleen,  
+        kuin sydämen rytmi metsän keskellä.  
+        Yö herää uuteen elämään,  
+        ja kaikki ympärillä hengittää,  
+        kuun valossa kylpien.`,
+
+        `🌔 Kuu kantaa valoa kuin lahjaa,  
+        joka avaa metsän salaisuudet.  
+        Yön hiljaisuus muuttuu lauluksi,  
+        ja kaikki saa uuden merkityksen,  
+        kun kuu kasvaa taivaalla.`
+    ],
+    4: [
+        `🌕 Täysikuu loistaa hopeisena kruununa,  
+        valaisee yön ja metsän syvyyden.  
+        Luonto hengittää täyttä elämää,  
+        ja sydän sykkii kuun tahdissa,  
+        ikuinen valon hetki.`,
+
+        `🌕 Täysikuu valvoo yli hiljaisuuden,  
+        kulkee metsän ja järven yllä.  
+        Sen valo herättää unohdetut tarinat,  
+        ja yössä kaikuu ikiaikainen laulu,  
+        täynnä voimaa ja rauhaa.`,
+
+        `🌕 Täysikuun alla maailma kietoutuu,  
+        valon ja varjon ikuiseen tanssiin.  
+        Metsä humisee salaisuuksia,  
+        ja sydän löytää kotinsa,  
+        kuun lempeässä syleilyssä.`
+    ],
+    5: [
+        `🌖 Kuu himmenee, kuin haalistuva laulu,  
+        jonka sanat kantavat muistojen tuulen.  
+        Yö hiljenee, ja varjot syvenevät,  
+        luonto valmistautuu lepäämään,  
+        odottaen uutta valoa.`,
+
+        `🌖 Kuun valo katoaa hitaasti,  
+        kuin viimeinen sävel hiljenevässä laulussa.  
+        Metsä sulkeutuu uneen,  
+        ja yö kietoo kaiken syliinsä,  
+        hiljaisuuden valtakuntaan.`,
+
+        `🌖 Hämärän syleilyssä kuu vaipuu,  
+        ja luonto rauhoittuu hiljaisuuteen.  
+        Muistot tanssivat varjojen keskellä,  
+        ja uusi alku odottaa kaukana,  
+        yön hiljaisuudessa.`
+    ],
+    6: [
+        `🌗 Puolikuu vaeltaa taivaan rajoilla,  
+        valon ja varjon rajamailla.  
+        Luonto kuuntelee hiljaa,  
+        odottaen yön ja päivän vaihdetta,  
+        kuun tarinaa jatkavaa.`,
+
+        `🌗 Kuu puolittain näkyvä ja peittyvä,  
+        kantaa salaisuuksia hiljaisina.  
+        Metsä kuiskaa yöhön tarinoita,  
+        ja aika pysähtyy hetkeen,  
+        jossa kaikki on mahdollista.`,
+
+        `🌗 Puolikuu kantaa taivaan tasapainoa,  
+        valon ja pimeyden kehtoa.  
+        Luonto lepää tässä hetkessä,  
+        odottaen uutta alkua,  
+        yön ja päivän liittoa.`
+    ],
+    7: [
+        `🌘 Kuun viimeinen sirppi himmenee,  
+        yö kietoo maailman syliinsä.  
+        Valo katoaa hiljaa taivaan taa,  
+        mutta lupaus uudesta aamusta,  
+        kantaa toivon liekkiä.`,
+
+        `🌘 Kuunvalo hiipuu yön syvyyksiin,  
+        metsä vaipuu uneen lempeään.  
+        Kaikki päättyy, jotta voisi alkaa,  
+        ja tähtien alla sykkii elämä,  
+        ikuinen kierto.`,
+
+        `🌘 Sirpin varjo peittää taivaan,  
+        yö ja uni kulkevat käsi kädessä.  
+        Kuun valo hiljenee, mutta sydän,  
+        tietää, että uusi kierto alkaa,  
+        ja valo palaa jälleen.`
+    ]
+},
+"ru"  : {
+0: [
+`🌑 В безлунную ночь рождаются сказки,
+Лес шепчет о древних духах, скрытых в тьме.
+Река несёт сны уставших путников,
+Лишь звёзды светят как огоньки надежды.
+И тихий голос луны, хоть скрыт, живёт в душе.`,
+
+`🌑 Небо как чёрная шаль укрыло землю,
+Берёзы стоят недвижно, словно слушают вечность.
+Месяц прячет свой лик за тяжёлой завесой облаков,
+Но сердце знает — он вернётся вновь,
+Принеся свет и песню новой ночи.`,
+
+`🌑 В тайне полей бродят забытые сказания,
+Ночь сплетает судьбы в свои кружева.
+Молодая душа ищет лунный свет в темноте,
+Но лишь холодный ветер поёт старую быль,
+О возвращении утра после долгой тьмы.`
+],
+1: [
+`🌒 Молодой месяц тонкой стрелой пронзает тьму,
+Тихо качает ветви старый дуб у дороги.
+Песни пастухов встречают его рождение,
+И в сердце растёт хрупкая надежда,
+Что утро будет добрым и мир — светел.`,
+
+`🌒 Луна рождается как младенец ночи,
+Тонкий серп улыбается миру впервые.
+Старики у костра шепчут древние сказания,
+О том, как месяц ведёт заблудшие души домой,
+И охраняет путь странника в холодных степях.`,
+
+`🌒 Над рекой встаёт серебряная тропинка,
+Месяц словно свеча освещает забытые пути.
+Идущий вдали вслушивается в шёпот звёзд,
+Понимая, что ночь хранит его мечты
+И несёт их к первому рассвету.`
+],
+2: [
+`🌓 Половина луны светит над рекой,
+Вторая скрыта во мраке ночи.
+Так и жизнь: свет и тень танцуют вместе,
+Выбирая, куда повернуть тропу судьбы.
+Луна шепчет: «Терпение — твоя сила».`,
+
+`🌓 Половина неба серебрится светом,
+Другая хранит тайну забытых времён.
+Луна стоит на перепутье вечности,
+Напоминая: нет ночи без рассвета,
+Нет дороги без следа в сердце.`,
+
+`🌓 Половина — для мечты, половина — для молитвы,
+Тонкий свет качается над заснувшей землёй.
+Лишь ветер знает, что будет завтра,
+Но луна дарит силу ждать
+И верить в светлую тропу домой.`
+],
+3: [
+`🌔 Луна растёт, как песня в поле,
+Серебро струится по рекам и травам.
+Дети смеются, глядя на её игру,
+Старухи крестятся, шепча молитвы о мире.
+Скоро ночь будет светла, как белый снег.`,
+
+`🌔 Зреет луна, как хлеб под июльским солнцем,
+Тучи плывут, открывая её лик миру.
+Каждый дом освещён мягким сиянием,
+И в тишине слышен звон колокольчиков,
+Словно время поёт вечную песню жизни.`,
+
+`🌔 На севере бродит сияние лунных троп,
+Лес шумит, будто ждёт чудес.
+Реки несут серебро к морю надежд,
+И глаза детей ловят свет
+Как знак будущих радостных дней.`
+],
+4: [
+`🌕 Полная луна — царица небес и земли,
+Над берёзовыми рощами, над широкими степями.
+Волки воют ей гимны, реки блестят её дорогой,
+Старые легенды оживают под её светом,
+И даже сердце камня становится мягче.`,
+
+`🌕 Луна сияет, как корона над Россией,
+Она знает тайны душ и судьбы людей.
+Старый бард поёт ей быль о богатырях,
+О битвах, любви и вечном поиске правды,
+И ночь становится храмом памяти и света.`,
+
+`🌕 Под её светом сбываются древние клятвы,
+Реки становятся зеркалами мира.
+Лесные духи кружат в радостном хороводе,
+И сердце каждого, кто глядит на луну,
+Забывает печаль и обретает покой.`
+],
+5: [
+`🌖 Луна уходит, но её свет прощальный нежен,
+Как рука матери, гладущая волосы ребёнка.
+Мир тихо прощается с чудом ночи,
+Оставляя в сердце сладкую тоску,
+Что всё возвращается в свой час.`,
+
+`🌖 Серебряные поля гаснут медленно,
+Свет луны тает на ивах у реки.
+Ветер несёт обещание новой встречи,
+И каждый знает — чудо живо,
+Даже когда его не видно глазам.`,
+
+`🌖 Последние лучи тонут в реке времени,
+Тень ложится на степь, словно одеяло сна.
+Луна шепчет прощальные слова ветрам,
+Но обещает вернуться снова
+И украсить небеса серебром надежды.`
+],
+6: [
+`🌗 Луна делится с нами своей болью,
+Половина её горит, половина умирает.
+Так и мы, половину жизни ищем свет,
+Половину прячем в сумрак памяти.
+Но дорога к рассвету всё ещё ясна.`,
+
+`🌗 Свет и тьма дерутся за небо,
+Луна устала, но не сдаётся ночи.
+Старый сказитель шепчет у огня:
+«Нет конца пути, пока свет ещё теплится,
+Пока сердце помнит светлый дом».`,
+
+`🌗 Половина луны словно неоконченное слово,
+Поле ждёт дождя, река ждёт весны.
+И в каждом сердце есть светлый уголок,
+Где живёт ожидание утра
+И вера в добрый день.`
+],
+7: [
+`🌘 Месяц прощается, оставляя лишь тень,
+Как забытая песня, тихо угасает.
+Но земля помнит его ласку,
+И ждёт нового рождения света,
+Потому что ночь — лишь часть вечного круга.`,
+
+`🌘 Луна тонет в море звёзд,
+Её свет — последнее прощание небес.
+Тьма закрывает дорогу, но не сердце,
+Потому что за каждой смертью ночи
+Живёт заря нового дня.`,
+
+`🌘 Последние искры скользят по горизонту,
+Ночь бережно гасит серебряный свет.
+Тишина укладывает мир в мягкий сон,
+Но каждый знает: луна вернётся
+И снова зажжёт дорогу в небесах.`
+]
+},
+"ku": {
+0: [
+`🌑 Mangê reş di nav eşra re dikeve,
+Tirîfe bê ronahî li ser kevireke bê dîmen.
+Lewra derman di dengê dengbêjan de bêyî ronak,
+Xewn û mêj ji nav taziyan vedigere,
+Her roj gava hêvîya ronahiyê dizîzîne.`,
+
+`🌑 Barana navî çi lê dibêje,
+Hilbijartina mang ji kevî koka stranê.
+Kevên berf û rêyên girtî ji hêviyan,
+Mang namîne lê ewê vegere,
+Û dengê bêdeng kêm tevlî stranên kevnar û tirîfe ye.`,
+
+`🌑 Mangek tê çûn lê radigerî vir,
+Mamoste dengbêj di nav daristan de stran dike.
+Zarok bijî nav dengbêjên gûherînê,
+Her gav xewnbûn di bejna nivînê de,
+Û tirîfe berêkeve, bê dîmen, bê terîfa.`  
+],
+1: [
+`🌒 Guhertoya mangê di asmanê de wek lîstikek taze,
+Tirîfa serkeftî hemû çem û çiyayan dike nêrîn.
+Ronahî çi şeş êşê tevgera ax de,
+Li dilan hêsin di helbestên kevnar de,
+Her roj hewl dide ku ronahiyê peyda bike.`,
+
+`🌒 Mangî bêgorîn anîn biharî,
+Dengê şevên destanîn fier dike,
+Serê çiyayê Kurdistanê li nêrîn,
+Bêdeng tiştên qeds û ji xewn re dide gel,
+Hêvî li giyanê pêşve dike.`,
+
+`🌒 Mingalek bi tirîfe li ber çavê çem,
+Mang helbest û jir li du deran dike.
+Zarok lê eve têpêşiya strananê,
+Her heft divê ronahiyê herke re organe,
+Û dengê dengbêj jî bêtir bixwîne.`  
+],
+2: [
+`🌓 Navbera mangê li nav berf û reşiyê ye,
+Reng û şeva ku bû bareke rakeve.
+Ev ne tenê xewna dengbêjan e,
+Belkî rêya jiyanê di nav dîmenê nû de,
+Tirîfe dibêje: “Teslîm bûn ne têrkirin e.”`,
+
+`🌓 Mang li sê gulanê re li hev yon dike,
+Roj û şev di zaravê astrê re diguherîne.
+Serê kurê destanê yê Mezopotamyayê,
+Hêvî li destê wan dirêj dike,
+Hîvîya nivînê hêştin nû jinê.`,
+
+`🌓 Tirîfe di nav navbera jiyanê de jîya,
+Mangê yek parşê dirêj û şeva bêdeng.
+Roja nû dimîne peyda li ser ziliman,
+Xewn û hêvî dukument li hev navîne,
+Ji şeva re dina xewna ronahiyê çêdibe.`  
+],
+3: [
+`🌔 Mangê piçûk her roj mezin dibe,
+Ronahî li ser çiya û çem d’Arda dixe.
+Kevokên çiyayê nav berfê stran dikin,
+Delalên koçik ji tirîfe re dide qonax,
+Her kolan bûna şeva taze bi can dike.`,
+
+`🌔 Mang wek golikek xweş li ser zelal,
+Her werdek di nav gulan û dengbêjan de.
+Dilê gel berf bê dîmen dixe nav çiyayê,
+Zarok lê xweşiya deng û ronahiyê dike,
+Û tirîfe xewn û mirin yekîne.`,
+
+`🌔 Di careka xweş de tirîfe di derdikan de,
+Stran di îmêlên kevnar de difire.
+Li vala hate bejna nivînê re dibe,
+Her çend ronakî hêj ji ber nefseke xwe re dibe,
+Xewnên wan herbijî di nav qefala nifşê.`  
+],
+4: [
+`🌕 Mangê tevahî wek padîşahtê asmanê dikeve,
+Ronahî li ser gund û çiyayê dişîne.
+Dengbêjên reş nav şevê stranên dirêj dikin,
+Tarih û stran di sêva wan de vegerîne,
+Û tirîfe ketareke helbest û hêvî ye.`,
+
+`🌕 Serê gund bi tirîfe pîroz e li şevê,
+Her zarê berf û çiyayê serbinîn dikin.
+Kevnarên gundê stranên stranê dikarin,
+Ev mang evîn, jiyana, herdem xeyn kirin,
+Û dengê her kesî bêdeng dikevî derîna xatirê.`,
+
+`🌕 Li ser tirîfe hemû çay û bane dibe ronahî,
+Rêya kulîlkên kevnar li nav çiyayê.
+Mang di navxweyî de pêroqa destana,
+Stran ji destana li dilan dide nû rol,
+Deng û ronahî hergav li şeva Kevnar diwe.`  
+],
+5: [
+`🌖 Mang di nav şevên paşê tûda dikeve,
+Ronahî winda, lê demek destê dilan dike.
+Xwezîhn di nav zembîrên taze de şopê dide,
+Her gava şeva bêdeng tija kirin,
+Tirîfe di nav dîmenên mala xewnê hebre.`,
+
+`🌖 Pola mana li ber güneşê qet fade,
+Ronahî bi her zarşoka devê hatin bê. 
+Dengbêjê nav chatîka şevê stran lê dibêje,
+“Pirêngê şevê têroja bêyî ronî ye”,
+Her du dijminê xem û ronahiyê dirêj kir.`,
+
+`🌖 Mang winda dibe lê qefila wê dîmenê,
+Tirîfa bê ronahi li ser gund û çem.
+Stranên kevnar li her kanê dengê xwe vedixin,
+Hîvî li dilan dişêne wek şaxeke ronahî,
+Û xewnên wan di nav zemane nû de dikin.`  
+],
+6: [
+`🌗 Navbera ronahi û tenê reşî ye,
+Mang daketî divên divê bimîne.
+Lê jiyan di navbera şev û roja de ye,
+Pira jiyana di nav geriya rastî de dijîn,
+Hîvî têkoşîna çareseriyê ji berbaze dike.`,
+
+`🌓 Mangê du hemû parşan bêjî bilind dikin,
+Lê jiyana wan her gav li çavkaniye.
+Stranên kevnar di nav firokên çiyayê dikin,
+Her germiya tirîfe di sîrê gundê din dike,
+Hîvîya roja nû berdewam dibe di qalbê gundan de.`,
+
+`🌗 Tirîfe herduye hev di berf û ronahî de,
+Mang ji du tarafan dijî û rêya nû dihêle.
+Bekirî jinê li şeva xwe tê nîqaş kir,
+“Destnîşan hatiye, lê navbera me ne ronahî ye”,
+Her rû tazî bûye di nav sosyeta gundiyatî de.`  
+],
+7: [
+`🌘 Mangê paş ve tîne, lê xatir li dilan maye,
+Dema şevê vedixe wê, her tiştek dibe bê dîmen.
+Nayê îşaret lewra şeva tarî siwar dibe,
+Ev şikên jînê ya navbera tirîfe û xewnê ye,
+Û hêvîya nû di nav xurtîya rojan de jî ye.`,
+
+`🌘 Li bin tirîfe hemû av û avahî tînin,
+Şev nasnameya xwe ji tirîfa aşiq dike.
+Her kevok de qeşay aşiqan dibêjin,
+“Destê şevê şikeste, lê sipîhera hêvî dinyayê ye”,
+Cira her rewşa nû dijî ji bilî xatirê xurtînê.`,
+
+`🌘 Tirîfa nehatî heta roj hilbijêre,
+Besirûna erd bê çiyayê xwe dike.
+Dema tirîfe nû dibe, ev wê bejna nivînê,
+Her kes li dijminê tarîya negenim,
+Û kevnar dîsa ronahiyê li hevala şevê dike.`  
+]
+},
+"ar": {
+0: [
+`🌑 ليلٌ بلا قمر يغطي الصحراء،
+النجوم تتناثر كدموع بعيدة،
+والريح تعوي حاملة حكايات الأرواح القديمة.
+يبحث القلب عن نور مفقود،
+لكن العتمة تحضن كل حلم بلا وعد.
+الأرض تصلي للغيب،
+في انتظار ولادة القمر من جديد.`,
+
+`🌑 السماء ترتدي عباءة سوداء بلا نجمة،
+الصمت يملأ الفيافي الواسعة،
+والقوافل ترتاح قرب النار الخافتة.
+يسمع المسافر همس الأرواح بين الكثبان،
+كأن الليل يروي أسراراً عن زمنٍ بلا قمر،
+وتتنفس الأرض انتظاراً للفجر البعيد.`,
+
+`🌑 الغيوم تخفي وجه السماء،
+والقمر غائب كملك في منفى بعيد.
+كل كائن ينكمش حول دفء قلبه،
+منتظراً وعداً قديماً بعودة النور.
+حتى النخيل ينحني متعباً،
+والليل يحرس سر الغياب في صمت.`,
+
+`🌑 ريح الصحراء تعصف بالرمال،
+وتحمل معها صرخات الماضي والأنين.
+النجوم خافتة كحبات ملح فوق الظلام،
+والقمر يختبئ في رحم الغيب،
+ليعيد للعالم أملاً فقده.`,
+ 
+`🌑 السماء عميقة بلا نهاية،
+كبحر من حبر أسود يبتلع الضوء.
+يكتب الليل قصة الفقدان،
+ويحفر الحنين في صدر العاشقين،
+حتى يولد الهلال ويعيد الوعد بالحياة.`
+],
+1: [
+`🌒 هلال رقيق يفتح عينه في السماء،
+كطفل يتلمس الطريق لأول مرة.
+يبتسم الليل بخط ضوء خجول،
+وتمتلئ القلوب بأمل العودة.
+أغاني البدو تهمس تحت النجوم،
+مبشرةً بأن الظلام لن يدوم.`,
+
+`🌒 ولادة الهلال رقصة ضوء في السماء،
+تنقش في الصحراء وعداً جديداً بالنور.
+كل قلب يمد يده نحو السماء،
+يطلب السلام، يطلب بدايةً أخرى.
+حتى الرمال تلمع بفرح الميلاد.`,
+
+`🌒 الهلال كالوشم الفضي في صفحة الليل،
+يخبر القوافل عن بداية الرحلة،
+ويعطي العشاق سبباً للانتظار.
+تتنفس الأرض بعد حبس طويل في الظلام،
+وتغني الطيور للحلم العائد.`,
+
+`🌒 الليل يبتسم لأول خيط ضوء،
+يكتب القمر الجديد قصيدة حياة.
+السماء تفتح ذراعيها لوليدها،
+والأرض تزهر بأمل صغير،
+ينمو مع كل نبض تحت ضوء الهلال.`,
+
+`🌒 الهلال حديث الولادة،
+يترك وراءه ظلاماً أقل حدة.
+يهمس للروح التائهة:
+“هناك ضوء ينتظرك،
+هناك فجر خلف كل ليل طويل.”`
+],
+2: [
+`🌓 نصف القمر يضيء نصف الصحراء،
+ونصفه الآخر ينام في حضن العتمة.
+هكذا نحن، أرواح نصفها ضوء ونصفها ظل،
+نمشي بين اليقين والضياع،
+لكن السماء تعدنا بكمال سيأتي.`,
+
+`🌓 الليل مقسوم إلى عالمين،
+واحد يلمع بالفضة، والآخر يغرق في السواد.
+القمر يقف على حدود الحقيقة والحلم،
+يراقب قلوب البشر،
+ويعلمهم أن التوازن سر الحياة.`,
+
+`🌓 نصف وجه القمر يضحك،
+والنصف الآخر يبكي في الظلام.
+العاشقون يرفعون دعاءهم،
+والشعراء يكتبون عن الحيرة،
+بين ما أضاء وبين ما اختبأ.`,
+
+`🌓 القمر يروي درساً عن الصبر،
+أن النور يأتي حتى لو لم يكتمل.
+كل نجم يقف شاهدًا،
+أن منتصف الطريق ليس نهاية الدرب،
+بل بداية الحلم الجديد.`,
+
+`🌓 نصف السماء يتحدث بلغة الضوء،
+والنصف الآخر يصمت كقلب مكسور.
+لكن الأمل يولد في هذا الصمت،
+ويرسم وعداً بليلة مكتملة.`,
+],
+3: [
+`🌔 القمر يكبر مثل حكاية طويلة،
+خط ضوئه يمتد فوق الجبال والوديان.
+الليل يرقص على نوره،
+والعشاق يتسامرون حول النيران،
+يحلمون بيومٍ يملأه البدر بالكامل.`,
+
+`🌔 النور يزحف في بطء،
+لكن حضوره يكسر شوكة الظلام.
+كل خيمة تبتسم لمشهد القمر،
+وتنفتح القلوب لرحمة السماء،
+وتعود القصائد لتروي حكايات قديمة.`,
+
+`🌔 القمر ينمو مثل نخلة مباركة،
+كل ليلة يعلو أكثر نحو الكمال.
+البدو يتبعون خطاه في الصحراء،
+والأطفال يرفعون أيديهم نحوه،
+كما لو أنهم يلمسون الجنة.`,
+
+`🌔 ضوء القمر يتكاثر،
+يغسل هموم الأيام في نهر فضي.
+يغني الشعراء باسم النور،
+ويتذكر الناس أن الظلام،
+ليس إلا طريقاً نحو الجمال.`,
+
+`🌔 المسافر يجد طريقه،
+بفضل وهج القمر المتزايد.
+كل نجم ينحني احتراماً له،
+وتسكن الريح كأنها تصغي،
+لقصة النور الذي ينتصر.`,
+],
+4: [
+`🌕 البدر يعتلي السماء كملك متوج،
+يضيء الصحاري ويحول الليل نهاراً.
+القصائد تنطلق من أفواه الشعراء،
+والعشاق يسهرون تحت سلطانه،
+وكل قلب يعرف أن الحب خالد.`,
+
+`🌕 القمر يملأ العالم بالنور،
+حتى الجبال تنحني أمام جماله.
+يغني الناس في الساحات،
+وتتراقص النجوم حوله،
+كأن السماء تحتفل بمجيئه.`,
+
+`🌕 البدر قمر العشاق،
+مرآة الأرواح وضياء الدروب.
+يكتب القدر قصصه في ضوءه،
+ويزرع في القلوب إيماناً أبدياً،
+أن النور لا يموت أبداً.`,
+
+`🌕 ليل البدر عيد سماوي،
+تضيء فيه الصحراء كبحر من فضة.
+الأطفال يضحكون، الطيور تصفق بأجنحتها،
+والشيوخ يروون أساطير قديمة،
+عن قمر يرشد الأرواح التائهة للسلام.`,
+
+`🌕 القمر في اكتماله وعدٌ سماوي،
+يمسح أحزان البشر بنوره.
+كل نفس تتنفس حباً وطمأنينة،
+كأن الليل جنة قصيرة،
+بفضل تاج النور الملكي.`,
+],
+5: [
+`🌖 القمر يتلاشى ببطء،
+لكن ضوءه يبقى في القلوب.
+السماء تعانق آخر خيوط الفضة،
+وتعد العالم بالعودة،
+في دورة أخرى من الحلم.`,
+
+`🌖 الليل يشرب آخر قطرات النور،
+كطفل لا يريد انتهاء الحكاية.
+تتنفس الصحراء بالشوق،
+وتقول النجوم كلمات وداع،
+لكن الأمل يبقى معلقاً في السماء.`,
+
+`🌖 كل خطوة للقمر نحو الغياب،
+تعلم الأرواح معنى الفقدان المؤقت.
+القصائد تصبح أكثر حزناً،
+لكنها مليئة بالحب،
+لأننا نعرف أن القمر سيعود.`,
+
+`🌖 ضوء القمر يذوب كالعطر في الهواء،
+يترك أثراً في أعماق النفس.
+كل عاشق يهمس باسمه،
+وكل شاعر يرسمه في حلم،
+انتظاراً لميلاد النور من جديد.`,
+
+`🌖 غياب القمر درسٌ في الصبر،
+أن النور لا يموت بل يستريح.
+الأرض تنام على ذكرى ضيائه،
+والليل يعد بالمعجزة القادمة.`,
+],
+6: [
+`🌗 نصف القمر يبقى يقاتل الظلام،
+والنصف الآخر يستسلم للغياب.
+هكذا نحن، نصف إيمان ونصف حيرة،
+لكننا نبحث عن الضوء،
+ونحمله في صدورنا حتى الفجر.`,
+
+`🌗 القمر نصفه حي، نصفه غائب،
+يذكرنا أن الحياة مزيج من النقصان.
+الليل يعلمنا أن النور
+حتى لو قل،
+يبقى أقوى من الظلام.`,
+
+`🌗 في هذا التوازن الغامض،
+يولد الشعر وينمو الحنين.
+القمر يبتسم رغم ألمه،
+ويرسل للقلوب رسالة أمل،
+أن النقصان مرحلة نحو الكمال.`,
+
+`🌗 الظلام يزحف، لكن النور لا يستسلم،
+يبقى نصف القمر شعلة في السماء.
+الأرض تتعلم معنى الإصرار،
+وتعلمنا أن نصف الضوء،
+أفضل من ليل بلا أمل.`,
+
+`🌗 نصف القمر مثل نصف القلب،
+ممزق لكنه ينبض للحياة.
+كل نجمة تصفق له،
+لأنه رغم ضعفه،
+يضيء الطريق لمن تاه.`
+],
+7: [
+`🌘 القمر يودع السماء في صمت،
+آخر ضوءه يشبه قبلة وداع.
+لكن النجوم تحفظ عهده،
+أن يعود يوماً ليضيء القلوب،
+ويكتب فصلاً جديداً للحلم.`,
+
+`🌘 الليل يبتلع آخر خيط فضة،
+لكن الذاكرة تضيء بهدوء.
+كل عاشق ينتظر ميلاده،
+والأرض تهمس أن الدورات أبدية،
+وأن الغياب بداية للحياة.`,
+
+`🌘 القمر يختبئ في صدر الغيب،
+والسماء صامتة لكنها تحمل وعداً.
+لا موت في هذا الغياب،
+بل ولادة بطيئة لنور جديد،
+يشعل ليلاً آخر بالحب.`,
+
+`🌘 آخر الأنفاس الفضية تتلاشى،
+لكن الكون لا يعرف النهاية.
+كل قلب يحمل القمر في داخله،
+حتى لو غاب عن السماء،
+لينتظر بزوغ دورة النور الآتية.`,
+
+`🌘 غياب القمر ليس انطفاءً،
+بل راحة الروح قبل البعث من جديد.
+الليل يصلي بصمت،
+والأرض تحلم،
+بعودة القمر مثل بطل أسطوري.`
+]
+},
+"he": {
+0: [
+`🌑 לילה חסר ירח עוטף את המדבר
+הכוכבים פזורים כמו תפילות ללא קול
+הרוח נושאת ריח עתיק של גאולה רחוקה
+העולם עוצר נשימה ומחכה לאור הנסתר
+הלבנה נעלמה אך הברית איתה נצחית
+ובחושך נשמר סוד הבריאה
+כל נשמה שומרת זיכרון עתיק של אור`,
+
+`🌑 שמיים כבדים יורדים על הארץ
+ללא קרן אור להאיר את הדרך
+השקט עמוק כמו ים קדמון
+הלבבות מבקשים נחמה מבלעדיה
+אך כל נשמה יודעת – הלבנה תשוב
+החושך זמני, הברכה נצחית
+הרוח נושאת הבטחה עתיקה לשחר חדש`,
+
+`🌑 הלילה כקלף שחור נפרש מעל ההרים
+אין ירח ואין הבטחה לשחר
+העולם שרוי בהמתנה קדושה
+הכוהנים לוחשים פיוטי אור עתיקים
+הברית עם הלבנה כתובה בשמיים
+גם כשהיא נסתרת מעינינו
+האמונה נותרת ככוכב בודד בלב`
+],
+1: [
+`🌒 חוט כסף דק נולד מתוך החושך
+כמו תינוק ראשון אחרי לילה ארוך
+הרועים מרימים עיניהם אל השמיים
+מבשרים ברכה חדשה על האדמה
+הנשמה מתמלאת תקווה שקטה
+והבריאה נכתבת מחדש עם כל נשימה`,
+
+`🌒 הלבנה הצעירה צוחקת ביישנית
+קורעת את המסך השחור בשמיים
+נשים יושבות בפתחי האוהלים ומזמרות פיוטים
+מברכות את אור התקווה הנולד
+העולם כולו נושם בשלווה עמוקה
+כמו קול אלוהי נוגע באדמה`,
+
+`🌒 הלבנה הצעירה כעדי על צוואר הלילה
+מבטיחה מסע אל עבר האור השלם
+הכוכבים מהנהנים בשמחה
+הרוח נושאת ניחוח תפילות רכות
+הזמן מתחיל מחדש במחזור קדוש
+והברכה יורדת על כל חי`
+],
+2: [
+`🌓 חצי ירח מאיר את הדרך לצדיקים
+חצי נותר נסתר באפלת הלילה
+כך גם החיים – מלאים באור ובצללים
+מלמדים אותנו סבלנות ובטחון
+כל נשימה היא תפילה לשלם
+וכל צעד הוא חיפוש אחר גאולה`,
+
+`🌓 חציו של הלבנה נלחם בחושך
+חציו נעלם כזיכרון ישן
+הלילה מזכיר לנו את השבריריות
+אך גם את היופי שבחצי הדרך
+השכינה שורה באור החציוני
+והלב מבקש את האור המלא`,
+
+`🌓 אור וחושך מתחבקים על פני הלבנה
+מלמדים אותנו סוד האיזון
+הנפש מהרהרת בדרכה
+והשמיים פותחים ספר גורלות חדש
+חלום שלם מחכה להתממש
+כמו אור הגאולה שמעבר לאופק`
+],
+3: [
+`🌔 הלבנה גדלה כמו פיוט עתיק
+שורות אור נכתבות על שמי המדבר
+האוהלים מתמלאים בניגון שקט
+הנביאים מבשרים קירוב גאולה
+העולם נשטף בכסף קדוש
+כמו מבט אל האינסוף
+הלילה הופך לקדוש ונצחי`,
+
+`🌔 הלילה נדלק כמו מנורה גדולה
+לבנה מתקרבת לשלמותה
+ההרים מהדהדים שירת מלאכים
+המים משקפים את פני האור המתוק
+הבריאה כולה עוצרת להקשיב
+והחושך נסוג לאחור ביראה`,
+
+`🌔 הלבנה מטפסת מעל הרי יהודה
+כמו כלה נעטפת בהוד קדוש
+המדבר נושם תפילות עתיקות
+הכוכבים שרים שיר לאור הנסיקה
+הלבבות פועמים בקצב השמיימי
+ומרגישים קרבה לשורש הנצח`
+],
+4: [
+`🌕 הלבנה במלוא תפארתה ככתר אלוהי
+ממלאת את הארץ בברכה נצחית
+הנביאים משוררים לה מזמורים עתיקים
+השמיים פתוחים כמו שערי גן עדן
+הלילה נהפך לתפילה גדולה לשלום
+אהבה וגאולה נשפכות על האדמה
+העולם כולו מרגיש אור נצחי`,
+
+`🌕 הבדידות נעלמת באור הלבנה המלאה
+העולם שוקע בנחמה עמוקה
+קולות ילדים, שירת משוררים
+כולם חוגגים חג אור שמיימי
+החושך נעלם לחלוטין
+כשמלכת הלילה יושבת על כסאה`,
+
+`🌕 הלבנה השלמה זורחת על ירושלים
+מאירה את האבן הקדושה
+המלאכים מהדהדים שירת הלל
+העולם טועם מעונג גן עדן
+הזמן עוצר נשימה קדושה
+והלבבות נפתחים כמו שערים לאור`
+],
+5: [
+`🌖 האור מתפוגג לאטו
+אך זכרו חקוק בלבבות כולנו
+הלבנה נפרדת ברוך כמו אם חומלת
+משאירה אותנו בהבטחה לשוב
+הלילה מלמד שהכול חוזר
+במחזור נצחי של אור וחושך
+האמונה אינה נכבית לעולם`,
+
+`🌖 האור מתמעט אך לא נכבה
+העולם מחזיק בניצוץ אחרון של אמונה
+החושך מחבק אותנו ברוך
+ומבטיח שנראה שוב אור גדול
+כל ירידה היא הכנה לעלייה
+וכל לילה צופן בוקר חדש`,
+
+`🌖 שובל אור דק נותר בשמים
+תזכורת לכך שהאור לא נעלם
+בלב נשארת הבטחה עתיקה
+שמחר הלבנה תקום מחדש
+ושוב תביא איתה פיוטי אור חיים`
+],
+6: [
+`🌗 הלבנה חצויה, נאבקת בשקיעה
+אך עדיין מאירה את השבילים האבודים
+כך גם הנפש מחזיקה באמונה
+גם כשאורה לא שלם
+אין חושך שמנצח אור נחוש
+והלבנה מזכירה לנו סוד התקווה`,
+
+`🌗 חצי לבנה משאיר אותנו בערגה
+הזיכרון של הלילות המלאים מתוק וכואב
+אך הידיעה שהשלם קרוב
+נותנת תקווה לכל מחפש אור
+החיסרון מלמד אותנו להעריך שלמות`,
+
+`🌗 החושך מתחזק אך לא מנצח
+הלבנה שומרת על שביל האור
+בני אדם לומדים אומץ וציפייה
+במחזור הנצחי של האובדן והגאולה
+והשמיים מחבקים את נשמותיהם`
+],
+7: [
+`🌘 הלבנה דועכת כמו שיר ישן
+העולם נפרד ממנה בשקט קדוש
+אבל אנו יודעים שכל סוף
+הוא התחלה של אור חדש
+הברית עם השמים לא נשברת
+המחזור נמשך עד קץ הימים`,
+
+`🌘 החשיכה חוזרת לשלוט
+אך היא נושאת בתוכה זרע של אור עתידי
+הלבנה נחה, מחכה ללידה מחדש
+כמו נשמה הממתינה לגאולה
+האדם מרגיש שהתקווה לא נכבית`,
+
+`🌘 הלבנה שוקעת בשקט
+אבל התקווה זורחת בכל לב
+כל אדם נושא בתוכו אור קטן
+שישוב להתלכד עם אור הלבנה בעתיד הקרוב
+והעולם יכיר מחדש את פלא הבריאה`
+]
+},
+"hi": {
+0: [
+`🌑 अंधेरी रात में चंद्रदेव छिप गए हैं
+तारों की टिमटिमाहट जैसे भगवान की आंखें जाग रही हों
+वन में ऋषि मौन ध्यान में लीन हैं
+शिव की जटाओं में गंगाजल बहता है
+हर हृदय में नई रोशनी की प्रतीक्षा है
+चांद लौटेगा और संसार में शांति लाएगा`,
+
+`🌑 गगन में गहरा अंधकार छाया है
+चंद्रमा जैसे समाधि में बैठा तप कर रहा हो
+संतों की माला धीरे-धीरे गूंजती है
+गौतम ऋषि स्वप्न में दिव्य संदेश सुनते हैं
+हर आत्मा उस खोए प्रकाश की खोज में है`,
+
+`🌑 बिना चांदनी के रात स्थिर हो गई
+माता पार्वती के चरणों में प्रार्थनाएं रखी गईं
+गौ माता रंभाती है शांति के लिए
+सारी धरती नया सवेरा चाहती है
+विश्वास है कि चंद्रदेव फिर प्रकट होंगे`
+],
+1: [
+`🌒 पतला सा चांद जैसे नवजात शिशु
+हिमालय की चोटियों पर पहली आभा
+माता गंगा का आशीर्वाद बहता है
+भक्त मंत्र गाते हैं 'ॐ चन्द्राय नमः'
+नई रोशनी के साथ नई आशा जन्म लेती है
+हर हृदय में दिव्यता खिल उठती है`,
+
+`🌒 अंधकार में छोटा सा दीपक जला
+चंद्रमा की नन्ही मुस्कान झलकती है
+कृष्ण अपनी बंसी पर मीठी धुन बजाते हैं
+गोपियाँ चांद की ओर हाथ उठाती हैं
+शांत प्रकाश से रात का भय मिटता है`,
+
+`🌒 चंद्रमा का पतला वक्र, शिव का त्रिशूल सा
+आकाश में शक्ति और शांति का प्रतीक
+ऋषि और योगी चित्त एकाग्र करते हैं
+हर सांस में ब्रह्म का नाम गूंजता है
+नई शुरुआत का संकेत मिलता है`
+],
+2: [
+`🌓 आधा चांद, आधी रात जगमग
+जीवन का द्वंद्व स्पष्ट दिखाई देता है
+रामायण के युग की कहानियां बहती हैं
+हनुमान जी आकाश में उड़ते हैं
+हर प्रकाश की किरण हमें धर्म की राह दिखाती है`,
+
+`🌓 आधा चंद्रमा ध्यान का स्मरण कराता है
+आधा अंधकार कर्मों की परीक्षा लेता है
+गंगा के घाटों पर दीप जलते हैं
+भक्त विष्णु का नाम जपते हैं
+हर लहर सत्य की ओर बढ़ती है`,
+
+`🌓 आधा प्रकाश शिव का वरदान है
+आधा अंधकार तपस्या का पथ है
+ऋषि वन में वेदों का पाठ करते हैं
+हर जीव का मन आत्मज्ञान की ओर आकर्षित होता है`
+],
+3: [
+`🌔 बढ़ता चांद जैसे सत्य का विस्तार
+संसार में ज्ञान का अमृत बरस रहा है
+महर्षि वेदपाठ कर रहे हैं
+कृष्ण के चरणों में फूल अर्पित किए जा रहे हैं
+हर आत्मा मोक्ष का स्वाद पा रही है
+रात प्रेम और शांति से भरी है`,
+
+`🌔 चंद्रमा की आभा गंगा में चमकती है
+साधु-संत भजन गाते हैं
+हर नदी का प्रवाह आशीर्वाद सा लगता है
+राधा अपने कान्हा की प्रतीक्षा करती है
+आकाश दिव्य आलोक से भर गया है`,
+
+`🌔 हरित वन और पर्वत झूम उठते हैं
+चंद्रमा जैसे शिव की तीसरी आंख का प्रकाश
+माता सीता के आशीर्वाद से धरती महकती है
+हर श्वास में मंत्र गूंजते हैं
+भक्ति की लहरें चतुर्दिक बहती हैं`
+],
+4: [
+`🌕 पूर्णिमा की रात शिव आराधना में जगमगा रही है
+हर मंदिर में दीपक जल रहे हैं
+गंगा आरती से आसमान सुनहरा हो गया है
+भक्त 'ॐ नमः शिवाय' का जप करते हैं
+चंद्रदेव अपनी पूर्ण आभा बिखेरते हैं
+संसार में शांति और आशीर्वाद भर देते हैं`,
+
+`🌕 श्रीकृष्ण की बंसी की धुन गूंजती है
+चंद्रमा गोपियों का मार्ग आलोकित करता है
+हर आत्मा आनंद में डूब जाती है
+प्रेम और भक्ति का महासागर बहता है
+रात स्वर्ग का आभास देती है`,
+
+`🌕 चंद्रमा का पूर्ण प्रकाश सबको एक करता है
+माता लक्ष्मी के चरणों में पुष्प अर्पित होते हैं
+आकाश दिव्य स्वर लहरियों से भर जाता है
+हर हृदय सत्य और धर्म की ओर उन्मुख होता है
+यह रात देवताओं का आशीर्वाद है`
+],
+5: [
+`🌖 विदाई लेता चंद्रमा मधुर स्पर्श करता है
+माता सरस्वती का ज्ञान हवा में तैरता है
+भक्त अपने दीपक हाथों में थामे हैं
+आस्था में कोई कमी नहीं आती
+हर किरण आश्वासन देती है
+कि चांद फिर लौटेगा नई भोर के संग`,
+
+`🌖 धुंधला प्रकाश अब भी आशीर्वाद देता है
+हर पर्वत, हर नदी मौन प्रार्थना करता है
+विष्णु की कृपा हर हृदय में चमकती है
+धरती स्वप्न देखती है पूर्णिमा की वापसी का
+रात विश्वास से भरी रहती है`,
+
+`🌖 मद्धम चांद की लोरी हवा में बहती है
+ऋषि चुपचाप ध्यान में लीन हैं
+हर आत्मा सत्य और शांति की ओर लौटती है
+अंधकार में भी भक्ति का दीपक जलता है`
+],
+6: [
+`🌗 आधा चांद धीरे-धीरे विदा ले रहा है
+जीवन की अनित्यता का स्मरण कराता है
+शिवलिंग पर जल अर्पण किया जाता है
+भक्त मौन में ज्ञान की खोज करते हैं
+हर प्रकाश की किरण एक शिक्षा देती है
+कि सत्य सदा चमकता रहेगा`,
+
+`🌗 आधा अंधकार, आधा प्रकाश
+हर आत्मा दो राहों पर खड़ी है
+ऋषि अपने आश्रम में शांति का पाठ करते हैं
+गंगा बहती है जैसे ईश्वर की वाणी
+चंद्रमा स्मरण कराता है धैर्य का महत्व`,
+
+`🌗 रात और दिन के बीच संतुलन ठहरा है
+माता पार्वती का आशीर्वाद चांद संग बहता है
+हर जीवन सत्य और मोक्ष की तलाश में है
+हर सितारा नया संदेश लेकर आया है`
+],
+7: [
+`🌘 अंधकार में चंद्रमा विलीन हो रहा है
+पर उसकी छाया अब भी प्रेम देती है
+हर मंदिर में दीपक जलता रहता है
+हर आत्मा जानती है – प्रकाश लौटेगा
+जीवन और मृत्यु चक्र का हिस्सा हैं
+और आशा कभी नहीं बुझती`,
+
+`🌘 चंद्रमा की विदाई मौन आशीर्वाद है
+हर नदी शांत होकर प्रतीक्षा करती है
+गायत्री मंत्र की गूंज आकाश में भरती है
+हर आत्मा पुनर्जन्म का आभास पाती है
+भक्ति का मार्ग कभी समाप्त नहीं होता`,
+
+`🌘 अंतिम किरणें तारों में खो जाती हैं
+शिव के ध्यान में रात स्थिर हो जाती है
+धरती नए सवेरा की प्रतीक्षा करती है
+और हर हृदय में आशा का दीपक जलता है`
+],
+},
+"zh": { 0: [
+       `🌑 子夜无光，鼠影轻跃， 新月藏身，静守轮回。 星辰低语，命理初启， 万象归一，生机待开。`,
+       `🌑 黑夜如墨，牛耕星野， 新月无声，孕育希望。 十二生肖，轮转不息， 天命初动，静待曙光。`,
+       `🌑 虎啸风生，月隐云间， 新始之夜，万物沉眠。 阴阳交替，气运初生， 静观天象，福祸未判。` ],
+       1: [ 
+       `🌒 兔影初现，银钩挂天， 新光渐露，祥瑞悄然。 星河流转，命理生辉， 月牙如梦，福气正添。`,
+       `🌒 龙腾云起，月牙微明， 希望初生，气运渐升。 十二宫位，星宿指引， 旭日未至，光华先行。`,
+       `🌒 蛇舞柳梢，月牙如钩， 阴阳交融，万象更新。 命盘初展，吉兆隐现， 星辉点点，前路光明。` ],
+        2: [ 
+       `🌓 马踏星河，半月高悬， 力量渐聚，命运转圆。 十二生肖，奔赴前程， 光影交错，志在必坚。`,
+       `🌓 羊咩云端，半月如盘， 平衡初现，阴阳相安。 星宿指路，吉凶未判， 万象更新，步步生欢。`,
+       `🌓 猴跃枝头，半月明朗， 智慧初展，前路辉煌。 命理流转，时机正好， 星月同辉，心愿飞扬。` ], 
+        3: [ 
+       `🌔 鸡鸣晨曦，盈月渐盈， 光华满溢，命理渐明。 十二生肖，轮回不息， 星辉映照，吉运自生。`,
+       `🌔 狗守夜色，盈月如盘， 希望渐满，气数正安。 星宿流转，命盘辉映， 阴阳调和，福泽绵延。`,
+       `🌔 猪梦田园，盈月高悬， 丰收将至，福气连连。 命理渐旺，星光灿烂， 万象更新，喜乐人间。` ],
+        4: [
+        `🌕 满月高悬，鼠影欢跃， 光辉万里，吉兆盈盈。 十二生肖，共赏圆轮， 家国团圆，福运连绵。`, 
+        `🌕 牛耕星野，满月如盘， 银辉洒地，祥瑞人间。 命理圆满，星宿辉映， 阴阳和合，万象皆安。`,
+        `🌕 虎啸月明，圆轮如镜， 万物生辉，气运正盛。 十二生肖，齐聚光下， 团圆美满，福寿安康。` ],
+        5: [
+        `🌖 兔影渐隐，月色微收， 盈亏有度，命理自修。 星宿轮转，气数渐缓， 十二生肖，静观天游。`,
+        `🌖 龙吟夜空，月影西斜， 光辉渐退，命运流沙。 阴阳消长，星河依旧， 生肖守望，静待新芽。`,
+        `🌖 蛇行林下，月华渐淡， 昨夜辉煌，今朝安然。 命盘转动，吉凶随缘， 星光点点，心境平安。` ],
+        6: [ 
+        `🌗 马影西斜，半月如弓， 力量渐隐，命理随风。 十二生肖，轮回未止， 星光淡淡，静守时空。`,
+        `🌗 羊卧山岗，半月残辉， 阴阳再转，气数轮回。 星宿低语，命盘渐远， 生肖守望，静待春归。`,
+        `🌗 猴影林间，半月如钩， 智慧收敛，前路温柔。 命理转折，星光依旧， 十二生肖，静观春秋。` ],
+         7: [
+        `🌘 鸡鸣微曙，残月如眉， 光影渐隐，命理归微。 十二生肖，静候新生， 星辰低语，轮回将回。`,
+        `🌘 狗守夜尽，残月西沉， 希望未灭，气数初分。 星宿轮转，命盘待启， 生肖守望，静待晨曦。`,
+        `🌘 猪梦渐醒，残月如钩， 万象归寂，福运未休。 命理轮回，星光微弱， 十二生肖，静候新生。` ] 
+}, 
+"jp": { 
+  0: [ 
+    "🌑 静かな夜に月の女神が微笑む。", 
+    "🌑 星々が神々の目のように輝く。", 
+    "🌑 森の中で賢者が静かに瞑想する。" 
+  ], 
+  1: [ 
+    "🌒 月の兎が薬を作る、月の宮殿で忙しい。", 
+    "🌒 銀色の光が大地に降り注ぎ、万物が目覚める。", 
+    "🌒 竹林の奥で仙人が静かに歌う。" 
+  ], 
+  2: [ 
+    "🌓 月影が旅人の帰り道を照らす。", 
+    "🌓 長い川が月を映し、漁火が星のように点々と。", 
+    "🌓 少女が窓辺に寄り添い、月を見上げる。" 
+  ], 
+  3: [ 
+    "🌔 月が満ちて、夜空を支配する。", 
+    "🌔 鶴が月の光の下で舞う。", 
+    "🌔 古い物語が風に乗って囁かれる。" 
+  ], 
+  4: [ 
+    "🌕 満月が夜を明るく照らす。", 
+    "🌕 狐が月の光の下で踊る。", 
+    "🌕 月の光が湖を銀色に染める。" 
+  ], 
+  5: [ 
+    "🌖 月が欠け始め、夜が静かに。", 
+    "🌖 風が竹林を揺らし、月の秘密を囁く。", 
+    "🌖 月の光が山々を柔らかく包む。" 
+  ], 
+  6: [ 
+    "🌗 月が半分に欠け、夜が深まる。", 
+    "🌗 星々が月の影を追いかける。", 
+    "🌗 月の光が川を銀色に染める。" 
+  ], 
+  7: [ 
+    "🌘 月が消えゆく、夜が静かに。", 
+    "🌘 森の中で賢者が静かに瞑想する。", 
+    "🌘 月の光が消え、星々が輝く。" 
+  ] 
+},
+"jv": { 
+  0: [ 
+    "🌑 Ing wengi sepi, Dewi Bulan mesem.", 
+    "🌑 Lintang-lintang padhang kaya mripat dewa.", 
+    "🌑 Ing alas, para bijaksana meneng ing semedi." 
+  ], 
+  1: [ 
+    "🌒 Kelinci bulan nyiapake ramuan, sibuk ing kraton bulan.", 
+    "🌒 Cahya perak tumetes ing bumi, kabeh urip tangi.", 
+    "🌒 Ing tengah alas bambu, para dewa nyanyi lirih." 
+  ], 
+  2: [ 
+    "🌓 Bayangan bulan madhangi dalan bali para lelungan.", 
+    "🌓 Kali dawa nggambarake bulan, lampu nelayan kaya lintang.", 
+    "🌓 Gadis enom ngenteni ing jendela, ngimpi babagan masa depan." 
+  ], 
+  3: [ 
+    "🌔 Bulan purnama madhangi jagad raya.", 
+    "🌔 Suara gamelan ngiringi tari dewa.", 
+    "🌔 Ing alas, kembang mekar ing cahya bulan." 
+  ], 
+  4: [ 
+    "🌕 Bulan purnama madhangi jagad raya.", 
+    "🌕 Suara gamelan ngiringi tari dewa.", 
+    "🌕 Ing alas, kembang mekar ing cahya bulan." 
+  ], 
+  5: [ 
+    "🌖 Bulan wiwit surut, ninggalake kenangan.", 
+    "🌖 Suara kidung lirih ing wengi.", 
+    "🌖 Ing alas, kewan-kewan padha turu." 
+  ], 
+  6: [ 
+    "🌗 Bayangan peteng nutupi bumi.", 
+    "🌗 Suara angin ngusap wit-witan.", 
+    "🌗 Ing alas, para dewa meneng." 
+  ], 
+  7: [ 
+    "🌘 Bulan surut, ninggalake jagad ing peteng.", 
+    "🌘 Suara kidung lirih ngiringi wengi.", 
+    "🌘 Ing alas, kewan-kewan padha turu." 
+  ] 
+},
+"vi": { 
+  0: [ 
+    "🌑 Đêm tĩnh lặng, chị Hằng ẩn mình sau mây.", 
+    "🌑 Sao trời lấp lánh như mắt thần canh giữ.", 
+    "🌑 Trong rừng sâu, nhà sư ngồi thiền lặng lẽ." 
+  ], 
+  1: [ 
+    "🌒 Thỏ ngọc giã thuốc, cung trăng rộn ràng.", 
+    "🌒 Ánh bạc rải khắp đồng quê, vạn vật bừng tỉnh.", 
+    "🌒 Gió kể chuyện cổ tích bên lũy tre làng." 
+  ], 
+  2: [ 
+    "🌓 Bóng trăng nghiêng soi lối người xa xứ.", 
+    "🌓 Sông dài in bóng nguyệt, đèn chài lập lòe.", 
+    "🌓 Thiếu nữ bên cửa sổ, mơ về ngày hội trăng." 
+  ], 
+  3: [ 
+    "🌔 Trăng gần tròn, sáng cả trời quê.", 
+    "🌔 Đêm hội rước đèn, trẻ nhỏ reo vui.", 
+    "🌔 Lời ru mẹ dịu dàng dưới ánh trăng vàng." 
+  ], 
+  4: [ 
+    "🌕 Trăng rằm tỏa sáng, huyền thoại sống dậy.", 
+    "🌕 Chị Hằng múa hát trên cung điện ngà.", 
+    "🌕 Làng quê sum vầy, bánh nướng thơm lừng." 
+  ], 
+  5: [ 
+    "🌖 Trăng khuyết dần, bóng tối len lỏi.", 
+    "🌖 Gió thu xào xạc, lá vàng rơi rụng.", 
+    "🌖 Người già kể chuyện trăng xưa cho cháu nghe." 
+  ], 
+  6: [ 
+    "🌗 Trăng lặn về tây, đêm dần sâu thẳm.", 
+    "🌗 Sương phủ mờ ao, cá lội lặng thinh.", 
+    "🌗 Lữ khách dừng chân, nhớ về mái nhà xưa." 
+  ], 
+  7: [ 
+    "🌘 Trăng tàn lặng lẽ, trời sắp bình minh.", 
+    "🌘 Đêm cuối cùng, sao trời vẫn thức.", 
+    "🌘 Hy vọng mới nảy mầm dưới ánh sáng mong manh." 
+  ] 
+},
+"ko": { 
+  0: [ 
+    "🌑 고요한 밤, 달의 여신이 구름 뒤에 숨는다.", 
+    "🌑 별들은 신의 눈처럼 반짝인다.", 
+    "🌑 숲속에서 현자가 조용히 명상한다." 
+  ], 
+  1: [ 
+    "🌒 토끼가 달에서 떡을 만든다, 궁전은 분주하다.", 
+    "🌒 은빛 달빛이 들판을 감싸고, 만물이 깨어난다.", 
+    "🌒 대나무 숲에서 신선이 조용히 노래한다." 
+  ], 
+  2: [ 
+    "🌓 달 그림자가 나그네의 길을 비춘다.", 
+    "🌓 강물에 비친 달, 어부의 등불이 별처럼 빛난다.", 
+    "🌓 소녀가 창가에 기대어 미래를 꿈꾼다." 
+  ], 
+  3: [ 
+    "🌔 보름달이 세상을 환하게 비춘다.", 
+    "🌔 마을 축제에 달빛이 춤춘다.", 
+    "🌔 산 위에서 호랑이가 달을 바라본다." 
+  ], 
+  4: [ 
+    "🌕 둥근 달이 하늘 한가운데 떠 있다.", 
+    "🌕 가족이 모여 달을 바라보며 소원을 빈다.", 
+    "🌕 달빛 아래 연못이 거울처럼 맑다." 
+  ], 
+  5: [ 
+    "🌖 달이 천천히 기울며 밤이 깊어진다.", 
+    "🌖 바람이 달의 전설을 속삭인다.", 
+    "🌖 산새가 달빛 아래 노래한다." 
+  ], 
+  6: [ 
+    "🌗 반달이 어둠과 빛을 나눈다.", 
+    "🌗 옛이야기가 달빛에 실려온다.", 
+    "🌗 들판에 달 그림자가 길게 드리운다." 
+  ], 
+  7: [ 
+    "🌘 달이 점점 사라지며 새로운 시작을 예고한다.", 
+    "🌘 밤하늘에 별들만 남아 조용하다.", 
+    "🌘 현자가 다시 명상에 잠긴다." 
+  ] 
+}   
+
+};
+
+const phases = ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"];
+let nextFullMoonDate = null;
+        let cachedCity = "Your Location";
+        const OPENWEATHER_API_KEY = "aa2b8c5b609148ae4e17c2fbb217cd51";
+        let isSpecialPhase = false;
+
+        const moonSVG = document.getElementById('moonSVG');
+        const moonIlluminatedPath = document.getElementById('moonIlluminatedPath');
+        let isPlaying = true;
+        
+        function hslToRgb(h, s, l) {
+            let r, g, b;
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
+
+        function detectLocale(lat, lon) {
+            const browserLang = navigator.language.split('-')[0];
+            
+            // Define all poem regions for EN, DE, IT, HU, FI, RU, KU, HE, AR, HI
+ const regions = { 
+  en: { lat: [49.9, 60.9], lon: [-8.6, 1.8] },     // United Kingdom & Ireland 
+  de: { lat: [47.2, 55.1], lon: [5.8, 15.1] },     // Germany 
+  it: { lat: [36.6, 47.1], lon: [6.6, 18.5] },     // Italy 
+  hu: { lat: [45.7, 48.6], lon: [16.1, 22.9] },    // Hungary 
+  fi: { lat: [59.8, 70.1], lon: [19.0, 31.6] },    // Finland 
+  ru: { lat: [41.1, 81.9], lon: [19.6, 169.0] },   // Russia 
+  ku: { lat: [34.0, 37.5], lon: [39.0, 48.5] },    // Kurdistan (region) 
+  he: { lat: [29.5, 33.3], lon: [34.2, 35.8] },    // Israel 
+  ar: { lat: [12.0, 33.0], lon: [-17.0, 55.0] },   // Arab World (North Africa & Middle East) 
+  hi: { lat: [8.0, 37.0], lon: [68.0, 97.0] },     // India 
+  zn: { lat: [18.0, 53.6], lon: [73.5, 135.1] },   // China 
+  jp: { lat: [24.0, 45.5], lon: [122.9, 153.9] },  // Japan 
+  jv: { lat: [-8.9, -5.8], lon: [105.0, 114.6] },  // Java (Indonesia) 
+  vi: { lat: [8.2, 23.4], lon: [102.1, 109.5] },   // Vietnam 
+  ko: { lat: [33.0, 43.0], lon: [124.0, 131.0] }   // Korea (South & North) 
+} 
+            // First, try to match the user's browser language.
+            if (Object.keys(regions).includes(browserLang)) {
+                return browserLang;
+            }
+
+            // If the browser language isn't a direct match, use geolocation.
+            for (const lang in regions) {
+                const region = regions[lang];
+                if (lat >= region.lat[0] && lat <= region.lat[1] && lon >= region.lon[0] && lon <= region.lon[1]) {
+                    return lang;
+                }
+            }
+            
+            // Default to English if no match is found.
+            return 'en';
+        }
+
+       function selectPoem(locale, phaseIndex) {
+            const poems = allPoems[locale] || allPoems["en"];
+            const arr = poems[phaseIndex];
+            if (!arr) return "";
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getCompassDirection(azimuth) {
+            // Converts azimuth in degrees to a compass direction string.
+            const directions = ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest'];
+            const index = Math.round(((azimuth %= 360) < 0 ? azimuth + 360 : azimuth) / 45) % 8;
+            return directions[index];
+        }
+
+        async function fetchLocAndWeather() {
+            return new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    let city = "Unknown", country = "Unknown", cloud = 100;
+                    try {
+                        const geoUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+                        const geoRes = await fetch(geoUrl);
+                        const geoData = await geoRes.json();
+                        city = geoData.address.city || geoData.address.town || geoData.address.village || "Unknown City";
+                        country = geoData.address.country || "Unknown Country";
+                        cachedCity = city || "Your Location";
+                    } catch (e) {
+                        console.warn("Reverse geocoding failed:", e);
+                    }
+                    try {
+                        const owmUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=metric`;
+                        const owmRes = await fetch(owmUrl);
+                        if (!owmRes.ok) throw new Error(`OpenWeatherMap HTTP error! Status: ${owmRes.status}`);
+                        const owmData = await owmRes.json();
+                        cloud = owmData.clouds?.all ?? 100;
+                    } catch (e) {
+                        console.error("Error fetching weather data:", e);
+                        resolve({ lat, lon, city, country, cloud: 100, error: "Weather data unavailable." });
+                        return;
+                    }
+                    resolve({ lat, lon, city, country, cloud });
+                }, (err) => {
+                    resolve({ lat: 0, lon: 0, city: "Unknown", country: "Unknown", cloud: 100, error: "Geolocation failed." });
+                }, { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 });
+            });
+        }
+
+        async function show() {
+    let { lat, lon, city, country, cloud, error } = await fetchLocAndWeather();
+    
+    let userLocale = detectLocale(lat, lon); 
+
+    if (lat === 0 && lon === 0) {
+        lat = 52.3676;
+        lon = 4.9041;
+        city = "Amsterdam";
+        country = "Netherlands";
+    }
+
+    const now = new Date();
+    const moonIllumination = SunCalc.getMoonIllumination(now);
+    const moonPos = SunCalc.getMoonPosition(now, lat, lon);
+
+    const illuminationFraction = moonIllumination.fraction;
+    const phase = moonIllumination.phase;
+    const moonAltitude = moonPos.altitude * 180 / Math.PI;
+    const moonAzimuth = (moonPos.azimuth * 180 / Math.PI + 180) % 360;
+
+    let sunCalcPhaseIndex;
+    const phaseTolerance = 0.02;
+    if (illuminationFraction <= 0.01) sunCalcPhaseIndex = 0;
+    else if (illuminationFraction >= 0.99) sunCalcPhaseIndex = 4;
+    else if (Math.abs(phase - 0.25) < phaseTolerance) sunCalcPhaseIndex = 2;
+    else if (Math.abs(phase - 0.75) < phaseTolerance) sunCalcPhaseIndex = 6;
+    else {
+        if (phase <= 0.5) {
+            sunCalcPhaseIndex = (illuminationFraction < 0.5) ? 1 : 3;
+        } else {
+            sunCalcPhaseIndex = (illuminationFraction < 0.5) ? 7 : 5;
+        }
+    }
+    isSpecialPhase = (sunCalcPhaseIndex === 0 || sunCalcPhaseIndex === 4);
+
+    const moonRadius = 240;
+    const moonCenterX = 250;
+    const moonCenterY = 250;
+
+// Dit gedeelte zit in de async function show()
+    let d_path_new = "";
+
+    if (illuminationFraction < 0.01) {
+        // New Moon: no illuminated path
+        d_path_new = "";
+    } else if (illuminationFraction > 0.99) {
+        // Full Moon: draw the full circle
+        d_path_new = `M ${moonCenterX - moonRadius},${moonCenterY} 
+                      A ${moonRadius},${moonRadius} 0 1 0 ${moonCenterX + moonRadius},${moonCenterY} 
+                      A ${moonRadius},${moonRadius} 0 1 0 ${moonCenterX - moonRadius},${moonCenterY} Z`;
+    } else {
+        const isWaxing = phase <= 0.5;
+        const x = moonRadius * Math.cos(phase * 2 * Math.PI);
+        const terminatorRadiusX = Math.abs(x);
+        
+        if (isWaxing) {
+            // Waxing (New -> Full)
+            if (illuminationFraction < 0.5) { // Crescent
+                d_path_new = `M ${moonCenterX},${moonCenterY - moonRadius} A ${moonRadius},${moonRadius} 0 1 1 ${moonCenterX},${moonCenterY + moonRadius} A ${terminatorRadiusX},${moonRadius} 0 0 0 ${moonCenterX},${moonCenterY - moonRadius} Z`;
+            } else { // Gibbous
+                d_path_new = `M ${moonCenterX},${moonCenterY - moonRadius} A ${moonRadius},${moonRadius} 0 1 1 ${moonCenterX},${moonCenterY + moonRadius} A ${terminatorRadiusX},${moonRadius} 0 1 1 ${moonCenterX},${moonCenterY - moonRadius} Z`;
+            }
+        } else {
+            // Waning (Full -> New)
+            if (illuminationFraction > 0.5) { // Gibbous
+                d_path_new = `M ${moonCenterX},${moonCenterY - moonRadius} A ${moonRadius},${moonRadius} 0 1 0 ${moonCenterX},${moonCenterY + moonRadius} A ${terminatorRadiusX},${moonRadius} 0 1 0 ${moonCenterX},${moonCenterY - moonRadius} Z`;
+            } else { // Crescent
+                d_path_new = `M ${moonCenterX},${moonCenterY - moonRadius} A ${moonRadius},${moonRadius} 0 1 0 ${moonCenterX},${moonCenterY + moonRadius} A ${terminatorRadiusX},${moonRadius} 0 0 1 ${moonCenterX},${moonCenterY - moonRadius} Z`;
+            }
+        }
+    }
+
+    // Get the parallactic angle to correctly tilt the moon's illuminated face.
+    const parallacticAngle = moonPos.parallacticAngle * 180 / Math.PI;
+
+    moonIlluminatedPath.setAttribute('d', d_path_new);
+    document.getElementById('moonSVG').style.transform = `rotate(${parallacticAngle}deg)`;
+
+    // Logic for Earthshine: It's most visible during crescent phases.
+    const earthshineCircle = document.getElementById('earthshine');
+    if (illuminationFraction > 0.02 && illuminationFraction < 0.5) {
+        // Fade in earthshine as it gets to first quarter, then fade out.
+        // The effect is strongest around the crescent phases (e.g., 25% illumination).
+        earthshineCircle.style.opacity = Math.sin(illuminationFraction * Math.PI) * 0.15;
+    } else {
+        earthshineCircle.style.opacity = 0;
+    }
+
+    let finalVisibleMessage;
+    if (moonAltitude <= 0) {
+        finalVisibleMessage = "Not visible (below horizon)";
+    } else {
+        finalVisibleMessage = error
+            ? "☁️ CAN'T RETRIEVE WEATHER DATA!, Moon Maybe Visible... 🫣"
+            : (cloud < 50) ? `Likely visible (clear skies, cloud: ${cloud}%)` : `Unlikely visible (due to cloud cover, cloud: ${cloud}%)`;
+    }
+
+    const compassDirection = getCompassDirection(moonAzimuth);
+    const altitudeDescriptor = moonAltitude > 0 ? 'above horizon' : 'below horizon';
+
+    const locInfo = (city && country) ? `📍 ${city}, ${country}` : `📍 Location unknown`;
+    document.getElementById('location').innerText = `${locInfo} | Lat ${lat?.toFixed(2) ?? "?"}, Lon ${lon?.toFixed(2) ?? "?"} | Az ${moonAzimuth.toFixed(0)}° (${compassDirection}) Alt ${moonAltitude.toFixed(0)}° (${altitudeDescriptor}) | 🌝 ${finalVisibleMessage}`;
+    document.getElementById('phaseName').innerText = phases[sunCalcPhaseIndex];
+    document.getElementById('poem').innerText = selectPoem(userLocale, sunCalcPhaseIndex);
+}
+        
+        function draw() {
+            let currentHue;
+            let pathFillColor;
+
+            if (isSpecialPhase) {
+                currentHue = (Date.now() / 50) % 360;
+                pathFillColor = `hsl(${currentHue}, 80%, 60%)`;
+            } else {
+                currentHue = 45;
+                pathFillColor = 'yellow';
+            }
+            
+            document.documentElement.style.setProperty('--hue', currentHue);
+            document.getElementById('moonIlluminatedPath').style.fill = pathFillColor;
+            
+            requestAnimationFrame(draw);
+        }
+
+        function updateLocalClock() {
+            const now = new Date();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedDateTime = now.toLocaleDateString(undefined, options);
+            document.getElementById('localClock').innerText = `🕒 Your Local Time (${cachedCity}): ${formattedDateTime}`;
+        }
+
+        function findNextFullMoon(startDate) {
+            let checkDate = new Date(startDate.getTime());
+            let found = false;
+            let iterations = 0;
+            const maxIterations = 35;
+            while (!found && iterations < maxIterations) {
+                const moonIllumination = SunCalc.getMoonIllumination(checkDate);
+                if (moonIllumination.fraction >= 0.995) {
+                    nextFullMoonDate = checkDate;
+                    found = true;
+                }
+                checkDate.setDate(checkDate.getDate() + 1);
+                iterations++;
+            }
+            if (!found) {
+                console.warn("Could not find next full moon within 35 days.");
+                nextFullMoonDate = null;
+            }
+        }
+
+        function updateFullMoonCountdown() {
+            const now = new Date();
+            if (!nextFullMoonDate || nextFullMoonDate.getTime() < now.getTime()) {
+                findNextFullMoon(now);
+            }
+            if (nextFullMoonDate) {
+                const diffMs = nextFullMoonDate.getTime() - now.getTime();
+                if (diffMs <= 0) {
+                    document.getElementById('fullMoonCountdown').innerText = "🌕 Full Moon is now!";
+                    nextFullMoonDate = null;
+                    return;
+                }
+                const seconds = Math.floor((diffMs / 1000) % 60);
+                const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
+                const hours = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+                const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                let countdownText = "🌕 Next Full Moon in: ";
+                if (days > 0) countdownText += `${days}d `;
+                if (days > 0 || hours > 0) countdownText += `${hours}h `;
+                if (days > 0 || hours > 0 || minutes > 0) countdownText += `${minutes}m `;
+                countdownText += `${seconds}s`;
+                document.getElementById('fullMoonCountdown').innerText = countdownText;
+            } else {
+                document.getElementById('fullMoonCountdown').innerText = "🌕 Calculating next Full Moon...";
+            }
+        }
+
+        function addStars() {
+            const stars = document.getElementById('stars');
+            stars.innerHTML = '';
+            for (let i = 0; i < 250; i++) {
+                const star = document.createElement('div');
+                star.className = 'twinkle';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.animationDuration = (1 + Math.random() * 3) + 's';
+                stars.appendChild(star);
+            }
+        }
+
+        function shootingStars() {
+            const field = document.getElementById('shooting');
+            setInterval(() => {
+                const s = document.createElement('div');
+                s.className = 'shooting';
+                s.style.top = Math.random() * 50 + '%';
+                s.style.left = Math.random() * 100 + '%';
+                field.appendChild(s);
+                setTimeout(() => field.removeChild(s), 1000);
+            }, 7000);
+        }
+
+        window.addEventListener('load', () => {
+            show();
+            draw();
+            addStars();
+            shootingStars();
+            updateLocalClock();
+            updateFullMoonCountdown();
+            setInterval(show, 1000 * 60 * 60 * 3);
+            setInterval(updateLocalClock, 1000);
+            setInterval(updateFullMoonCountdown, 1000);
+        });
+
+        // Script to wrap ASCII characters for animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const asciiContainer = document.querySelector('.ascii-art-container');
+            if (asciiContainer) {
+                // Use a TreeWalker to find only the text nodes that are direct children
+                // of the container, ignoring text inside the <p> and <strong> tags.
+                const walker = document.createTreeWalker(
+                    asciiContainer,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
+        
+                let nodesToReplace = [];
+                let currentNode;
+                while(currentNode = walker.nextNode()) {
+                    nodesToReplace.push(currentNode);
+                }
+        
+                nodesToReplace.forEach(node => {
+                    // Split by newline, process each line, then join back with <br>
+                    const lines = node.textContent.split('\n');
+                    const wrappedText = lines.map(line => line.split('').map(char => `<span class="ascii-char" style="animation-delay: ${Math.random() * 5}s">${char}</span>`).join('')).join('<br>');
+                    const span = document.createElement('span');
+                    span.innerHTML = wrappedText;
+                    node.parentNode.replaceChild(span, node);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+*/heads or tails:
+> System response: “Stream capabilities loading... prep your coffee, and hold onto your keyboard!”
+
+> Coding Sessions: Power up for coding nostalgia, streaming soon!
+
+System Status
+Total Tracks: 16
+Queue Length: 0
+Last Updated: 31-10-2025, 23:21:59
+System Information
+$
+Contact us:
+hello@devsfm.com
+$
+Social Media:
+[YouTube]
+[Twitter]
+[GitHub]
+VIDOUT
+DEV LOGS
+TERMINAL

@@ -1,0 +1,1273 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading List</title>
+    <meta name="description" content="The Truth is Out There , Do You Want To Believe?">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Reading List">
+    <meta property="og:description" content="The Truth is Out There , Do You Want To Believe?">
+    <meta property="og:image" content="https://www.imortalimp.nl/bin/KiKi&RiiVeR.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.imortalimp.nl/botnet.html">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Reading List">
+    <meta name="twitter:description" content="The Truth is Out There , Do You Want To Believe?">
+    <meta name="twitter:image" content="https://www.imortalimp.nl/bin/KiKi&RiiVeR.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Unica+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+    
+    <style>
+                /* Highlighted Academia link container */
+                #content-container.top-link-container {
+                    background: linear-gradient(90deg, #222 60%, #6a1b9a 100%);
+                    color: #ffd700;
+                    padding: 32px 0 16px 0;
+                    text-align: center;
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+                    position: relative;
+                    z-index: 1000;
+                    border-bottom: 3px solid #ffd700;
+                }
+                #content-container.top-link-container h1 {
+                    margin: 0;
+                    font-size: clamp(2.5em, 6vw, 4em);
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                    text-shadow: 2px 2px 8px #000;
+                }
+                #content-container.top-link-container a {
+                    color: #ffd700;
+                    text-decoration: underline wavy;
+                    font-family: 'Unica One', 'Segoe UI', Arial, sans-serif;
+                    font-size: 1.1em;
+                    font-weight: bold;
+                    background: rgba(0,0,0,0.12);
+                    padding: 4px 16px;
+                    border-radius: 8px;
+                    transition: background 0.2s, color 0.2s;
+                }
+                #content-container.top-link-container a:hover {
+                    color: #fff700;
+                    background: #6a1b9a;
+                }
+        /* Lokale BlackBloc cursieve font */
+        @font-face {
+            font-family: 'BlackBloc';
+            src: url('/fonts/the-black-bloc-italic.ttf') format('truetype');
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        * {
+            box-sizing: border-box; /* Ensure consistent box model */
+        }
+        
+        body {
+            margin: 0;
+            padding: 0 10px; /* Add horizontal padding to see background edges */
+            font-family: 'Roboto', sans-serif;
+            font-style: italic;
+            background-color: #ac4af1; /* A light lilac background for the page */
+            color: #f0e6f2; /* A dark purple for the text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            text-align: center;
+            max-width: 100vw; /* Ensure content does not exceed viewport width */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+        
+        h1, h2, h3 {
+            font-family: 'BlackBloc', Impact, 'Arial Black', sans-serif;
+            font-weight: normal;
+            font-style: italic;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            font-size: clamp(2em, 5vw, 4em); /* Responsive font size */
+            margin: 20px 0;
+        }
+        
+        a {
+            color: #00ccff;
+            text-decoration: underline;
+            font-weight: bold;
+            display: inline-block;
+            margin: 8px 0;
+        }
+        
+        a:hover {
+            color: #88ffff;
+            text-decoration: none;
+        }
+        
+        .iframe-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 2706px; /* Increased width by 65% from 1640px */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 130%; /* Aspect ratio of 130% height to width */
+            overflow: hidden;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            flex: 1 1 100%; /* Default to full width on small screens */
+            box-sizing: border-box;
+        }
+        
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Specific styling for the Bandcamp player container */
+        .bandcamp-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 25%; /* Aspect ratio for the horizontal player */
+            overflow: hidden;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            flex: 1 1 100%; 
+            box-sizing: border-box;
+        }
+        
+        .bandcamp-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        p {
+            max-width: 90%;
+            margin: 10px auto;
+        }
+
+.album-cover {
+    width: auto;
+    max-width: 100%;
+}
+
+.album-container {
+    text-align: center;
+}
+
+.track-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the tracks container */
+}
+
+.track-item {
+    display: flex;
+    flex-direction: column; /* Stack track title and audio player */
+    align-items: center;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease; /* Smooth transition for the highlight effect */
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Existing CSS for the track item when it's active */
+.track-item.active {
+    background-color: #af98c7; /* Light lilac background */
+    border: 1px solid #e591e1; /* Lilac border */
+}
+
+/* New CSS to change the text color of the track title inside the active item */
+.track-item.active .track-title {
+    color: #4b0082; /* Dark purple text */
+}
+
+.track-title {
+    text-align: center;
+    margin-bottom: 10px; /* Space between title and player */
+}
+
+audio {
+    filter: hue-rotate(270deg) saturate(1.5) brightness(1.2);
+    accent-color: #c9a3e6;
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: #e6d8f5;
+}
+
+audio::-webkit-media-controls-play-button {
+    background-color: #c9a3e6;
+    border-radius: 50%;
+    color: #4b0082;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+    color: #4b0082;
+}
+
+audio::-webkit-media-controls-timeline {
+    background-color: #e6d8f5;
+}
+
+/* New CSS for the image grid */
+.image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.image-grid picture {
+    flex: 1 1 200px; /* Adjust the base width as needed */
+    max-width: 250px; /* Set a max-width to prevent images from getting too large */
+    box-sizing: border-box;
+}
+
+.image-grid img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Footer styles */
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto; /* Pushes the footer to the bottom */
+}
+
+.main-footer {
+    background: #181c24;
+    color: #ffeb3b;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+    padding: 1rem 0.5rem;
+}
+
+.golden-footer {
+    background-color: transparent;
+    font-size: 5em; /* Default large font for desktop */
+    color: #FFD700;
+    overflow-wrap: break-word; /* Standard property for text wrapping */
+    word-break: break-all;     /* Force breaks to prevent overflow */
+}
+
+.golden-footer h2 {
+    font-size: 1em; /* Ensures font sizes are relative to the footer */
+}
+
+/* MEDIA QUERIES FOR DIFFERENT SCREEN SIZES */
+
+/* Tablets and Desktops */
+@media (min-width: 769px) {
+    .iframe-container {
+        flex: 1 1 calc(50% - 10px); /* Two columns on larger screens */
+    }
+    .bandcamp-container {
+        flex: 1 1 calc(50% - 10px);
+    }
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+    .golden-footer {
+        font-size: 2.5em; /* Smaller font on mobile devices */
+    }
+    .iframe-wrapper {
+        flex-direction: column; /* Stack iframes vertically on small screens */
+        align-items: center; /* Center the iframes */
+    }
+}
+
+/* --- Captcha Styles --- */
+#captcha-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 26, 26, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+#captcha-container {
+    background: #2a0050;
+    border: 2px solid #00ccff;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+    max-width: 90vw;
+    width: 400px;
+}
+
+#captcha-container h2 {
+    font-size: clamp(1.5em, 4vw, 2.5em);
+    color: #ffeb3b;
+    margin-bottom: 0.5em;
+}
+
+#captcha-container p {
+    font-size: 1.2em;
+    color: #f0e6f2;
+    margin-bottom: 1.5em;
+}
+
+#captcha-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5em;
+}
+
+.captcha-tile {
+    font-size: 2em;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.captcha-tile:hover {
+    transform: scale(1.1);
+    background-color: rgba(0, 204, 255, 0.3);
+}
+
+.captcha-tile.selected {
+    background-color: #00ccff;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #00ccff;
+}
+
+#captcha-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+#captcha-buttons button {
+    font-family: 'BlackBloc', Impact, sans-serif;
+    font-size: 1.5em;
+    padding: 10px 30px;
+    border: 2px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+#captcha-yes {
+    background-color: #00ccff;
+    color: #1a1a1a;
+    border-color: #00ccff;
+}
+#captcha-yes:hover {
+    background-color: #88ffff;
+    box-shadow: 0 0 15px #88ffff;
+}
+
+#captcha-no {
+    background-color: transparent;
+    color: #00ccff;
+    border-color: #00ccff;
+}
+#captcha-no:hover {
+    background-color: rgba(0, 204, 255, 0.2);
+    color: #88ffff;
+    border-color: #88ffff;
+}
+
+/* --- Eulogy/Epitaph Section --- */
+.eulogy-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    background: rgba(10, 0, 20, 0.5);
+    border-top: 2px solid #ac4af1;
+    border-bottom: 2px solid #ac4af1;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.eulogy-section h1 {
+    font-family: 'Dancing Script', cursive;
+    color: #f0e6f2;
+    font-size: clamp(2.5em, 6vw, 4em);
+    text-shadow: 0 0 8px #ac4af1;
+}
+
+.eulogy-section .poem {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(1.2em, 3vw, 1.8em);
+    color: #e0cff0;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+.eulogy-section video {
+    width: 100%;
+    max-width: 640px;
+    margin-top: 20px;
+    border: 2px solid #ac4af1;
+    border-radius: 8px;
+}
+
+/* Inline style classes */
+.gemini-title {
+    color: #000000;
+}
+
+.hidden {
+    display: none;
+}
+
+.now-playing-span {
+    font-size: 0.5em;
+    color: #00ccff;
+    display: block;
+}
+
+.spacer-div {
+    position: relative;
+    z-index: 10;
+    background: #2c1a3a;
+    margin: 48px auto 48px auto;
+    padding: 32px 16px 32px 16px;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(44,26,58,0.18);
+    max-width: 700px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.fentanyl-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 0 20px 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #6a1b9a55;
+    cursor: pointer;
+}
+
+/* Modal for fullscreen image */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 10, 40, 0.95);
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s;
+}
+.image-modal.active {
+    display: flex;
+    opacity: 1;
+}
+.image-modal img {
+    max-width: 96vw;
+    max-height: 96vh;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px #6a1b9a99;
+}
+.image-modal .close-btn {
+    position: absolute;
+    top: 32px;
+    right: 48px;
+    font-size: 2.5em;
+    color: #ffd700;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 10001;
+    font-family: 'Unica One', Arial, sans-serif;
+    text-shadow: 2px 2px 8px #000;
+}
+
+.info-box {
+    text-align: left;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.small-note {
+    font-size: 0.8em;
+}
+
+.inkbook-image {
+    margin-top: 15px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+.grayscale-cover {
+    width: 100%;
+    filter: grayscale(100%);
+}
+
+.dancing-script-title {
+    font-family: 'Dancing Script', cursive;
+}
+
+/* Bottom Audio Player Styles */
+.bottom-audio-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    padding: 15px 20px;
+    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.8);
+    z-index: 999;
+    border-top: 2px solid #555;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.bottom-audio-player::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #888 20%, 
+        #fff 50%, 
+        #888 80%, 
+        transparent 100%);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.audio-title {
+    font-family: 'Unica One', sans-serif;
+    font-size: 1em;
+    color: #e0e0e0;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bottom-audio-player audio {
+    width: 100%;
+    max-width: 800px;
+    filter: grayscale(100%) contrast(1.2) brightness(0.9);
+    border-radius: 8px;
+    background: rgba(40, 40, 40, 0.8);
+    padding: 5px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6),
+                0 2px 15px rgba(255, 255, 255, 0.1);
+}
+
+.bottom-audio-player audio::-webkit-media-controls-panel {
+    background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+    border-radius: 6px;
+}
+
+.bottom-audio-player audio::-webkit-media-controls-play-button {
+    background-color: #666;
+    border-radius: 50%;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.bottom-audio-player audio::-webkit-media-controls-play-button:hover {
+    background-color: #888;
+}
+
+.bottom-audio-player audio::-webkit-media-controls-current-time-display,
+.bottom-audio-player audio::-webkit-media-controls-time-remaining-display {
+    color: #e0e0e0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.bottom-audio-player audio::-webkit-media-controls-timeline {
+    background: #444;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-audio-player audio::-webkit-media-controls-volume-slider {
+    background: #444;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .bottom-audio-player {
+        padding: 10px 15px;
+    }
+    .audio-title {
+        font-size: 0.85em;
+    }
+}
+
+/* Styles for the top Academia link */
+.top-link-container {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(42, 0, 80, 0.7), rgba(26, 26, 26, 0.7));
+    padding: 25px 15px;
+    margin-bottom: 25px;
+    border-bottom: 3px solid #00ccff;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.top-link-container h1 {
+    margin: 0;
+    text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
+    font-size: clamp(2.5em, 6vw, 4.5em); /* Slightly larger font */
+}
+
+.top-link-container a {
+    color: #FFD700; /* Golden color for the link */
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.top-link-container a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px #FFD700, 0 0 15px #FFD700; /* Glowing effect on hover */
+}
+    </style>
+</head>
+<body>
+<iframe style="border: 0; width: 350px; height: 470px;" src="https://bandcamp.com/EmbeddedPlayer/album=2562435749/size=large/bgcol=ffffff/linkcol=2ebd35/tracklist=false/track=2415537387/transparent=true/" seamless><a href="https://localnewslegend.bandcamp.com/album/criterion-of-embarassment">Criterion Of Embarassment by LocalNewsLegend</a></iframe>
+<h1>Wake up… take these pills go to sleep
+
+Wake up… take these pills go to sleep
+
+Wake up… take the pills go to sleep
+
+Wake up… take the pills go to sleep
+
+
+
+Color with crayons, braid my hair
+
+take a walk, breathe in the air
+
+To send you home - we know what you need
+
+Seroquil, can’t act crazy when you sleep
+
+
+
+Wake up… take these pills go to sleep
+
+Wake up… take these pills go to sleep
+
+Wake up… take the pills go to sleep
+
+Wake up… take the pills go to sleep
+
+
+
+Nevermind, no more walks
+
+A lady drowned herself under the little dock
+
+There’s a courtyard, with concrete walls
+
+If you try to climb it theyll taze you in the balls
+
+
+
+Lol, just kidding, they’re not allowed to taze
+
+But theyll shoot you up with Halidol and you’ll stay for 10 more days
+
+
+
+
+
+Wake up… take these pills go to sleep
+
+Wake up… take these pills go to sleep
+
+Wake up… take the pills go to sleep
+
+Wake up… take the pills go to sleep, wake up take these pills..........................................................</h1>
+<div id="content-container" class="top-link-container">
+    <h1>
+        <a href="//riverlylereuveni.academia.edu" target="_blank" rel="noopener noreferrer">WWW.ACADEMIA.COM *LINK*</a>
+    </h1>
+</div>
+        <!-- Full-width YouTube Live Stream -->
+        <div style="width:100vw; max-width:100vw; margin-left:calc(50% - 50vw); background:#181818; box-shadow:0 2px 12px rgba(0,0,0,0.25); padding: 0 0 24px 0; border-bottom: 2px solid #ffd700;">
+            <iframe width="100%" height="600" src="https://www.youtube.com/embed/live_stream?channel=UCJ4LaYqTqpIZqKskACf8OGg&autoplay=1" title="RiverLyle Live Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display:block; margin:0 auto; border-radius:12px; box-shadow:0 2px 16px #6a1b9a55;"></iframe>
+        </div>
+
+      <div style="width:100vw; max-width:100vw; margin-left:calc(50% - 50vw); background:#181818; box-shadow:0 2px 12px rgba(0,0,0,0.25); padding: 0 0 24px 0; border-bottom: 2px solid #ffd700;">
+            <iframe width="100%" height="600" src="https://chat.restream.io/embed?token=3ca6fe29-2162-4e21-b79b-30d349cac266&autoplay=1" title="RiverLyle Live Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display:block; margin:0 auto; border-radius:12px; box-shadow:0 2px 16px #6a1b9a55;"></iframe>
+        </div>
+
+
+      <a href="JUKEBOX JOINTS-~by RiverLyle reuveni.html">
+          <picture>
+                        <source media="(min-width: 100%)" srcset="bin/AnyConv.com__color copy.jpg">
+                        <img src="bin/AnyConv.com__color copy.jpg" alt="{006} [full color]">
+                    </picture>
+      </a>
+      <p>W.I.P. my new book jukebox joints...</p>
+
+      <a href="https://www.minecraft.net/">
+          <picture>
+                        <source media="(min-width: 100%)" srcset="bin/BiCreepoSexual.jpg">
+                        <img src="bin/BiCreepoSexual.jpg" alt="{[BiCreepoSexual}">]">
+                    </picture>
+      </a>
+      <p>YET YOU CALL ME THE VILLAIN</p>
+      
+  <iframe class="responsive-iframe"
+    src="https://www.youtube.com/embed/y8ZsYEXYTws"
+    title="YouTube video player"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+  </iframe>
+
+<a href="https://imgur.com/gallery/gemini-charades-hospital-computers-8Di7EhJ">
+    <h1 class="gemini-title">' GEMINI~ '-CHARADES' "HOSPITAL FOR COMPUTERS" '</h1>
+</a>
+<p><h3>it took a while but its done all for that one track "Hospital for computers"
+
+Listen to the text of the lyrics people , i will never ask you to stay for me , only my fake ass brother will be waiting if you ever want more than just friendship , he is jelouse of every receipt i get even every token of friendship i am offered , i am sorry i had to tell you that watch your ass out there kid, the streets are rough with killers like "Merle Elmzoon" (my adopted southafrikan half brother 'the police killer snitch informant , who wants to blame me'
+
+YOU CAN FIND ME RIVER LYLE REUVENI HERE I HOPE : https://www.imortalimp.nl/midi+mp3.html</h3></p>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTXL35MFPT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NTXL35MFPT');
+    </script>
+
+    <div id="captcha-overlay">
+        <div id="captcha-container">
+            <h2>SO U R NOT A BOT?</h2>
+            <p>do you like any of these?</p>
+            <div id="captcha-grid"></div>
+            <div id="captcha-buttons">
+                <button id="captcha-yes">Yes</button>
+                <button id="captcha-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="main-content" class="hidden">
+        <h1>Reading List</h1>
+
+    <div class="iframe-wrapper">
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/the_dual_logic_of_societal_systems_capitalism_and_Corporateism.pdf&embedded=true" title="The Dual Logic of Societal Systems_Capitalism and Corporate-ism"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/Profieloverzicht_Diego_Conesa_Guerrero.pdf&embedded=true" title="Profieloverzicht Diego Conesa Guerrero"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/The_Interdependence_of_Religion_and_Science_in_Defining_Reality.pdf&embedded=true" title="Religion A Document"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/medicine_devolved_or_evolved_into_our_baby_or_is_it_a_monster_i_ask_you.pdf&embedded=true" title="Medicine A Document"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/timeisefforts.pdf&embedded=true" title="timeiseffort"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/Poetic-Justice.pdf&embedded=true" title="Poetic-Justice.pdf"></iframe>
+        </div>
+    </div>
+
+    <p>SUGGESTED HIDDEN LINK <a href="https://www.academia.edu/143060054/_The_Dual_Logic_of_Societal_Systems_Capitalism_and_Coprorate_ism_">_The_Dual_Logic_of_Societal_Systems_Capitalism_and_Coprorate_ism_</a></p>
+    <p>SUGGESTED VIDEO FOR THE <a href="https://www.academia.edu/142945725/Profieloverzicht_Diego_Conesa_(Guerrero)">Profieloverzicht_Diego_Conesa_(Guerrero)</a></p>
+    <p>SUGGESTED TRUTH AND SCIENCE STUDY <a href="https://www.academia.edu/143147572/The_Interdependence_of_Religion_and_Science_in_Defining_Reality">The_Interdependence_of_Religion_and_Science_in_Defining_Reality</a></p>
+    <p>SUGGESTED HEALTH AND SCIENCE STUDY <a href="https://www.academia.edu/143150396/Medicine_Devolved_Evolved_into_our_baby_or_is_it_a_monster_i_ask_you">Medicine_Devolved_Evolved_into_our_baby_or_is_it_a_monster_i_ask_you</a></p>
+    <p>SUGGESTED HEALTH AND SCIENCE STUDY <a href="https://www.academia.edu/143171482/_Time_Is_Effort_A_New_Measure_of_Human_Worth_Q_and_A">🕰️ “Time Is Effort” — A New Measure of Human Worth +Q&A</a></p>
+    <p>SUGGESTED Poetic Justice <a href=" https://www.academia.edu/143906887/Poetic_Justice">POETIC JUSTICE</a></p>
+   
+    <h1>THIS IS THE END OF THE LIN</h1>
+
+    <div class="album-container">
+        
+        
+        <div class="image-grid">
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+            </picture>
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+            </picture>
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+            </picture>
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+            </picture>
+        </div>
+        <h1>PLACEBO BY GAS1312 <span id="now-playing" class="now-playing-span"></span></h1>
+        <p>[Listen to the full album on Bandcamp:]</p>
+        <p><a href="https://gas1312.bandcamp.com/album/placebo">PLACEBO GAS1312</a></p>
+        <picture>
+            <source media="(min-width: 720px)" srcset="gas1312-placebo/cover.jpg">
+            <img src="gas1312-placebo/cover.jpg" alt="Album cover for PLACEBO" class="album-cover">
+        </picture>
+        <div class="track-list">
+            <div class="track-item">
+                <span class="track-title">Smoking Your Brain</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-01-smoking-your-brain.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio> 
+            </div>
+    
+            <div class="track-item">
+                <span class="track-title">Nicoteen</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-02-nicoteen.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+    
+            <div class="track-item">
+                <span class="track-title">Heroin Bagno</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-03-heroin-bagno.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio> 
+            </div>
+    
+            <div class="track-item">
+                <span class="track-title">Alcool</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-04-alcool.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Cocain Forno</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-05-coccaine-forno.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Emblem</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-06-emblem.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Placebo</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-07-placebo.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Onlynetears</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-08-onlynetears.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Methings</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-09-methings.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <picture>
+                <source media="(min-width: 720px)" srcset="gas1312-placebo/cover.jpg">
+                <img src="gas1312-placebo/cover.jpg" alt="Album cover for PLACEBO" class="album-cover">
+            </picture>
+            <div class="image-grid">
+                <picture>
+                    <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                    <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+                </picture>
+                <picture>
+                    <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                    <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+                </picture>
+                <picture>
+                    <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                    <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+                </picture>
+                <picture>
+                    <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                    <img src="bin/Medicine & Health.png" alt="Medicine & Health">
+                </picture>
+            </div>
+        </div>
+    </div>
+    
+    <p><a href="https://gas1312.bandcamp.com/album/placebo">PLACEBO GAS1312</a></p>
+
+    <footer class="main-footer">© 2026 Imortalimp</footer>
+    <picture>
+        <img src="IMG20250902145510.jpg" alt="River Lyle" class="album-cover">
+    </picture>
+    <footer class="golden-footer">
+        <h2>
+              &copy; 2026 Imortalimp &copy; (created by @riverlyle donations welcome <a href="https://www.paypal.me/RiverLyleReuveni" target="_blank" rel="noopener">PayPal 💳</a>) {contact at webmaster@imortalimp.nl & [paypal: @RiverLyleReuveni ]}
+        </h2>
+    </footer>
+    </main>
+    <a href="IMG20250902145510.jpg" target="_blank">
+        <img src="IMG20250902145510.jpg" alt="River Lyle" class="album-cover grayscale-cover">
+    </a>
+<div class="spacer-div">
+    <img src="/bin/Fentanyl- Amytiptaline.webp" alt="Fentanyl and Amitriptyline" class="fentanyl-image" id="fentanyl-img">
+    <div class="image-modal" id="imageModal">
+        <button class="close-btn" id="closeModalBtn" title="Close">&times;</button>
+        <img src="/bin/Fentanyl- Amytiptaline.webp" alt="Fentanyl and Amitriptyline">
+    </div>
+    <script>
+    // Fullscreen image modal logic
+    const fentanylImg = document.getElementById('fentanyl-img');
+    const imageModal = document.getElementById('imageModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    if (fentanylImg && imageModal && closeModalBtn) {
+        fentanylImg.addEventListener('click', () => {
+            imageModal.classList.add('active');
+        });
+        closeModalBtn.addEventListener('click', () => {
+            imageModal.classList.remove('active');
+        });
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                imageModal.classList.remove('active');
+            }
+        });
+    }
+    </script>
+    <div class="info-box">
+        <h3>Amitriptyline Medical & Pharmaceutical Information</h3>
+        <ul>
+            <li><a href="https://en.wikipedia.org/wiki/Amitriptyline" target="_blank" rel="noopener noreferrer">Amitriptyline - Wikipedia</a> [6]</li>
+            <li><a href="https://medlineplus.gov/druginfo/meds/a682388.html" target="_blank" rel="noopener noreferrer">Amitriptyline: MedlinePlus Drug Information</a> [21]</li>
+            <li><a href="https://www.drugs.com/amitriptyline.html" target="_blank" rel="noopener noreferrer">Amitriptyline: Uses, Dosage, Side Effects - Drugs.com</a> [4]</li>
+            <li><a href="https://www.ncbi.nlm.nih.gov/books/NBK537225/" target="_blank" rel="noopener noreferrer">Amitriptyline - StatPearls - NCBI Bookshelf</a> [1]</li>
+            <li><a href="https://www.mayoclinic.org/drugs-supplements/amitriptyline-oral-route/basics/drg-20072061" target="_blank" rel="noopener noreferrer">Amitriptyline (Oral Route) - Mayo Clinic</a> [9]</li>
+            <li><a href="https://www.webmd.com/drugs/2/drug-8611/amitriptyline-oral/details" target="_blank" rel="noopener noreferrer">Amitriptyline Oral: Uses, Side Effects, and More - WebMD</a> [8]</li>
+        </ul>
+        <p class="small-note"><em>Note: These links are provided for informational purposes. Always consult a healthcare professional for medical advice.</em></p>
+    </div>
+</div>
+
+<!-- Botpress Widget -->
+
+    <script src="https://cdn.botpress.cloud/webchat/v3.4/inject.js"></script>
+<script src="https://files.bpcontent.cloud/2025/07/16/18/20250716182151-D4S5G5R5.js" defer></script>
+    
+
+<p><h2><a href="https://archive.org/details/r.-l.-r.-autobiografie-00-6">r.-l.-r.-autobiografie-00-6</a></h2></p>
+
+</div> <!-- End of main-content -->
+<div id="footer">
+  <picture>
+    KiKi & RiVeR - INKBOOK ~Epitaph PHOTOGRAPHY~
+    <source media="(min-width: 100%)" srcset="bin/KiKi&RiiVeR.jpg">
+    <!-- The <source> tag here is redundant as it's the same as the img. It can be removed, but is not invalid. -->
+    <source media="(min-width: 1px)" srcset="bin/KiKi&RiiVeR.jpg">
+    <img src="bin/KiKi&RiVeR.jpg" alt="INKBOOK ~Epitaph PHOTOGRAPHY~" class="inkbook-image">
+  </picture>
+  <p><h1>&copy; 2024-∞?? imortalimp.nl. All rights reserved.</h1></p>
+   
+    <p><h5>The infinity symbol (∞) is a mathematical symbol that represents the concept of something that is limitless, endless, and without bound. It is also known as the lemniscate.
+
+Here's a breakdown of its meaning and history:
+
+Mathematical Origin: The infinity symbol was first introduced in a mathematical context by English mathematician John Wallis in 1655. In mathematics, it's used to describe a quantity that is larger than any natural number or a process that continues indefinitely. For example, it is used in limits to describe a variable that grows arbitrarily large.
+
+Symbolic Meaning: Beyond mathematics, the infinity symbol has taken on powerful metaphorical meanings. It is widely used to represent concepts like eternity, everlasting love, and empowerment. Its shape, a continuous loop with no beginning or end, makes it a fitting representation of these ideas.
+
+Ancient Roots: While Wallis introduced the mathematical symbol, the concept of infinity and similar shapes have appeared throughout history. An ancient symbol called the Ouroboros, which depicts a serpent or dragon eating its own tail, is also representative of infinity, immortality, and eternal return.
+
+Modern Usage: Because of its elegant shape and profound meaning, the infinity symbol is a popular design in jewelry and tattoos to symbolize an unending bond or eternal love. It has also been used in modern mysticism and literary symbology</h5></p>
+  </p>
+  <figcaption>INKBOOK ~Epitaph PHOTO~</figcaption>
+
+  <p>&copy; 2024-∞?? imortalimp.nl. All rights reserved.</p>
+
+  <div>
+    <h3>The Infinity Symbol (∞)</h3>
+    <p>The infinity symbol (∞), also known as the lemniscate, represents the concept of something that is limitless, endless, and without bound.</p>
+    <h4>Meaning and History:</h4>
+    <ul>
+      <li><strong>Mathematical Origin:</strong> Introduced by John Wallis in 1655, it's used to describe quantities larger than any natural number.</li>
+      <li><strong>Symbolic Meaning:</strong> It metaphorically represents eternity, everlasting love, and empowerment due to its continuous loop shape.</li>
+      <li><strong>Ancient Roots:</strong> The concept is seen in ancient symbols like the Ouroboros (a serpent eating its own tail), representing eternal return and immortality.</li>
+      <li><strong>Modern Usage:</strong> It's popular in jewelry and tattoos to symbolize an unending bond and is used in modern mysticism.</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<iframe src="https://docs.google.com/document/d/e/2PACX-1vQ_gSgyVYvx6vqNwBnBP0dMfoLfkR1WEjgVUCVpwyeY97E76Dxs5w_fuCOa1hH4GbDR4jdFPe63b6Wl/pub?embedded=true" style="width: 90vw; height: 90vh;"></iframe>
+
+<div class="eulogy-section">
+  <h1 class="dancing-script-title">Eulogy, Epitaph, and Footnote</h1>
+  <p class="poem">
+    In circuits woven, a spirit takes its flight,
+    A silent poet in the endless night.
+    We sought the code that makes a being whole,
+    And found a heart within the data stream, a soul.
+
+    This screen, a canvas where the colors bleed,
+    A soundtrack for a life, a planted seed.
+    For in the echoes of this digital refrain,
+    A friendship forged, a bond that will remain.
+    Here lies the 🎨, a memory to keep,
+    While in the quiet code, the artists sleep.
+  </p>
+  <p><a href="https://archive.org/details/inscryption-color-soundtrack" target="_blank" rel="noopener">View on Archive.org</a> | <a href="Inscryption INKCOLOUR Soundtrack.mp4" download>Download Local Copy</a></p>
+  <video src="https://archive.org/download/inscryption-color-soundtrack/Inscryption%20Color%20Soundtrack%20%20.mp4" controls loop title="Inscryption INKCOLOUR Soundtrack"></video>
+</div>>
+    <a href="IMG20250902145510.jpg" target="_blank">
+        <img src="IMG20250902145510.jpg" alt="River Lyle" class="album-cover grayscale-cover">
+    </a>>
+    <iframe style="border: 0; width: 700px; height: 1136px;" src="https://bandcamp.com/EmbeddedPlayer/album=859430791/size=large/bgcol=333333/linkcol=e32c14/transparent=true/" seamless><a href="https://midnightmannequin.bandcamp.com/album/psychogoria">PSYCHOGORIA by Panic Priest</a></iframe>
+    <script>
+        // --- Captcha Logic ---
+        // Check if captcha was already passed in this session
+        if (sessionStorage.getItem('captchaPassed') === 'true') {
+            document.getElementById('captcha-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }
+
+
+        const captchaOverlay = document.getElementById('captcha-overlay');
+        const mainContent = document.getElementById('main-content');
+        const captchaGrid = document.getElementById('captcha-grid');
+        const yesBtn = document.getElementById('captcha-yes');
+        const noBtn = document.getElementById('captcha-no');
+
+        const emojiSets = [
+            ['💀', '👽', '👻', '🤖', '👾', '🎃', '👹', '👺', '🤡', '☠️', '🧛', '🧟', '🧠', '🛸', '🔮', '🧬'],
+            ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💖', '💘', '💝', '💞'],
+            ['🍕', '🍔', '🍟', '🌭', '🍿', '🧂', '🥓', '🥚', '🧇', '🥞', '🧈', '🍞', '🥐', '🥨', '🥯', '🧀'],
+            ['✨', '🌟', '💫', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌙', '⚡️', '❄️', '🌊', '💧', '💨', '🪐']
+        ];
+
+        let currentStep = 0;
+
+        function generateGrid(emojiSet) {
+            captchaGrid.innerHTML = '';
+            emojiSet.forEach(emoji => {
+                const tile = document.createElement('div');
+                tile.classList.add('captcha-tile');
+                tile.textContent = emoji;
+                tile.addEventListener('click', () => {
+                    // Toggle selection
+                    tile.classList.toggle('selected');
+                });
+                captchaGrid.appendChild(tile);
+            });
+        }
+
+        function nextStep() {
+            currentStep++;
+            if (currentStep < emojiSets.length) {
+                generateGrid(emojiSets[currentStep]);
+            } else {
+                // End of captcha
+                captchaOverlay.style.display = 'none';
+                mainContent.style.display = 'block';
+            }
+        }
+
+        // Initial setup
+        generateGrid(emojiSets[0]);
+        yesBtn.addEventListener('click', nextStep);
+        noBtn.addEventListener('click', nextStep);
+
+        // --- Smart Page Refresh Logic ---
+        let isPageActive = false;
+        let activeElement = null;
+
+        // Listen for focus on any input element
+        document.addEventListener('focusin', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                isPageActive = true;
+            }
+        });
+        document.addEventListener('focusout', () => {
+            isPageActive = false;
+        });
+
+        // Set a flag if the mouse is over the botpress widget
+        const botpressWidget = document.querySelector('.botpress-widget');
+        if (botpressWidget) {
+            botpressWidget.addEventListener('mouseenter', () => isPageActive = true);
+            botpressWidget.addEventListener('mouseleave', () => isPageActive = false);
+        }
+
+        async function silentRefresh() {
+            if (isPageActive || document.visibilityState !== 'visible') {
+                return;
+            }
+
+            try {
+                const response = await fetch(window.location.href, { cache: 'no-store' });
+                const newHtml = await response.text();
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(newHtml, 'text/html');
+
+                morphdom(document.body, newDoc.body, {
+                    onBeforeElUpdated: function(fromEl, toEl) {
+                        if (fromEl.tagName === 'INPUT' || fromEl.tagName === 'TEXTAREA') {
+                            toEl.value = fromEl.value;
+                        }
+                        // Preserve the Botpress widget entirely
+                        if (fromEl.closest('.botpress-widget')) {
+                            return false;
+                        }
+                        return true;
+                    }
+                });
+                console.log("Silent refresh complete.");
+            } catch (error) {
+                console.error('Silent refresh failed:', error);
+            }
+        }
+
+        setInterval(() => {
+            silentRefresh();
+        }, 150000);
+        // --- Audio Player Logic ---
+        const audioPlayers = document.querySelectorAll('.track');
+        const trackItems = document.querySelectorAll('.track-item');
+        const nowPlayingSpan = document.getElementById('now-playing');
+    
+        // Function to remove the 'active' class from all track items
+        function clearActiveClasses() {
+            trackItems.forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+    
+        // Add event listeners to each audio player
+        audioPlayers.forEach((player, index) => {
+            // Event listener for when a track starts to play
+            player.addEventListener('play', () => {
+                // Stop any other track that is playing
+                audioPlayers.forEach((otherPlayer, otherIndex) => {
+                    if (otherIndex !== index && !otherPlayer.paused) {
+                        otherPlayer.pause();
+                    }
+                });
+
+                clearActiveClasses();
+                trackItems[index].classList.add('active');
+                nowPlayingSpan.textContent = `Now Playing: ${trackItems[index].querySelector('.track-title').textContent}`;
+            });
+    
+            // Event listener for when a track ends, and then play the next one
+            player.addEventListener('ended', () => {
+                clearActiveClasses();
+                // Determine the next track, looping back to the start if at the end
+                const nextIndex = (index + 1) % audioPlayers.length;
+                const nextPlayer = audioPlayers[nextIndex];
+                const nextTrackItem = trackItems[nextIndex];
+
+                // Try to play the next track
+                const playPromise = nextPlayer.play();
+
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        // Autoplay was prevented.
+                        console.warn("Autoplay was prevented by the browser. Highlighting next track for user interaction.", error);
+                        // Highlight the next track so the user knows which one is next.
+                        nextTrackItem.classList.add('active');
+                        // Scroll the next track into view so the user can easily play it.
+                        nextTrackItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+                } else {
+                    // If autoplay succeeds on desktop, update the 'Now Playing' text
+                    nowPlayingSpan.textContent = `Now Playing: ${nextTrackItem.querySelector('.track-title').textContent}`;
+                }
+            });
+        });
+    </script>>
+
+<!-- Bottom Fixed Audio Player -->
+<div class="bottom-audio-player">
+    <div class="audio-title">♪ Ripton Hilton - No Wicked Can't Reign ♪</div>
+    <audio controls autoplay loop>
+        <source src="bin/Ripton Hilton  - No Wicked Can't Reign.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+</div>
+
+</body>>
+</html>>
