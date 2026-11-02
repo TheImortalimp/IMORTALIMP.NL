@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="favicon.ico?v=6.4.38.21" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI WARP ENGINE — Hyper-Integrated Synthesis | IMORTALIMP.NL</title>
+    <meta name="description" content="AI Warp Engine unified synthesis: YouTube Randoms with forward/back navigation, the YouTube Warp Bus and per-pixel SVG Warp Lens, browser tab/window/full-screen capture feeding real pixels and optional audio into the Canvas engine, independent microphone monitoring and Audio Reactive Ear modes, local media, 34 glitch voices, 29 AI Warp modes, presets, and Soft-Eye crescendo.">
+    <link rel="stylesheet" href="media_page.css?v=6.4.38.21">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unica+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+
+    <!-- ── PRIMARY STAGE CANVAS & MEDIA MOUNT ───────────────────────────── -->
+    <main id="canvas-stage">
+        <!-- YouTube Mount Behind Canvas -->
+        <div id="ytWarpShell">
+            <div id="ytPlayerMount"></div>
+        </div>
+
+        <!-- Glitch / Warp Canvas -->
+        <canvas id="glitchCanvas"></canvas>
+
+        <!-- Hidden Local Media Elements -->
+        <video id="localVideo" playsinline loop style="display:none;"></video>
+        <audio id="localAudio" playsinline loop style="display:none;"></audio>
+        <img id="localArtworkImg" style="display:none;" alt="Local Artwork">
+    </main>
+
+    <!-- ── SVG WARP LENS (v6.3.1): per-pixel displacement graph for the YouTube feed ─
+         The cross-origin iframe pixels are rasterized by the compositor through
+         feTurbulence → feDisplacementMap. Display-only: JS never reads the pixels.
+         IMPORTANT: keep width/height 0 sizing — never display:none, or url() refs die. -->
+    <svg class="svg-warp-defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="ytSvgWarp" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+                <feTurbulence id="ytWarpTurb" type="fractalNoise" baseFrequency="0.006 0.01" numOctaves="2" seed="7" result="warpNoise"/>
+                <feDisplacementMap id="ytWarpDisp" in="SourceGraphic" in2="warpNoise" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- ── FULLSCREEN OVERLAY FX (CRT + VIGNETTE + OSD) ──────────────────── -->
+    <div id="fullscreen-fx-layer">
+        <div class="crt-overlay"></div>
+        <div class="cyber-vignette"></div>
+        <div class="vcr-osd-badge">AI WARP ▶ PLAY SP 00:06:00</div>
+    </div>
+
+    <!-- ── HUD NOTIFICATION BANNER (outside the z-index 2 FX layer so it paints above the HUD bars) ── -->
+    <div id="hudNotificationBanner" class="hud-notification-banner">AI WARP // READY</div>
+
+    <!-- ── DRAG AND DROP FULLSCREEN OVERLAY ──────────────────────────────── -->
+    <div id="dropOverlay">
+        <div class="drop-message">📁 DROP VIDEO / AUDIO / FOLDER HERE TO PLAY</div>
+    </div>
+
+    <!-- ── TOP HUD BAR ──────────────────────────────────────────────────── -->
+    <header id="glitch-top-bar">
+        <div class="hud-title-cluster">
+            <h1>AI Warp Engine</h1>
+            <span class="hud-version-badge" title="6.4.38.21 ULTIMATE">6.4.38.21 ULTIMATE</span>
+        </div>
+
+        <div class="hud-visualizer-group">
+            <canvas id="spectrum-canvas" width="150" height="34" title="Real-time Audio Spectrum"></canvas>
+            <canvas id="waveform-canvas" width="100" height="34" title="Waveform Oscilloscope"></canvas>
+            
+            <div class="stereo-vu-display" title="Stereo VU Meter">
+                <div class="vu-channel"><span class="vu-label">L</span><div class="vu-bar" id="vu-bar-l"></div></div>
+                <div class="vu-channel"><span class="vu-label">R</span><div class="vu-bar" id="vu-bar-r"></div></div>
+            </div>
+            <span id="audioMonitorBadge" class="audio-monitor-badge" title="Active Audio Sync Source">MONITOR: STANDBY</span>
+            <span id="cadenceClockBadge" class="cadence-clock-badge" title="Timed Effects Automation Clock">CADENCE: IDLE</span>
+        </div>
+
+        <div class="hud-actions">
+            <button id="micToggleBtn" class="wired-button" title="Toggle Live Microphone Audio Monitor (Drives Visualizers & Warp)">🎙 MIC: OFF</button>
+            <div class="synth-cluster-group">
+                <button id="synthToggleBtn" class="wired-button" title="Cycle Web Audio Synthesizer Grooves">SYNTH DUB: OFF</button>
+                <button id="btn-play-keygen" class="wired-button synth-sub-btn" title="138 BPM Keygen Techno">KEYGEN</button>
+                <button id="btn-play-mellow" class="wired-button synth-sub-btn" title="96 BPM Mellow Deep Bass">MELLOW</button>
+                <button id="btn-play-hybrid" class="wired-button synth-sub-btn" title="Cyber-Hybrid Dub">HYBRID</button>
+                <button id="btn-stop-synth" class="wired-button synth-sub-btn synth-stop-btn" title="Stop Web Audio Synth" style="display:none;">⏹</button>
+            </div>
+            <button id="poleRDrawerBtn" class="wired-button" title="Open Raum X-R Showcase">RAUM · X-R (4)</button>
+            <button id="eqDrawerBtn" class="wired-button" title="Adjust Audio Reactive EQ Sensitivity (Bass/Mid/Treble)">🎛 EQ GAIN</button>
+            <button id="shortcutsBtn" class="wired-button" title="View Cyber VJ Keyboard Shortcuts [?]">⌨ HOTKEYS</button>
+
+            <!-- Theme Presets -->
+            <div class="theme-rack" title="Change Theme Palette">
+                <button class="theme-btn theme-cyber active" data-theme="cyber" title="Cyber Matrix"></button>
+                <button class="theme-btn theme-neon" data-theme="neon" title="Neon Pulse"></button>
+                <button class="theme-btn theme-gold" data-theme="gold" title="Void Gold"></button>
+                <button class="theme-btn theme-cyan" data-theme="cyan" title="Terminal Cyan"></button>
+                <button class="theme-btn theme-white" data-theme="white" title="CRT Monochrome"></button>
+                <button class="theme-btn theme-retro" data-theme="retro" title="Retro HUD"></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── SECONDARY HUD: YOUTUBE RANDOMS & LOCAL MEDIA DOCK ───────────────── -->
+    <section id="ytMediaBar">
+        <!-- YouTube Randoms Navigation -->
+        <div class="yt-randoms-cluster">
+            <button id="ytPrevBtn" class="wired-button" title="Previous YouTube Video in History" disabled>⏮ BACK</button>
+            <button id="ytRandomBtn" class="wired-button" title="Play Completely Random YouTube Video from Knowledgebase">🎲 RANDOM YT</button>
+            <button id="ytNextBtn" class="wired-button" title="Skip to Next Video / New Random">NEXT ⮞</button>
+            <span id="ytStatusBadge" class="yt-status-badge">YT: IDLE</span>
+            <input id="ytUrlInput" type="text" placeholder="YouTube URL, Video ID, or Playlist (Press Enter)" title="Active YouTube URL or Playlist">
+            <button id="ytLoadBtn" class="wired-button" title="Load & Play Entered Video URL, Playlist, or ID">LOAD ▶</button>
+            <button id="ytPlaylistBtn" class="wired-button highlight-btn" title="Load and play the featured playlist through the AI Warp Engine">▶ PLAY FEATURED PLAYLIST</button>
+            <a class="wired-button" href="https://www.youtube.com/playlist?list=PLGQdK_CU4B7w" target="_blank" rel="noopener noreferrer" title="Open the featured playlist directly on YouTube">↗ YOUTUBE</a>
+            <button id="ytExtractPlaylistBtn" class="wired-button highlight-btn" title="Extract All Videos from YouTube Playlist into Knowledgebase">📑 EXTRACT PLAYLIST</button>
+            <button id="ytKbModalBtn" class="wired-button" title="Open YouTube Knowledgebase & Stored Links Vault">📚 KB: [16]</button>
+            <button id="ytCopyUrlBtn" class="wired-button" title="Copy YouTube URL to Clipboard">📋 COPY URL</button>
+            <button id="ytPasteUrlBtn" class="wired-button" title="Paste YouTube URL from Clipboard & Play">📋 PASTE & PLAY</button>
+            <button id="ytCaptureTabBtn" class="wired-button" title="Share a browser tab, application window, or full screen. Captured pixels feed the Canvas pipeline; shared audio is analyzed without playback duplication. Click again to stop. [Hotkey: N]">🖥 SHARE SCREEN / WINDOW</button>
+        </div>
+
+        <!-- Local Media & Artwork Controls -->
+        <div class="local-media-cluster">
+            <button id="openLocalMediaBtn" class="wired-button" title="Open Local MP4, AVI, MKV, MOV, MP3, M4A">📁 OPEN MEDIA</button>
+            <button id="openLocalFolderBtn" class="wired-button" title="Select Folder: Plays Audio & Cycles Folder Images">📂 FOLDER (AUDIO+PICS)</button>
+            <button id="addArtworkBtn" class="wired-button" title="Select Artwork Images for MP3 Playback">🖼 ARTWORK</button>
+            <button id="customBgBtn" class="wired-button" title="Select Custom Backdrop Images (From glitch-test.html)">🖼 CUSTOM BG</button>
+
+            <!-- Media Transport Strip -->
+            <div id="mediaTransportBar">
+                <button id="mediaPrevTrackBtn" class="wired-button" title="Previous Audio Track" style="display:none;">⏮</button>
+                <button id="mediaPlayPauseBtn" class="wired-button">PLAY ▶</button>
+                <button id="mediaNextTrackBtn" class="wired-button" title="Next Audio Track" style="display:none;">⏭</button>
+                <span id="mediaTitleBadge" class="media-title-badge">Local Media</span>
+                <input id="mediaSeekSlider" type="range" min="0" max="100" value="0" title="Scrub Timeline">
+                <span id="mediaTimeDisplay" class="media-time-display">00:00 / 00:00</span>
+                
+                <div id="artworkControls" class="artwork-controls">
+                    <button id="prevArtworkBtn" class="wired-button" title="Previous Folder Artwork">❮</button>
+                    <span id="artworkBadge" class="artwork-badge">IMG [0/0]</span>
+                    <button id="nextArtworkBtn" class="wired-button" title="Next Folder Artwork">❯</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden File Inputs -->
+        <input type="file" id="localFileInput" accept=".mp4,.m4v,.mov,.avi,.mkv,.webm,.ogv,.ogm,.3gp,.av1,.ivf,.wmv,.asf,.mpg,.mpeg,.ts,.mts,.m2ts,.flv,.vob,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.flac,.weba,.mka,.spx,.aif,.aiff,.wma,.ac3,.dts,.amr,video/*,audio/*" style="display:none;">
+        <input type="file" id="localFolderInput" webkitdirectory directory multiple accept="video/*,audio/*,image/*" style="display:none;">
+        <input type="file" id="localArtworkInput" multiple accept="image/*" style="display:none;">
+        <input type="file" id="customBgFile" multiple accept="image/*" style="display:none;">
+    </section>
+
+    <!-- ── LEFT MIXER RACK (17 CORE + 17 GC#(3) VOICES) ───────────────────── -->
+    <aside id="effect-toggle-column">
+        <!-- Generated dynamically by media_page.js -->
+    </aside>
+
+    <!-- ── BOTTOM CONTROL DOCK & PRESETS ─────────────────────────────────── -->
+    <footer id="glitch-bottom-bar">
+        <!-- Preset Memory Rack -->
+        <div class="preset-rack">
+            <button id="presetListToggleBtn" class="wired-button preset-mode-machine" title="Swap memory list: USER ⇄ MACHINE">MACHINE</button>
+            <select id="presetSelect" title="Preset Selection"></select>
+            <button id="presetPrevBtn" class="wired-button" title="Previous Preset">&lsaquo;</button>
+            <button id="presetNextBtn" class="wired-button" title="Next Preset">&rsaquo;</button>
+            <button id="presetAutoBtn" class="wired-button" title="Curated Auto Roulette Cycler"> -ʁ%AUTO%ʁ- </button>
+            <input id="presetNameInput" type="text" placeholder="preset name">
+            <button id="presetSaveBtn" class="wired-button" title="Save board as User Preset">Save</button>
+            <button id="presetDeleteBtn" class="wired-button" title="Delete User Preset">Del</button>
+        </div>
+
+        <!-- Master Automation & Mode Buttons -->
+        <div class="master-controls-cluster">
+            <button id="aiWarpBtn" class="wired-button active" title="Toggle AI Warp Pipeline [ON/OFF]">AI WARP: [ON]</button>
+            <button id="warpModeCycleBtn" class="wired-button" title="Cycle AI Warp Mode (AI ZERO + 29 Algorithmic Modes)">MODE: LIQUID [1/29]</button>
+            <select id="warpModeSelect" class="warp-mode-select" title="Directly Select AI Warp Mode (AI ZERO + 29 Modes)">
+                <option value="ai_zero">0. AI ZERO MOTION · Stillness + Subtle Ghost</option>
+                <option value="liquid">1. LIQUID · Fluid Waves</option>
+                <option value="prism">2. PRISM · Crystal Dispersion</option>
+                <option value="breathe">3. BREATHE · Radial Expansion</option>
+                <option value="fold">4. FOLD · Origami Accordion</option>
+                <option value="aurora">5. AURORA · Neon Curtains</option>
+                <option value="vortex">6. VORTEX · Multi-Ring Whirlpool</option>
+                <option value="cybergrid">7. CYBERGRID · Isometric Matrix</option>
+                <option value="hyperdrive">8. HYPERDRIVE · Starburst Zoom</option>
+                <option value="kaleidoscope">9. KALEIDOSCOPE · Mandala Symmetry</option>
+                <option value="quantum">10. QUANTUM · Probabilistic Foam</option>
+                <option value="ripple">11. RIPPLE · Concentric Shockwaves</option>
+                <option value="analog_crt">12. ANALOG CRT · Cathode Tube</option>
+                <option value="newblue_roll">13. ROLL · NewBlue Shutter Roll</option>
+                <option value="newblue_active_cam">14. ACTIVE CAM · NewBlue Handheld Shake</option>
+                <option value="newblue_shear">15. SHEAR · NewBlue Vector Slant</option>
+                <option value="newblue_wiggle">16. WIGGLE · NewBlue Micro Jitter</option>
+                <option value="newblue_zoom_blur">17. ZOOM BLAST · NewBlue Velocity Streaks</option>
+                <option value="newblue_video_tile">18. VIDEO TILE · NewBlue Multi-pane Grid</option>
+                <option value="newblue_twirl">19. TWIRL · NewBlue Polar Vortex Spiral</option>
+                <option value="newblue_light_ring">20. LIGHT RING · NewBlue Anamorphic Flare</option>
+                <option value="newblue_earthquake">21. EARTHQUAKE · NewBlue Seismic Shockwave</option>
+                <option value="newblue_water_drop">22. WATER DROP · NewBlue Caustic Lens</option>
+                <option value="newblue_rgb_shift">23. RGB FAST SHIFT · NewBlue Prism Split</option>
+                <option value="newblue_quad_mirror">24. QUAD MIRROR · NewBlue 4-Way Symmetry</option>
+                <option value="newblue_fish_eye">25. FISH EYE · NewBlue Convex Bulge Glass</option>
+                <option value="newblue_pinch">26. PINCH · NewBlue Optical Contraction</option>
+                <option value="newblue_solarize">27. SOLARIZE · NewBlue Sabattier Luma Wash</option>
+                <option value="newblue_cathode_beam">28. CATHODE BEAM · NewBlue Raster Deflection</option>
+                <option value="newblue_neon_edges">29. NEON EDGES · NewBlue Electric Vector Outlines</option>
+            </select>
+            <button id="ghostProtocolBtn" class="wired-button" title="Toggle & Cycle Ghost Protocol">GHOST: OFF</button>
+            <button id="vsyncScanBtn" class="wired-button" title="Toggle & Cycle V-Sync Raster">V-SYNC: OFF</button>
+            <button id="autoGlitchBtn" class="wired-button" title="Toggle Rhythmic Auto Glitch Surges">AUTO GLITCH: OFF</button>
+            <button id="randomizeBtn" class="wired-button" title="One-Shot Scramble: Randomize Active Effects Board">🎲 RANDOMIZE</button>
+            <button id="continualRandomizeBtn" class="wired-button" title="Toggle Continual LFO Randomization">CONTINUAL RAND: OFF</button>
+            <button id="autoMastersBtn" class="wired-button" title="Toggle Automated Drift for Speed, Opacity & Motion">AUTO MASTERS: OFF</button>
+            <button id="hardLightBtn" class="wired-button" title="Toggle High-Contrast Electric Blend Mode">HARD-LIGHT: OFF</button>
+            <button id="softEyeBtn" class="wired-button" title="Toggle Soft-Eye Crescendo Scheduler & Pacing">SOFT-EYE: CALM</button>
+            <button id="milkdropBtn" class="wired-button" title="Toggle Drop the Milk? — soupy, audio-reactive Milkdrop/projectM-inspired feedback FX">DROP THE MILK? OFF</button>
+            <button id="earBtn" class="wired-button" title="Audio Reactive Ear: AUTO / AUDIO / CANVAS">EAR: AUTO</button>
+            <button id="timedAutoBtn" class="wired-button" title="Toggle Timed Effects Automation Cadence">TIMED AUTO: OFF</button>
+            <button id="crescendoBtn" class="wired-button" title="Trigger Soft-Eye Crescendo Overdrive">CRESCENDO ⚡</button>
+            
+            <!-- Quick Glitch Rails -->
+            <div class="rail-cluster" title="Quick Master Intensity Rails">
+                <button class="rail-btn" data-rail="0.5" title="Set Master Intensity to 50%">50%</button>
+                <button class="rail-btn" data-rail="0.75" title="Set Master Intensity to 75%">75%</button>
+                <button class="rail-btn" data-rail="1.0" title="Set Master Intensity to 100%">100%</button>
+            </div>
+
+            <button id="zeroAllBtn" class="wired-button" title="EMP Purge Flash: Zero All Active Levels">ZERO ALL</button>
+            <button id="freezeFrameBtn" class="wired-button" title="Export PNG Screenshot">FREEZE FRAME 📷</button>
+        </div>
+
+        <!-- Master Sliders with Quick Zero & Lock Controls -->
+        <div class="master-controls-cluster">
+            <!-- Master AI Warp Strength Slider (Wide precision fader from 0% No Warp to 100% Full Burst) -->
+            <div class="slider-group warp-slider-group" title="Master AI Warp Strength (0% Flat to 100% Full Burst)">
+                <button id="null-warp-btn" class="null-btn" title="Quick Zero AI Warp Strength">0</button>
+                <label for="ai-warp-strength-slider">WARP STRENGTH</label>
+                <input id="ai-warp-strength-slider" type="range" min="0" max="1" step="0.005" value="0.65" title="Master AI Warp Strength (0% No Warp to 100% Full Burst)">
+                <button id="burst-warp-btn" class="burst-btn" title="Max Burst (100% Full Strength)">⚡ MAX</button>
+                <span id="warpStrengthValBadge" class="slider-val-badge">65%</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-speed-btn" class="null-btn" title="Quick Zero Speed">0</button>
+                <label for="glitch-speed-slider">SPEED</label>
+                <input id="glitch-speed-slider" type="range" min="0.1" max="3" step="0.05" value="1.2">
+                <button id="speedLockBtn" class="lock-btn" title="Lock Speed against Automated Masters, Continual Random, Timed Auto and presets" aria-label="Lock Speed">🔓</button>
+                <span id="speedValBadge" class="slider-val-badge">1.2x</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-opacity-btn" class="null-btn" title="Quick Zero Opacity">0</button>
+                <label for="glitch-opacity-slider">OPACITY</label>
+                <input id="glitch-opacity-slider" type="range" min="0" max="1" step="0.01" value="0.95">
+                <button id="opacityLockBtn" class="lock-btn" title="Lock Opacity against Automated Masters, Continual Random, Timed Auto and presets" aria-label="Lock Opacity">🔓</button>
+                <span id="opacityValBadge" class="slider-val-badge">95%</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-ghost-btn" class="null-btn" title="Quick Zero Ghost Protocol">0</button>
+                <label for="ghostProtocolSlider">GHOST</label>
+                <input id="ghostProtocolSlider" type="range" min="0" max="1" step="0.01" value="0">
+                <button id="ghostLockBtn" class="lock-btn" title="Lock Ghost mode and level against automation and presets" aria-label="Lock Ghost Protocol">🔓</button>
+                <span id="ghostValBadge" class="slider-val-badge">0%</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-vsync-btn" class="null-btn" title="Quick Zero V-Sync Level">0</button>
+                <label for="vsyncScanSlider">V-SYNC</label>
+                <input id="vsyncScanSlider" type="range" min="0" max="1" step="0.01" value="0">
+                <button id="vsyncLockBtn" class="lock-btn" title="Lock V-Sync mode and level against automation and presets" aria-label="Lock V-Sync">🔓</button>
+                <span id="vsyncValBadge" class="slider-val-badge">0%</span>
+            </div>
+            <div class="slider-group milkdrop-opacity-group" title="Milkdrop opacity; unlocked presets may automate this level.">
+                <button id="null-milkdrop-opacity-btn" class="null-btn" title="Set Drop the Milk opacity to zero">0</button>
+                <label for="milkdropOpacitySlider">MILKDROP</label>
+                <input id="milkdropOpacitySlider" type="range" min="0" max="1" step="0.01" value="0.82" aria-label="Drop the Milk opacity">
+                <button id="milkdropOpacityLockBtn" class="lock-btn" title="Lock Milkdrop opacity against preset automation" aria-label="Lock Milkdrop opacity">🔓</button>
+                <span id="milkdropOpacityValBadge" class="slider-val-badge">82%</span>
+            </div>
+        </div>
+        <div class="voice-fx-tuning" aria-label="B&W and Hue/Color FX tuning">
+            <span class="voice-fx-tuning-title">LENS / VOICE FX TUNING</span>
+            <div class="slider-group">
+                <label for="bwInvertControlSlider">B&amp;W INVERT</label>
+                <input id="bwInvertControlSlider" type="range" min="0" max="1" step="0.01" value="1" title="Adjust inversion strength and activate both B&W voices; lock to protect from random rolls" aria-label="LENS B&W inversion strength">
+                <span id="bwInvertControlPreview" class="voice-fx-bw-preview" aria-hidden="true"></span>
+                <span id="bwInvertControlBadge" class="slider-val-badge">100%</span>
+                <button id="bwInvertControlLock" class="lock-btn" title="Lock B&W inversion tuning against random rolls" aria-label="Lock B&W inversion tuning">🔓</button>
+            </div>
+            <div class="slider-group">
+                <label for="hueCycleControlSlider">HUE SPECTRUM</label>
+                <input id="hueCycleControlSlider" type="range" min="0" max="359" step="1" value="0" title="Adjust the Hue/Color Cycle spectrum and activate both Hue voices; lock to protect from random rolls" aria-label="LENS Hue/Color Cycle spectrum">
+                <span id="hueCycleControlPreview" class="voice-fx-hue-preview" aria-hidden="true"></span>
+                <span id="hueCycleControlBadge" class="slider-val-badge">0°</span>
+                <button id="hueCycleControlLock" class="lock-btn" title="Lock Hue/Color tuning against random rolls" aria-label="Lock Hue/Color tuning">🔓</button>
+            </div>
+            <button id="voiceFxRandomizeBtn" class="wired-button" title="Randomize unlocked B&W inversion and Hue/Color settings">🎲 ROLL FX</button>
+        </div>
+    </footer>
+
+    <!-- ── POLE - R SHOWCASE MODAL / DRAWER ──────────────────────────────── -->
+    <div id="pole-r-drawer">
+        <div class="poleR-drawer-header">
+            <h2>RAUM · X-R SHOWCASE</h2>
+            <button id="poleRCloseBtn" class="wired-button">✕</button>
+        </div>
+        <div class="poleR-grid" id="poleR-grid">
+            <!-- Dynamically populated from media_page.json -->
+        </div>
+        <div class="raum-thanks">
+            <img class="raum-back-cover" src="audio/back-cover.jpg" alt="Back cover: pole - Я - raum - variant X-R, tracklist and credits" loading="lazy">
+            <h3>THANKS &amp; DEDICATION</h3>
+            <p>Pole - Я - Raum 1, 2, 3 &amp; 4 - variant X-R are original, fully synthesized works with no sampled audio. They are dedicated to <b>Stefan Betke (Pole)</b> and the artists behind the 1998 album <i>R</i> on DIN &mdash; <b>Daniel Meteo</b>, <b>Burnt Friedman</b> and <b>Kit Clayton</b> &mdash; whose Raum compositions inspired them.</p>
+            <p>Created by <b>GitHub Copilot</b> (AI) as an original work, prompted and directed by <b>River Lyle Reuveni</b> (Imortalimp). Not affiliated with Stefan Betke, Pole, DIN or the artists named above; no recordings by them are used.</p>
+            <p>If you enjoy the original album, please support it: <a href="https://pole-stefanbetke.bandcamp.com/album/r" target="_blank" rel="noopener">pole-stefanbetke.bandcamp.com/album/r</a></p>
+        </div>
+    </div>
+
+    <!-- ── FLOATING UI TOGGLE TAB ────────────────────────────────────────── -->
+    <div id="ui-toggle-tab" title="Click to Collapse / Expand UI" role="button" tabindex="0">
+        <button id="toggle-ui-btn" type="button" tabindex="-1">HIDE U.I. ▶</button>
+    </div>
+
+    <!-- ── EXTERNAL & INTERNAL ENGINE LIBRARIES ───────────────────────────── -->
+    <script src="three.min.js?v=6.4.38.21"></script>
+    <script src="glitch_engine.js?v=6.4.38.21"></script>
+    <script src="r3_gc3_factories.js?v=6.4.38.21"></script>
+    <script src="r3_ghost_vsync.js?v=6.4.38.21"></script>
+    <script src="ai_warp_engine.js?v=6.4.38.21"></script>
+    <script src="local_media.js?v=6.4.38.21"></script>
+    <script src="freeze_frame.js?v=6.4.38.21"></script>
+    <script src="media_page.js?v=6.4.38.21"></script>
+
+
+    <!-- ── YOUTUBE KNOWLEDGEBASE & PLAYLIST VAULT MODAL ────────────────── -->
+    <div id="ytKbModal" class="cyber-modal">
+        <div class="cyber-modal-card yt-kb-modal-card">
+            <div class="cyber-modal-header">
+                <h3>📚 YOUTUBE KNOWLEDGEBASE & PLAYLIST VAULT</h3>
+                <button id="ytKbCloseBtn" class="wired-button">✕</button>
+            </div>
+            <div class="cyber-modal-body">
+                <!-- Stats Bar -->
+                <div class="yt-kb-stats-bar">
+                    <span id="ytKbTotalCount">TOTAL STORED: 16 LINKS</span>
+                    <span id="ytKbPlaylistCount">PLAYLISTS: 0</span>
+                    <span id="ytKbUserCount">USER ADDED: 0</span>
+                </div>
+
+                <!-- Input & Extraction Strip -->
+                <div class="yt-kb-input-box">
+                    <input id="ytKbInput" type="text" placeholder="Paste YouTube Video URL, Playlist URL, or Batch of Links...">
+                    <button id="ytKbAddBtn" class="wired-button">➕ ADD LINK / PLAYLIST</button>
+                    <button id="ytKbExtractBtn" class="wired-button highlight-btn">📑 EXTRACT PLAYLIST</button>
+                </div>
+
+                <!-- Filter & Search Strip -->
+                <div class="yt-kb-filter-strip">
+                    <input id="ytKbSearchInput" type="text" placeholder="Search Knowledgebase titles or IDs...">
+                    <select id="ytKbSourceFilter" class="wired-select">
+                        <option value="all">ALL SOURCES</option>
+                        <option value="playlist">PLAYLIST EXTRACTED</option>
+                        <option value="user">USER INPUTTED</option>
+                        <option value="curated">CURATED DEFAULTS</option>
+                    </select>
+                    <button id="ytKbPlayRandomBtn" class="wired-button">🎲 RANDOM ROLL FROM KB</button>
+                </div>
+
+                <!-- List of Stored Links -->
+                <div id="ytKbList" class="yt-kb-list">
+                    <!-- Populated dynamically by YouTubeKnowledgebase -->
+                </div>
+            </div>
+            <div class="cyber-modal-footer yt-kb-modal-footer">
+                <div class="yt-kb-actions">
+                    <button id="ytKbExportBtn" class="wired-button">📤 EXPORT KB (JSON)</button>
+                    <button id="ytKbImportBtn" class="wired-button">📥 IMPORT KB (JSON)</button>
+                    <input id="ytKbImportFile" type="file" accept=".json,application/json" style="display:none;">
+                    <button id="ytKbResetBtn" class="wired-button">🔄 RESET TO CURATED</button>
+                    <button id="ytKbClearBtn" class="wired-button danger-btn">🗑 CLEAR CUSTOM</button>
+                </div>
+                <small>Every video or playlist link input is permanently remembered in your browser and available for random rerolls!</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── KEYBOARD SHORTCUTS MODAL ────────────────────────────────────── -->
+    <div id="shortcutsModal" class="cyber-modal">
+        <div class="cyber-modal-card">
+            <div class="cyber-modal-header">
+                <h3>⚡ CYBER VJ KEYBOARD SHORTCUTS</h3>
+                <button id="shortcutsCloseBtn" class="wired-button">✕</button>
+            </div>
+            <div class="cyber-modal-body">
+                <div class="shortcut-grid">
+                    <div class="shortcut-item"><kbd>Space</kbd><span>Play / Pause Active Media</span></div>
+                    <div class="shortcut-item"><kbd>W</kbd><span>Cycle AI Warp Mode (12 Modes)</span></div>
+                    <div class="shortcut-item"><kbd>G</kbd><span>Toggle / Cycle Ghost Protocol</span></div>
+                    <div class="shortcut-item"><kbd>V</kbd><span>Toggle / Cycle V-Sync Raster</span></div>
+                    <div class="shortcut-item"><kbd>A</kbd><span>Toggle Rhythmic Auto Glitch</span></div>
+                    <div class="shortcut-item"><kbd>R</kbd><span>Toggle Continual LFO Randomization</span></div>
+                    <div class="shortcut-item"><kbd>T</kbd><span>Toggle Timed Effects Automation</span></div>
+                    <div class="shortcut-item"><kbd>C</kbd><span>Trigger Soft-Eye Crescendo Overdrive ⚡</span></div>
+                    <div class="shortcut-item"><kbd>D</kbd><span>Toggle DROP THE MILK? soupy feedback and wave automation</span></div>
+                    <div class="shortcut-item"><kbd>Z</kbd><span>EMP Purge / Zero All Active Channels</span></div>
+                    <div class="shortcut-item"><kbd>M</kbd><span>Toggle the live microphone audio input</span></div>
+                    <div class="shortcut-item"><kbd>Y</kbd><span>Load the featured YouTube playlist into the YouTube canvas feed</span></div>
+                    <div class="shortcut-item"><kbd>E</kbd><span>Cycle the Audio Reactive Ear: AUTO / AUDIO / CANVAS</span></div>
+                    <div class="shortcut-item"><kbd>N</kbd><span>Share a browser tab, window, or full screen (real pixels and optional shared audio)</span></div>
+                    <div class="shortcut-item"><kbd>H</kbd><span>Fullscreen Mode / Hide All U.I.</span></div>
+                    <div class="shortcut-item"><kbd>S</kbd><span>Freeze Frame / Export High-Res PNG</span></div>
+                    <div class="shortcut-item"><kbd>1 - 9</kbd><span>Quick-Toggle Glitch Voices 1 to 9 (75%)</span></div>
+                    <div class="shortcut-item"><kbd>?</kbd><span>Toggle This Hotkeys Overlay</span></div>
+                </div>
+            </div>
+            <div class="cyber-modal-footer">
+                <small>PRO TIP: Click Spectrum or Waveform in Top Bar to cycle visualizer display modes!</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── AUDIO REACTIVE EQ GAIN DRAWER ─────────────────────────────────── -->
+    <div id="eqDrawer" class="cyber-drawer">
+        <div class="cyber-drawer-header">
+            <h3>🎛 AUDIO REACTIVE EQ SENSITIVITY</h3>
+            <button id="eqCloseBtn" class="wired-button">✕</button>
+        </div>
+        <div class="cyber-drawer-body">
+            <div class="eq-slider-row">
+                <label for="eqBassGain">SUB / BASS BOOST (20-160Hz)</label>
+                <input id="eqBassGain" type="range" min="0.2" max="3.0" step="0.1" value="1.2">
+                <span id="eqBassVal" class="slider-val-badge">1.2x</span>
+            </div>
+            <div class="eq-slider-row">
+                <label for="eqMidGain">MID BAND SENSITIVITY (200-2kHz)</label>
+                <input id="eqMidGain" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
+                <span id="eqMidVal" class="slider-val-badge">1.0x</span>
+            </div>
+            <div class="eq-slider-row">
+                <label for="eqTrebleGain">TREBLE / AIR SENSITIVITY (3.5-11kHz)</label>
+                <input id="eqTrebleGain" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
+                <span id="eqTrebleVal" class="slider-val-badge">1.0x</span>
+            </div>
+            <div class="eq-presets">
+                <button class="wired-button eq-preset-btn" data-eq="bass">BASS HEAVY</button>
+                <button class="wired-button eq-preset-btn" data-eq="vocal">MID VOCAL</button>
+                <button class="wired-button eq-preset-btn" data-eq="crisp">CRISP HIGH</button>
+                <button class="wired-button eq-preset-btn" data-eq="flat">FLAT (1.0x)</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

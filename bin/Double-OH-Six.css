@@ -1,0 +1,76 @@
+/* --- Double-OH-Six / Black Ice CRT Theme for Botpress Webchat --- */
+/* Paste this entire block into the Webchat Appearance CSS editor on botpress.com */
+
+/* 1. Core Theme Variables */
+:root {
+  /* Core Colors */
+  --botpress-webchat-background-color: #0A0A0A;
+  --botpress-webchat-text-color: #00FFFF;
+  --botpress-webchat-primary-color: #00FFFF;
+  --botpress-webchat-secondary-color: #FF00FF;
+
+  /* Bubbles */
+  --botpress-webchat-bubble-background-color: rgba(0, 255, 255, 0.1);
+  --botpress-webchat-bubble-color: #00FFFF;
+  --botpress-webchat-bubble-border-color: #00FFFF;
+  --botpress-webchat-bubble-border-radius: 4px;
+  --botpress-webchat-bubble-border-width: 1px;
+
+  /* User Bubbles */
+  --botpress-webchat-message-user-bubble-background-color: rgba(255, 0, 255, 0.1);
+  --botpress-webchat-message-user-bubble-border-color: #FF00FF;
+  --botpress-webchat-message-user-bubble-color: #FF00FF;
+
+  /* Composer (input area) */
+  --botpress-webchat-composer-background-color: #000;
+  --botpress-webchat-composer-border-color: #00FFFF;
+  --botpress-webchat-composer-color: #00FFFF;
+
+  /* Font */
+  --botpress-webchat-font-family: 'Courier New', Courier, monospace;
+}
+
+/* 2. CRT Effects (Scanlines & Flicker) */
+/* This targets the main container inside the webchat iframe */
+.bp-widget-container {
+  position: relative;
+  overflow: hidden;
+  animation: crt-flicker 0.2s infinite;
+  text-shadow: 0 0 3px #00ffff;
+}
+
+/* Add scanline overlay */
+.bp-widget-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 3px;
+  opacity: 0.4;
+  animation: scanline-move 5s linear infinite;
+  pointer-events: none; /* Allows clicking through the overlay */
+  z-index: 10; /* Ensure it's on top of other content */
+}
+
+/* 3. Keyframe Animations for the Effects */
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+@keyframes scanline-move {
+  from { background-position: 0 0; }
+  to { background-position: 0 3px; }
+}
+
+/* 4. Additional fine-tuning for a more authentic feel */
+.bp-msg-bubble, .bp-msg-choices {
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+}
+
+.bp-msg-user .bp-msg-bubble {
+  box-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+}

@@ -1,0 +1,470 @@
+<!-- ===================================================================
+     UPLINK DEMO PROVIDED BY INOVATION.CO.NL
+     Copy-paste block for your own index.html.
+
+     WHERE TO PUT IT
+       At the bottom of your page, directly ABOVE your advertisement
+       footer. This snippet ships with its own advertisement footer
+       section, so if you already have one, delete the
+       <footer class="up-adfooter"> block at the end.
+
+     WHAT TO CHANGE
+       1. The href on the play button. It points at ./uplink/index.html
+          by default. Change it to wherever you uploaded the package.
+       2. The ad slot contents. Replace each <div class="up-adslot">
+          with your real ad network markup.
+
+     No dependencies. No JavaScript required. All styles are scoped
+     under the .uplink-demo-embed class so they cannot leak into your
+     existing stylesheet.
+     =================================================================== -->
+
+<section class="uplink-demo-embed" id="uplink-demo">
+  <style>
+    .uplink-demo-embed {
+      --up-paper: #e7e7d9;
+      --up-muted: #90988d;
+      --up-acid: #c6ed79;
+      --up-amber: #e7a858;
+      --up-signal: #7fb6d6;
+      --up-line: rgba(219, 224, 204, 0.16);
+      position: relative;
+      overflow: hidden;
+      padding: 46px 22px 0;
+      border-top: 1px solid var(--up-line);
+      background:
+        radial-gradient(60% 50% at 78% 8%, rgba(198, 237, 121, 0.1), transparent 68%),
+        radial-gradient(50% 44% at 8% 92%, rgba(127, 182, 214, 0.08), transparent 70%),
+        #080b09;
+      color: var(--up-paper);
+      font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+      text-align: left;
+    }
+
+    .uplink-demo-embed * { box-sizing: border-box; }
+
+    .up-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .up-kicker {
+      margin: 0;
+      color: var(--up-muted);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .up-kicker b { color: var(--up-acid); font-weight: 400; }
+
+    .up-title {
+      margin: 16px 0 0;
+      font-family: "Chakra Petch", "Arial Narrow", Impact, sans-serif;
+      font-size: clamp(2.6rem, 7vw, 5.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 0.86;
+      text-transform: uppercase;
+    }
+
+    .up-title span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(198, 237, 121, 0.7);
+    }
+
+    .up-strap {
+      margin: 14px 0 0;
+      color: var(--up-amber);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .up-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+      padding-top: 22px;
+      border-top: 1px solid var(--up-line);
+    }
+
+    .up-grid h3 {
+      margin: 0;
+      color: var(--up-paper);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.13em;
+    }
+
+    .up-grid p {
+      margin: 11px 0 0;
+      color: #a4ac9e;
+      font-size: 13px;
+      line-height: 1.72;
+    }
+
+    .up-grid a {
+      color: var(--up-signal);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(127, 182, 214, 0.35);
+    }
+
+    .up-grid a:hover { color: var(--up-acid); border-color: var(--up-acid); }
+
+    /* --- the big animated button ---------------------------------- */
+
+    .up-playrow { margin: 34px 0 40px; }
+
+    .up-play {
+      position: relative;
+      display: flex;
+      min-height: 168px;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      overflow: hidden;
+      padding: 26px 20px;
+      border: 1px solid rgba(198, 237, 121, 0.55);
+      background:
+        radial-gradient(120% 140% at 50% 120%, rgba(198, 237, 121, 0.16), transparent 62%),
+        linear-gradient(180deg, rgba(9, 14, 10, 0.9), rgba(6, 9, 7, 0.95));
+      color: var(--up-paper);
+      text-decoration: none;
+      transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease,
+        border-color 220ms ease;
+    }
+
+    .up-play:hover {
+      border-color: var(--up-acid);
+      transform: translateY(-3px);
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 64px rgba(198, 237, 121, 0.16);
+    }
+
+    .up-play strong {
+      position: relative;
+      z-index: 3;
+      font-family: "Chakra Petch", "Arial Narrow", Impact, sans-serif;
+      font-size: clamp(1.6rem, 4.4vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      text-transform: uppercase;
+      text-shadow: 0 0 26px rgba(198, 237, 121, 0.3);
+    }
+
+    .up-play small {
+      position: relative;
+      z-index: 3;
+      color: #9fa896;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+    }
+
+    .up-play small em { margin: 0 6px; color: var(--up-amber); font-style: normal; }
+
+    .up-sweep {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -40%;
+      z-index: 2;
+      width: 34%;
+      background: linear-gradient(100deg, transparent, rgba(198, 237, 121, 0.18),
+        rgba(231, 168, 88, 0.1), transparent);
+      animation: up-sweep 4.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    @keyframes up-sweep {
+      0% { left: -40%; }
+      55% { left: 118%; }
+      100% { left: 118%; }
+    }
+
+    .up-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 1;
+      width: 46%;
+      aspect-ratio: 1;
+      margin: -23% 0 0 -23%;
+      border: 1px solid rgba(198, 237, 121, 0.22);
+      border-radius: 50%;
+      animation: up-ring 3.6s ease-out infinite;
+      pointer-events: none;
+    }
+
+    .up-ring:nth-of-type(2) { animation-delay: 1.2s; }
+    .up-ring:nth-of-type(3) { animation-delay: 2.4s; }
+
+    @keyframes up-ring {
+      0% { opacity: 0.5; transform: scale(0.55); }
+      100% { opacity: 0; transform: scale(1.5); }
+    }
+
+    .up-caret {
+      position: absolute;
+      right: 16px;
+      bottom: 12px;
+      z-index: 3;
+      color: var(--up-acid);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 12px;
+      animation: up-blink 1.1s step-end infinite;
+    }
+
+    @keyframes up-blink {
+      0%, 52% { opacity: 1; }
+      53%, 100% { opacity: 0; }
+    }
+
+    .up-corner {
+      position: absolute;
+      z-index: 3;
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--up-acid);
+      transition: width 240ms ease, height 240ms ease;
+      pointer-events: none;
+    }
+
+    .up-corner.tl { top: 9px; left: 9px; border-right: 0; border-bottom: 0; }
+    .up-corner.br { right: 9px; bottom: 9px; border-top: 0; border-left: 0; }
+    .up-play:hover .up-corner { width: 30px; height: 30px; }
+
+    /* --- facts + legal -------------------------------------------- */
+
+    .up-facts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--up-line);
+      border-left: 1px solid var(--up-line);
+    }
+
+    .up-facts li {
+      padding: 12px 13px;
+      border-right: 1px solid var(--up-line);
+      border-bottom: 1px solid var(--up-line);
+      background: rgba(5, 8, 6, 0.32);
+      transition: background 200ms ease;
+    }
+
+    .up-facts li:hover { background: rgba(198, 237, 121, 0.08); }
+
+    .up-facts span {
+      display: block;
+      color: #828d7c;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 8px;
+      letter-spacing: 0.11em;
+    }
+
+    .up-facts strong {
+      display: block;
+      margin-top: 6px;
+      color: var(--up-paper);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    .up-legal {
+      max-width: 92ch;
+      margin: 0 0 30px;
+      color: #7f897c;
+      font-size: 10.5px;
+      line-height: 1.65;
+    }
+
+    /* --- advertisement footer -------------------------------------- */
+
+    .up-adfooter {
+      margin: 0 -22px;
+      padding: 22px 22px 28px;
+      border-top: 1px solid rgba(219, 224, 204, 0.28);
+      background:
+        repeating-linear-gradient(135deg, rgba(219, 224, 204, 0.035) 0,
+          rgba(219, 224, 204, 0.035) 1px, transparent 1px, transparent 9px),
+        rgba(4, 7, 5, 0.75);
+    }
+
+    .up-adhead {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px 18px;
+      color: #7d877a;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 8.5px;
+      letter-spacing: 0.13em;
+    }
+
+    .up-adgrid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 0.7fr);
+      gap: 14px;
+      margin-top: 15px;
+    }
+
+    .up-adslot {
+      display: flex;
+      min-height: 94px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 14px;
+      border: 1px dashed rgba(219, 224, 204, 0.24);
+      background: rgba(9, 13, 10, 0.4);
+      text-align: center;
+      transition: border-color 220ms ease, background 220ms ease;
+    }
+
+    .up-adslot:hover {
+      border-color: rgba(198, 237, 121, 0.45);
+      background: rgba(198, 237, 121, 0.05);
+    }
+
+    .up-adslot b {
+      color: #a3ab9b;
+      font-family: "Chakra Petch", "Arial Narrow", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .up-adslot i {
+      color: #6f7a6a;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 8px;
+      font-style: normal;
+      letter-spacing: 0.09em;
+    }
+
+    @media (max-width: 860px) {
+      .up-grid,
+      .up-adgrid { grid-template-columns: minmax(0, 1fr); }
+      .up-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .uplink-demo-embed * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+
+  <div class="up-shell">
+    <p class="up-kicker">
+      Hosted on <b>immortalimp.nl</b> &nbsp;/&nbsp; package by <b>inovation.co.nl</b>
+      &nbsp;/&nbsp; unofficial fan demo
+    </p>
+
+    <h2 class="up-title">UPLINK<span>DEMO</span></h2>
+    <p class="up-strap">Provided by inovation.co.nl</p>
+
+    <div class="up-playrow">
+      <!-- CHANGE THIS HREF to wherever you uploaded the package -->
+      <a class="up-play" href="./uplink/index.html">
+        <span class="up-ring"></span>
+        <span class="up-ring"></span>
+        <span class="up-ring"></span>
+        <span class="up-sweep"></span>
+        <span class="up-corner tl"></span>
+        <span class="up-corner br"></span>
+        <strong>PLAY UPLINK FOR ME</strong>
+        <small>THREE HOURS <em>/</em> NO LOSS STATE <em>/</em> OPTION A IS FAITH</small>
+        <span class="up-caret">&gt;_</span>
+      </a>
+    </div>
+
+    <ul class="up-facts">
+      <li><span>PLAYTIME</span><strong>03:00 + OVERTIME</strong></li>
+      <li><span>LOSS STATE</span><strong>NONE</strong></li>
+      <li><span>INTERACTIVE</span><strong>HOUR ONE</strong></li>
+      <li><span>ROUTES</span><strong>A / B / C</strong></li>
+    </ul>
+
+    <div class="up-grid">
+      <div>
+        <h3>THE GAME / UPLINK, 2001</h3>
+        <p>
+          Uplink is a hacking simulation by Introversion Software. You are a freelance agent
+          renting gateway time from a corporation and taking contracts against other
+          corporations: copying files, planting evidence, laundering money, and erasing your own
+          trail before a trace completes. It is still sold and still patched today, and its
+          mission statement is simple &mdash; you play either to win or to learn.
+        </p>
+        <p>
+          <a href="https://forums.introversion.co.uk" target="_blank" rel="noreferrer">Introversion Software</a>
+          &nbsp;&middot;&nbsp;
+          <a href="https://store.steampowered.com/app/1510/Uplink/" target="_blank" rel="noreferrer">Buy Uplink on Steam</a>
+        </p>
+      </div>
+      <div>
+        <h3>THIS DEMO / FAITH &mdash; REVELATION</h3>
+        <p>
+          Three in-game hours built around one question: do you like Faith, or do you need
+          Revelation to do so? Hour one is fully interactive &mdash; every day you choose the
+          job, the tool and the password, and every job is harmless: sweetener instead of sugar,
+          an overpaid grocery bill, loyalty points that were expiring anyway.
+        </p>
+        <p>
+          At 01:00 the question returns and only BOTH answers. Hour two is a cutscene where other
+          agents log in for the first time and make their own choices. Hour three is strongly
+          guided and cannot be failed: Faith stays on your machine, Revelation is copied to a
+          floppy and never run, and both dormant files are handed to the internal service machines
+          so their users decide for themselves. After 03:00 the demo enters overtime, where every
+          day you keep playing is a new end scene &mdash; until the day you are caught.
+        </p>
+      </div>
+    </div>
+
+    <p class="up-legal">
+      Fan-made and unofficial. Uplink is a trademark of Introversion Software and is sold on
+      Valve's Steam platform. This demo contains no original game assets, makes no real network
+      connections and is provided free of charge by inovation.co.nl. If you enjoy the idea, buy
+      the real thing.
+    </p>
+  </div>
+
+  <!-- Delete this footer if your site already has an advertisement footer -->
+  <footer class="up-adfooter">
+    <div class="up-adhead">
+      <span>ADVERTISEMENT</span>
+      <span>immortalimp.nl / SUPPORTS THE SITE</span>
+    </div>
+    <div class="up-adgrid">
+      <div class="up-adslot"><b>Leaderboard</b><i>728 &times; 90 &mdash; your ad network code here</i></div>
+      <div class="up-adslot"><b>Rectangle</b><i>300 &times; 250 &mdash; your ad network code here</i></div>
+      <div class="up-adslot"><b>Skyscraper</b><i>160 &times; 600 &mdash; your ad network code here</i></div>
+    </div>
+  </footer>
+</section>
+
+<!-- ===================================================================
+     OPTIONAL: embed the demo inline instead of linking away.
+     Replace the <a class="up-play"> above with a button that reveals
+     this iframe, or just paste the iframe where you want the game.
+
+     <iframe src="./uplink/index.html" title="Uplink Demo provided by
+       inovation.co.nl" loading="lazy" allow="fullscreen"
+       style="width:100%;height:80vh;border:1px solid rgba(219,224,204,.2);
+       background:#080b09"></iframe>
+     =================================================================== -->

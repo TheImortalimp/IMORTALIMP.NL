@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      // Public WiFi & mobile security: upgrade to HTTPS for microphone and screen/tab mediaDevices
+      if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+        location.replace("https:" + location.href.substring(5));
+      }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#020905" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Overscope SO — a symphonic ambient real-time generative audio engine visualizing the frequency spectrum of sound. Harmony comes first: an 8-bar cycle of two to four chords, each held for two to six bars, placed into a continuous bed that crossfades. Eight instruments — a chord bed of light pads, long crystal chimes, a drift line of very long gliding notes, a pauk (timpani) and a soft kick, brush snare, deep tom and tick hihat. Jam along with any browser tab or live microphone: the rig learns the key, tempo and CHORD PROGRESSION and holds it, answering rarely and softly rather than trading licks." />
+    <title>Overscope SO — ambient harmony rig</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="grid"></canvas>
+    <canvas id="scope"></canvas>
+    <canvas id="hud"></canvas>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+
+    <!-- Responsive Floating Top Bar (Mobile & Tablet Friendly) -->
+    <header id="top-bar" class="top-bar" aria-label="Main Navigation">
+      <button id="btn-toggle-panel" class="bar-btn active" aria-label="Toggle Controls (H)">🎛 Controls</button>
+      <button id="btn-toggle-desk" class="bar-btn" aria-label="Toggle Rig Deck (D)">🎹 Deck</button>
+      <button id="btn-toggle-touch" class="bar-btn active" aria-label="Toggle Quick Jam Dock">✨ Jam</button>
+      <button id="btn-fs" class="bar-btn fs-btn" aria-label="Toggle Fullscreen" title="Fullscreen (F)">⛶</button>
+    </header>
+
+    <aside id="panel">
+      <div class="panel-head">
+        <h1>Overscope <span>SO·AMBIENT 2.2</span></h1>
+        <button id="btn-close-panel" class="close-icon-btn" aria-label="Close Controls" title="Close (H)">✕</button>
+      </div>
+      <div id="status-pill" class="pill simulated">silent cosine · boot</div>
+
+      <section>
+        <h2>Audio interface</h2>
+        <div id="wifi-badge" class="wifi-badge">🔒 HTTPS verified · Public WiFi safe</div>
+        <button id="btn-mic" class="primary">🎙 Mic check (grant access)</button>
+        <div class="row">
+          <button id="btn-sys" title="Picker tips: Entire Screen + ☑ &quot;Also share system audio&quot; = the full speaker mix · a tab + ☑ &quot;Share tab audio&quot; = just that app">System mix</button>
+          <button id="btn-silent">Silent cosine</button>
+        </div>
+        <div class="row">
+          <button id="btn-groove" title="TOGGLE: start/stop the ambient rig — an endless composer at 68 BPM in aeolian/dorian. An 8-bar cycle of 2-4 chords, each HELD for 2-6 bars in a continuous bed that crossfades, with a drift line of long gliding notes, crystal chimes, pauk and soft percussion.">SO rig 🌙</button>
+          <button id="btn-stop">Stop</button>
+        </div>
+
+        <div class="jam-block">
+          <div class="jam-subhead">NOW-PLAYING HARMONY FOLLOW</div>
+          <button id="btn-learn" class="jam-btn" title="Pick a single browser TAB + tick “Share tab audio” — PICKUP ONLY. The rig learns the tab's key, tempo, and chord progression. (Desktop Chrome/Edge/Firefox)">🎧 Jam with a tab</button>
+          <button id="btn-learn-mic" class="jam-btn highlight" title="Listen through your microphone to music playing in your room or from speakers and follow its chords! Ideal for mobile phones and tablets.">📱 Jam with Mic (Now-Playing)</button>
+          <button id="btn-learn-file" class="jam-btn" title="Pick an audio file (MP3, WAV, M4A) from your phone or tablet storage to play inside the tab while the rig harmonizes with it!">📂 Jam with Audio File</button>
+          <input type="file" id="input-audio-file" accept="audio/*" style="display:none;" />
+        </div>
+
+        <p class="note" id="note">Audio is analysed locally in this page — pickup only, it is never played back or sent anywhere.</p>
+      </section>
+
+      <section>
+        <h2>Ambience</h2>
+        <label>Air <input id="air" type="range" min="0" max="1" step="0.01" value="0.7" title="Reverb depth, chorus width and how open the master lowpass is. 0 = dry and close · 1 = deep hall." /></label>
+        <label>Pulse <input id="pulse" type="range" min="0" max="1" step="0.01" value="0.45" title="Percussion budget. Every kit event carries a weight and only plays when Pulse is at or above it — so 0 is a pure drone and 1 is everything the composer wrote." /></label>
+      </section>
+      <section>
+        <h2>Rig output</h2>
+        <label>Deck volume <input id="volume" type="range" min="0" max="1" step="0.01" value="1" title="The rig and the hand-played solo kit both speak through this fader. The scope keeps drawing the performance at any volume — the analyser listens upstream of the fader." /></label>
+        <p class="note" id="rhythm-readout">RHYTHM 0/4</p>
+      </section>
+
+      <section>
+        <h2>Engine</h2>
+        <label>Smoothing <input id="smoothing" type="range" min="0" max="0.95" step="0.01" value="0.82" /></label>
+        <h2>Phosphor</h2>
+        <label>Persistence <input id="persistence" type="range" min="0" max="0.95" step="0.01" value="0.82" /></label>
+        <label>Glow <input id="glow" type="range" min="0" max="1" step="0.05" value="0.7" /></label>
+        <label>Amplitude <input id="ampScale" type="range" min="0.25" max="2" step="0.05" value="1" /></label>
+        <label class="check"><input id="spectrum" type="checkbox" checked /> Spectrum bars</label>
+      </section>
+
+      <p class="hint"><kbd>H</kbd> hide panel · <kbd>D</kbd> deck · 🖱 deck lanes &amp; chips = playable · 🖱 click scope = chime (⇧ = kick) · <kbd>←↑↓→</kbd> drift jam · <kbd>F</kbd> fullscreen<br>numpad <kbd>1</kbd>–<kbd>8</kbd> play the eight lanes · <kbd>9</kbd> adds a rhythm layer · <kbd>0</kbd> zeroes it and starts a fresh seed</p>
+    </aside>
+
+    <aside id="desk" class="hidden">
+      <div class="desk-head">
+        <h2>AMBIENT RIG DECK <span><kbd>D</kbd> close</span></h2>
+        <button id="btn-close-desk" class="close-icon-btn" aria-label="Close Deck" title="Close (D)">✕</button>
+      </div>
+      <div id="desk-wires"></div>
+      <div id="desk-song">— rig idle · start “SO rig 🌙” —</div>
+      <div id="desk-meta"></div>
+      <div id="desk-grid"></div>
+    </aside>
+
+    <!-- Floating Quick Touch Jam Dock (Mobile & Tablet Ergonomic Performance) -->
+    <nav id="touch-dock" class="touch-dock" aria-label="Touch Performance Controls">
+      <button class="dock-btn" id="dock-chime" title="Chime (Tap)"><span>✨</span> Chime</button>
+      <button class="dock-btn" id="dock-kick" title="Kick (Tap)"><span>🥁</span> Kick</button>
+      <button class="dock-btn" id="dock-pluck" title="Pluck Drift Synth (Tap)"><span>🎹</span> Pluck</button>
+      <button class="dock-btn" id="dock-rhythm" title="Cycle Rhythm Layer 0-4"><span>➕</span> Rhythm</button>
+      <button class="dock-btn" id="dock-seed" title="Roll Fresh Seed &amp; Chords"><span>🎲</span> Seed</button>
+    </nav>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

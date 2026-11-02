@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAMDISK RADIO — rindex — IMORTALIMP.NL</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2218%22 fill=%22%2305060c%22/%3E%3Crect x=%2214%22 y=%2234%22 width=%2272%22 height=%2244%22 rx=%228%22 fill=%22none%22 stroke=%22%2300ff00%22 stroke-width=%225%22/%3E%3Ccircle cx=%2262%22 cy=%2256%22 r=%2212%22 fill=%22none%22 stroke=%22%23ff0000%22 stroke-width=%225%22/%3E%3Cpath d=%22M24 30 L58 14%22 stroke=%22%2300ff00%22 stroke-width=%225%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M28 46 v12 M36 42 v20 M44 46 v12%22 stroke=%22%2300ff00%22 stroke-width=%224%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
+  <meta name="description" content="RAMDISK RADIO index: listen2myradio.com, the ramdisk.radio12345.com free-host station page, the YouTube radio-streaming setup guide, and the skinned OGG Vorbis player for image.ogg.">
+  <meta property="og:title" content="RAMDISK RADIO — rindex — IMORTALIMP.NL">
+  <meta property="og:description" content="Free internet radio: listen2myradio.com, the ramdisk.radio12345.com station page, the radio-streaming setup guide, and the OGG Vorbis player.">
+  <!-- Google Fonts (same family the main pages use; system fallbacks keep it working offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unica+One&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --vr-green: #00ff00;
+      --vr-red: #ff0000;
+      --cyan: var(--vr-green);
+      --pink: var(--vr-red);
+      --magenta: var(--vr-red);
+      --amber: #ffe066;
+      --bg: #05060c;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 50% -10%, rgba(255, 0, 0, 0.14) 0%, rgba(0, 0, 0, 0) 55%),
+        radial-gradient(ellipse at 85% 110%, rgba(0, 255, 0, 0.10) 0%, rgba(0, 0, 0, 0) 55%),
+        var(--bg);
+      color: #e8f6f5;
+      font-family: 'Unica One', 'Arial Black', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 28px 14px 64px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ---------------- audio-reactive starfield ---------------- */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.9;
+      mix-blend-mode: screen;
+    }
+
+    .rindex {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* full-page CRT scanlines */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 999;
+      background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 2px, rgba(0,0,0,0.08) 2px 4px);
+      mix-blend-mode: overlay;
+    }
+
+    .rindex {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* The page content tilts very slightly when the station GIF is hovered. */
+    .rpage {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      transform:
+        perspective(1800px)
+        rotateX(var(--page-tilt-x, 0deg))
+        rotateY(var(--page-tilt-y, 0deg));
+      transform-origin: 50% 12%;
+      transition: transform 0.34s ease, filter 0.34s ease;
+      will-change: transform, filter;
+    }
+    body.logo-tilting .rpage {
+      transition-duration: 55ms;
+      transition-timing-function: linear;
+      filter:
+        drop-shadow(var(--page-cyan-x, -8px) var(--page-cyan-y, 9px) 22px rgba(0, 255, 0, 0.18))
+        drop-shadow(var(--page-pink-x, 8px) var(--page-pink-y, -7px) 22px rgba(255, 0, 0, 0.14));
+    }
+
+    /* ---------------- top-left station logo ---------------- */
+    .rlogo {
+      --logo-tilt-x: 0deg;
+      --logo-tilt-y: 0deg;
+      --logo-scale: 1;
+      --cyan-shadow-x: -3px;
+      --cyan-shadow-y: 3px;
+      --pink-shadow-x: 3px;
+      --pink-shadow-y: -2px;
+      --halo-x: 0px;
+      --halo-y: 0px;
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      width: 112px;
+      margin: 0;
+      text-align: center;
+      user-select: none;
+      perspective: 520px;
+      cursor: crosshair;
+    }
+    .rlogo::after {
+      content: '';
+      position: absolute;
+      top: 7px;
+      left: 14px;
+      z-index: -1;
+      width: 84px;
+      height: 84px;
+      border-radius: 22px;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(135deg, rgba(0,255,0,0.68), rgba(255,0,0,0.64));
+      filter: blur(16px);
+      transform: translate(var(--halo-x), var(--halo-y)) scale(1.05);
+      transition: opacity 0.24s ease, transform 0.12s ease-out;
+    }
+    .rlogo:hover {
+      --logo-scale: 1.12;
+    }
+    .rlogo:hover::after,
+    .rlogo.is-tilting::after {
+      opacity: 0.74;
+    }
+    .rlogo-mark {
+      display: block;
+      width: 84px;
+      height: 84px;
+      margin: 0 auto;
+      border: 1px solid rgba(0, 255, 0, 0.72);
+      border-radius: 19px;
+      background: rgba(5, 6, 12, 0.88);
+      transform:
+        perspective(520px)
+        rotateX(var(--logo-tilt-x))
+        rotateY(var(--logo-tilt-y))
+        scale(var(--logo-scale));
+      transform-style: preserve-3d;
+      transform-origin: 50% 50%;
+      box-shadow:
+        var(--cyan-shadow-x) var(--cyan-shadow-y) 0 rgba(0, 255, 0, 0.48),
+        var(--pink-shadow-x) var(--pink-shadow-y) 0 rgba(255, 0, 0, 0.42),
+        0 0 20px rgba(0, 255, 0, 0.28);
+      transition: transform 0.24s ease, box-shadow 0.24s ease;
+      will-change: transform, box-shadow;
+    }
+    .rlogo.is-tilting .rlogo-mark {
+      transition-duration: 45ms;
+      transition-timing-function: linear;
+    }
+    .rlogo:hover .rlogo-mark {
+      box-shadow:
+        var(--cyan-shadow-x) var(--cyan-shadow-y) 0 rgba(0, 255, 0, 0.66),
+        var(--pink-shadow-x) var(--pink-shadow-y) 0 rgba(255, 0, 0, 0.58),
+        0 0 30px rgba(0, 255, 0, 0.46);
+    }
+    .rlogo figcaption {
+      margin-top: 8px;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.48rem;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      text-shadow: 0 0 7px rgba(0, 255, 0, 0.38);
+      transition: color 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .rlogo:hover figcaption {
+      color: #00ff00;
+      text-shadow: -2px 0 8px #00ff00, 2px 0 8px #ff0000;
+      transform: translateY(4px);
+    }
+
+    /* ---------------- header ---------------- */
+    .rtitle {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(2.2rem, 7vw, 4.2rem);
+      letter-spacing: 0.14em;
+      color: var(--vr-green);
+      animation: rflicker 3.2s infinite;
+    }
+    .rtitle-green {
+      color: #00ff00;
+      text-shadow:
+        0 0 6px #00ff00,
+        0 0 20px #00ff00,
+        3px 0 0 #ff0000;
+    }
+    .rtitle-red {
+      color: #ff0000;
+      text-shadow:
+        0 0 6px #ff0000,
+        0 0 20px #ff0000,
+        -3px 0 0 #00ff00;
+    }
+    @keyframes rflicker {
+      0%, 100% { opacity: 1; }
+      52% { opacity: 0.88; }
+      54% { opacity: 1; }
+      71% { opacity: 0.94; }
+      73% { opacity: 1; }
+    }
+    .rsub {
+      text-align: center;
+      font-family: 'Courier New', Courier, monospace;
+      color: #00ff00;
+      text-shadow: 2px 0 0 #ff0000, 0 0 8px #00ff00;
+      letter-spacing: 0.22em;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    /* ---------------- free-radio warning ---------------- */
+    .rwarn {
+      background: rgba(255, 224, 102, 0.08);
+      border: 1px solid rgba(255, 224, 102, 0.5);
+      border-left: 5px solid var(--amber);
+      border-radius: 8px;
+      padding: 14px 18px;
+      color: rgba(255, 233, 173, 0.92);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      line-height: 1.65;
+    }
+    .rwarn strong { color: #ffd700; letter-spacing: 0.06em; }
+    .rwarn a { color: var(--cyan); text-decoration: underline; }
+    .rwarn a:hover { color: #fff; text-shadow: 0 0 8px var(--cyan); }
+
+    /* ---------------- link buttons ---------------- */
+    .rbtn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .rbtn {
+      position: relative;
+      display: block;
+      padding: 16px 20px;
+      border: 1px solid rgba(0, 255, 0, 0.65);
+      border-radius: 10px;
+      background: rgba(4, 8, 16, 0.62);
+      color: #f5ffff;
+      text-decoration: none;
+      text-align: center;
+      font-size: 1.05rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      box-shadow:
+        -3px 3px 0 rgba(0, 255, 0, 0.4),
+        3px -2px 0 rgba(255, 0, 0, 0.35),
+        0 0 18px rgba(0, 255, 0, 0.15);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .rbtn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.25;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.14) 3px 4px);
+      animation: rscan 2.8s linear infinite;
+    }
+    @keyframes rscan {
+      from { background-position: 0 0; }
+      to   { background-position: 0 14px; }
+    }
+    .rbtn small {
+      display: block;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      color: #00ff00;
+      text-shadow: 1px 0 0 #ff0000;
+      margin-top: 7px;
+      text-transform: none;
+    }
+    .rbtn:hover,
+    .rbtn:focus-visible {
+      transform: translate(-2px, -2px) scale(1.01);
+      background: rgba(0, 255, 0, 0.12);
+      box-shadow:
+        -5px 5px 0 rgba(0, 255, 0, 0.6),
+        5px -4px 0 rgba(255, 0, 0, 0.55),
+        0 0 30px rgba(0, 255, 0, 0.35);
+      outline: 2px solid #fff;
+      outline-offset: 3px;
+    }
+    .rbtn-app {
+      padding-top: 24px;
+      border-width: 2px;
+      border-color: #00ff00;
+      background: linear-gradient(100deg, rgba(0,255,0,0.12), rgba(4,8,16,0.70) 48%, rgba(255,0,0,0.10));
+      box-shadow:
+        -4px 4px 0 rgba(0,255,0,0.56),
+        4px -3px 0 rgba(255,0,0,0.48),
+        0 0 24px rgba(0,255,0,0.20);
+    }
+    .rbtn-app::after {
+      content: 'ANDROID APP';
+      position: absolute;
+      top: 6px;
+      right: 9px;
+      padding: 2px 5px;
+      border: 1px solid #ff0000;
+      border-radius: 3px;
+      color: #00ff00;
+      background: #05060c;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.46rem;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      text-shadow: 1px 0 0 #ff0000;
+    }
+    .rbtn-pink {
+      border-color: rgba(255, 0, 0, 0.7);
+      box-shadow:
+        -3px 3px 0 rgba(255, 0, 0, 0.45),
+        3px -2px 0 rgba(0, 255, 0, 0.35),
+        0 0 18px rgba(255, 0, 0, 0.18);
+    }
+    .rbtn-pink:hover,
+    .rbtn-pink:focus-visible {
+      background: rgba(255, 0, 0, 0.12);
+      box-shadow:
+        -5px 5px 0 rgba(255, 0, 0, 0.65),
+        5px -4px 0 rgba(0, 255, 0, 0.5),
+        0 0 30px rgba(255, 0, 0, 0.4);
+    }
+
+    /* ---------------- OGG Vorbis player (custom skin) ---------------- */
+    .rplayer {
+      position: relative;
+      border: 1px solid rgba(0, 255, 0, 0.5);
+      border-radius: 14px;
+      background: rgba(4, 5, 9, 0.56);
+      box-shadow: 0 0 24px rgba(0, 255, 0, 0.18), inset 0 0 22px rgba(0, 255, 0, 0.05);
+      padding: 18px;
+      display: grid;
+      grid-template-columns: auto minmax(190px, 1fr) minmax(230px, 1.35fr);
+      gap: 16px;
+      align-items: center;
+      overflow: hidden;
+    }
+    .rplayer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(255,255,255,0.05) 3px 4px);
+    }
+    .rplayer > * { position: relative; z-index: 1; }
+    .rplayer audio { display: none; }
+
+    .rplay {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      border: 2px solid var(--cyan);
+      background: radial-gradient(circle at 30% 25%, rgba(0, 255, 0, 0.25), rgba(4, 8, 16, 0.58) 70%);
+      color: var(--cyan);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(0, 255, 0, 0.5), inset 0 0 12px rgba(0, 255, 0, 0.25);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rplay:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 28px rgba(0, 255, 0, 0.75), inset 0 0 16px rgba(0, 255, 0, 0.4);
+    }
+    .rplay:active { transform: scale(0.97); }
+
+    .pmeta { min-width: 0; }
+
+    .rscope {
+      min-width: 0;
+      min-height: 126px;
+      width: 100%;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding: 9px 11px 11px;
+      border: 1px solid rgba(255, 0, 0, 0.42);
+      border-radius: 8px;
+      background: rgba(2, 5, 13, 0.36);
+      box-shadow: inset 0 0 18px rgba(255, 0, 0, 0.07), 0 0 12px rgba(255, 0, 0, 0.08);
+    }
+    .rscope-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 0;
+    }
+    .rscope-capture {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 6px;
+      border: 1px solid rgba(0,255,0,0.52);
+      border-radius: 6px;
+      background: rgba(0,0,0,0.58);
+      box-shadow: inset 0 0 9px rgba(255,0,0,0.10);
+    }
+    .rscope-capture-status {
+      grid-column: 1 / -1;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.48rem;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      text-shadow: 1px 0 0 #ff0000;
+    }
+    .rscope-capture-button {
+      width: 100%;
+      min-width: 0;
+      height: 27px;
+      border: 1px solid #00ff00;
+      border-radius: 4px;
+      background: #020703;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.50rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .rscope-capture-button {
+      padding: 0 8px;
+      cursor: pointer;
+      box-shadow: -2px 2px 0 #00ff00, 2px -2px 0 #ff0000;
+    }
+    .rscope-capture-button:hover:not(:disabled),
+    .rscope-capture-button:focus-visible {
+      color: #ff0000;
+      border-color: #ff0000;
+      outline: none;
+      box-shadow: -3px 3px 0 #00ff00, 3px -3px 0 #ff0000, 0 0 10px #00ff00;
+    }
+    .rscope-capture-button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .rscope-share-dialog {
+      width: min(92vw, 470px);
+      border: 2px solid #00ff00;
+      border-radius: 10px;
+      padding: 0;
+      color: #00ff00;
+      background: #05060c;
+      box-shadow: -7px 7px 0 #00ff00, 7px -7px 0 #ff0000, 0 0 38px rgba(0,255,0,0.35);
+    }
+    .rscope-share-dialog::backdrop {
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(3px);
+    }
+    .rscope-share-form { padding: 18px; }
+    .rscope-share-title {
+      margin: 0 0 8px;
+      color: #00ff00;
+      font-size: 1.15rem;
+      letter-spacing: 0.12em;
+      text-shadow: 3px 0 0 #ff0000, 0 0 12px #00ff00;
+    }
+    .rscope-share-copy {
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.72rem;
+      line-height: 1.55;
+      letter-spacing: 0.06em;
+    }
+    .rscope-share-copy strong { color: #ff0000; }
+    .rscope-share-mode {
+      position: relative;
+      margin-top: 14px;
+      padding: 12px 14px;
+      overflow: hidden;
+      border: 1px solid #00ff00;
+      border-left: 5px solid #ff0000;
+      border-radius: 6px;
+      color: #00ff00;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,255,0,0.07) 3px 4px),
+        #020703;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-shadow: 1px 0 0 #ff0000, 0 0 7px #00ff00;
+      box-shadow: inset 0 0 14px rgba(0,255,0,0.10);
+    }
+    .rscope-share-mode small {
+      display: block;
+      margin-top: 7px;
+      color: #ff0000;
+      font-size: 0.55rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-shadow: none;
+    }
+    .rscope-share-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .rscope-share-cancel,
+    .rscope-share-live {
+      min-height: 38px;
+      border-radius: 5px;
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .rscope-share-cancel {
+      border: 1px solid #ff0000;
+      color: #ff0000;
+      background: #080000;
+    }
+    .rscope-share-live {
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      background: #001000;
+      box-shadow: -3px 3px 0 #00ff00, 3px -3px 0 #ff0000;
+    }
+    .rscope-share-live:hover,
+    .rscope-share-live:focus-visible {
+      color: #ff0000;
+      outline: none;
+      box-shadow: -4px 4px 0 #00ff00, 4px -4px 0 #ff0000, 0 0 14px #00ff00;
+    }
+    .rplayer.is-capture .rscope {
+      border-color: #00ff00;
+      box-shadow: inset 0 0 18px rgba(0,255,0,0.14), 0 0 18px rgba(255,0,0,0.18);
+    }
+    .rplayer.is-live-visual .rscope {
+      border-color: #ff0000;
+      box-shadow: inset 0 0 18px rgba(255,0,0,0.13), 0 0 18px rgba(0,255,0,0.18);
+    }
+    .rplayer.is-live-visual .rscope-label::after {
+      content: ' · WEB';
+      color: #00ff00;
+    }
+    .rscope-label,
+    .rscope-readout {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .rscope-label { color: #ff0000; text-shadow: 0 0 6px #ff0000; }
+    .rscope-gateway {
+      text-decoration: none;
+      transition: color 0.18s ease, text-shadow 0.18s ease;
+    }
+    .rscope-gateway:hover,
+    .rscope-gateway:focus-visible {
+      color: #00ff00;
+      text-shadow: -2px 0 7px #00ff00, 2px 0 7px #ff0000;
+      outline: none;
+    }
+    .rscope-readout {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #00ff00;
+      text-shadow: 0 0 6px #00ff00;
+    }
+    #ramdisk-scope {
+      display: block;
+      width: 100%;
+      height: 92px;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+    .rplayer.is-playing .rscope {
+      border-color: rgba(0, 255, 0, 0.62);
+      box-shadow: inset 0 0 18px rgba(0, 255, 0, 0.08), 0 0 16px rgba(0, 255, 0, 0.12);
+    }
+    .plabel {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: #00ff00;
+      text-shadow: 1px 0 0 #ff0000, 0 0 6px #00ff00;
+    }
+    .pname {
+      font-size: 1.15rem;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+      margin: 2px 0 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .prow {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .peq {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 26px;
+    }
+    .peq span {
+      width: 5px;
+      height: 8px;
+      background: var(--cyan);
+      box-shadow: 0 0 6px rgba(0, 255, 0, 0.8);
+      border-radius: 1px;
+      animation: eq-bounce 1s ease-in-out infinite;
+      animation-play-state: paused;
+    }
+    .rplayer.is-playing .peq span { animation-play-state: running; }
+    .peq span:nth-child(2) { animation-delay: 0.15s; background: var(--pink); box-shadow: 0 0 6px rgba(255, 0, 0, 0.8); }
+    .peq span:nth-child(3) { animation-delay: 0.3s; }
+    .peq span:nth-child(4) { animation-delay: 0.45s; background: var(--pink); box-shadow: 0 0 6px rgba(255, 0, 0, 0.8); }
+    .peq span:nth-child(5) { animation-delay: 0.6s; }
+    @keyframes eq-bounce {
+      0%, 100% { height: 8px; }
+      50% { height: 26px; }
+    }
+    .ptime {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.8rem;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      min-width: 56px;
+      text-align: right;
+    }
+    .pvol {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      color: #00ff00;
+      text-shadow: 1px 0 0 #ff0000;
+    }
+    .pvol input[type='range'] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 110px;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--pink));
+      outline: none;
+      cursor: pointer;
+    }
+    .pvol input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
+      cursor: pointer;
+    }
+    .pvol input[type='range']::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
+      cursor: pointer;
+    }
+    .pstatus {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.66rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #ff0000;
+      text-shadow: 0 0 7px #ff0000;
+    }
+    .rplayer.is-playing .pstatus {
+      color: #00ff00;
+      text-shadow: 0 0 8px #00ff00;
+    }
+
+    /* ---------------- footer ---------------- */
+    .rfoot {
+      text-align: center;
+      padding-top: 6px;
+    }
+    .rfoot a {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      color: #00ff00;
+      text-shadow: 1px 0 0 #ff0000;
+      text-decoration: none;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+    }
+    .rfoot a:hover {
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+    }
+
+    @media (max-width: 1120px) {
+      .rlogo {
+        position: relative;
+        top: auto;
+        left: auto;
+        align-self: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .rplayer { grid-template-columns: auto minmax(0, 1fr); }
+      .rscope { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 520px) {
+      .rlogo { width: 98px; }
+      .rlogo-mark { width: 72px; height: 72px; border-radius: 16px; }
+      .rlogo figcaption { font-size: 0.42rem; }
+
+      .rplayer { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      .pmeta { width: 100%; text-align: left; }
+      .rscope-capture { grid-template-columns: 1fr; text-align: left; }
+      .rscope-capture-button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rtitle { animation: none; }
+      .rbtn::before { animation: none; }
+      .peq span { animation: none; height: 14px; }
+      .rpage,
+      .rlogo-mark,
+      .rlogo figcaption { transform: none !important; transition: none !important; }
+      .rlogo::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+
+  <div class="rindex">
+
+    <figure class="rlogo">
+      <img
+        class="rlogo-mark"
+        src="ramdisk-radio-icon-exact.gif"
+        width="84"
+        height="84"
+        alt="RAMDISK RADIO ICON"
+        draggable="false">
+      <figcaption>alt=&quot;RAMDISK RADIO ICON&quot;&gt;</figcaption>
+    </figure>
+
+    <div class="rpage">
+    <header>
+      <h1 class="rtitle"><span class="rtitle-green">RAMDISK</span> <span class="rtitle-red">RADIO</span></h1>
+      <div class="rsub">// imortalimp.nl — radio living on a ramdisk //</div>
+    </header>
+
+    <!-- free radio / ads warning -->
+    <div class="rwarn" role="note">
+      <strong>&#9888; FREE RADIO NOTICE:</strong>
+      <a href="http://ramdisk.radio12345.com" target="_blank" rel="noopener noreferrer">ramdisk.radio12345.com</a>
+      is a <strong>FREE</strong> radio host &mdash; <strong>ads may play</strong>, especially when I am
+      <strong>NOT broadcasting</strong>. If it throws a privacy error or a wall of static, that is the free host
+      being flaky &mdash; the <a href="http://listen2myradio.com" target="_blank" rel="noopener noreferrer">listen2myradio.com</a>
+      button below is the reliable front door.
+    </div>
+
+    <!-- link buttons -->
+    <nav class="rbtn-row" aria-label="RAMDISK RADIO links">
+      <a class="rbtn rbtn-app" href="https://play.google.com/store/search?q=listen2myradio%20app&amp;c=apps" target="_blank" rel="noopener noreferrer">
+        &#128241; Mobile App &mdash; Listen2MyRadio on Google Play
+        <small>Android app search &mdash; find Listen2MyRadio for mobile listening or broadcasting; verify the app publisher before installing</small>
+      </a>
+      <a class="rbtn" href="http://listen2myradio.com" target="_blank" rel="noopener noreferrer">
+        &#128225; Listen 2 My Radio
+        <small>listen2myradio.com &mdash; the main listening front door</small>
+      </a>
+      <a class="rbtn rbtn-pink" href="http://ramdisk.radio12345.com" target="_blank" rel="noopener noreferrer">
+        &#128421; RamDisk.Radio12345.com
+        <small>free-host station page &mdash; ads may play while I am off-air</small>
+      </a>
+      <a class="rbtn" href="https://www.youtube.com/watch?v=L_hJC4IUQAU" target="_blank" rel="noopener noreferrer">
+        &#9654; YouTube &mdash; How To Set Up Radio Streaming
+        <small>(83) Easy FREE way to create an online radio station &mdash; hosting &amp; software</small>
+      </a>
+    </nav>
+
+    <!-- skinned OGG Vorbis player -->
+    <section class="rplayer" id="ramdisk-player" aria-label="RAMDISK RADIO OGG Vorbis player">
+      <button class="rplay" id="ramdisk-play" type="button" aria-label="Play RAMDISK RADIO">&#9654;</button>
+      <div class="pmeta">
+        <div class="plabel">OGG Vorbis &mdash; ramdisk stream</div>
+        <div class="pname">image.ogg</div>
+        <div class="prow">
+          <div class="peq" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="ptime" id="ramdisk-time">00:00</div>
+          <label class="pvol">VOL
+            <input id="ramdisk-vol" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+          </label>
+          <div class="pstatus" id="ramdisk-status" role="status" aria-live="polite">BOOTING</div>
+        </div>
+      </div>
+      <div class="rscope" aria-label="Live audio oscilloscope">
+        <div class="rscope-head">
+          <a class="rscope-label rscope-gateway" href="http://ramdisk.radio12345.com" target="_blank" rel="noopener noreferrer" title="Open the RAMDISK RADIO stream gateway">LIVE OSCILLOSCOPE</a>
+          <span class="rscope-readout" id="ramdisk-scope-readout">STANDBY</span>
+        </div>
+        <div class="rscope-capture" id="ramdisk-capture-panel" title="Shared screen/system audio is analyzed locally, never uploaded, and never played back">
+          <span class="rscope-capture-status" id="ramdisk-capture-status" role="status" aria-live="polite">SYSTEM MIX: OPEN THE SCREEN-AUDIO SELECTOR</span>
+          <button class="rscope-capture-button" id="ramdisk-capture-button" type="button" aria-pressed="false">SELECT SCREEN AUDIO</button>
+        </div>
+
+        <!-- In-player setup dialog. The browser's protected screen-share chooser follows LIVE / OK. -->
+        <dialog class="rscope-share-dialog" id="ramdisk-share-dialog" aria-labelledby="ramdisk-share-title">
+          <form class="rscope-share-form" method="dialog">
+            <h2 class="rscope-share-title" id="ramdisk-share-title">SYSTEM MIX → OSCILLOSCOPE</h2>
+            <p class="rscope-share-copy">
+              Press <strong>LIVE / OK</strong>, choose the screen carrying your speaker output,
+              and leave <strong>Share system audio</strong> enabled in the browser chooser.
+            </p>
+            <div class="rscope-share-mode" aria-label="Selected capture mode">
+              <span>SCREEN · FULL SYSTEM AUDIO</span>
+              <small>speaker mix → analyser → zero-gain silent output</small>
+            </div>
+            <div class="rscope-share-actions">
+              <button class="rscope-share-cancel" type="submit" value="cancel">CANCEL</button>
+              <button class="rscope-share-live" id="ramdisk-share-live" type="button">LIVE / OK</button>
+            </div>
+          </form>
+        </dialog>
+
+        <canvas id="ramdisk-scope" width="640" height="180" role="img" aria-label="Audio waveform visualization"></canvas>
+      </div>
+      <!-- Main player source: same folder as this page (RAMDISKRADIO/image.ogg). -->
+      <audio id="ramdisk-audio" src="image.ogg" preload="none"></audio>
+      <!-- Canonical gateway: http://ramdisk.radio12345.com. Its underlying MP3 mount feeds visuals only and is never routed to speakers. -->
+      <audio
+        id="ramdisk-live-audio"
+        data-station-page="http://ramdisk.radio12345.com"
+        data-stream-base="https://uk7freenew.listen2myradio.com/live.mp3?typeportmount=s1_13539_stream_"
+        preload="none"
+        crossorigin="anonymous"
+        playsinline></audio>
+    </section>
+
+    <!-- fallback when JS is disabled -->
+    <noscript>
+      <p style="text-align:center;font-family:'Courier New',monospace;color:#ffe066;">JavaScript is off &mdash; plain player below:</p>
+      <audio controls src="image.ogg" style="width:100%;"></audio>
+    </noscript>
+
+    <footer class="rfoot">
+      <a href="/index.html">&larr; BACK TO IMORTALIMP.NL</a>
+    </footer>
+
+    </div><!-- /.rpage -->
+  </div><!-- /.rindex -->
+
+  <script>
+    /* Mouse-following 3D tilt for the animated station GIF and page-edge shadows. */
+    (function () {
+      'use strict';
+
+      var logo = document.querySelector('.rlogo');
+      var logoMark = logo && logo.querySelector('.rlogo-mark');
+      var page = document.querySelector('.rpage');
+      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!logo || !logoMark || !page || reducedMotion) return;
+
+      var pendingEvent = null;
+      var frameRequest = 0;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function paintTilt(event) {
+        frameRequest = 0;
+        if (!pendingEvent) return;
+
+        var rect = logoMark.getBoundingClientRect();
+        var nx = clamp((pendingEvent.clientX - (rect.left + rect.width / 2)) / (rect.width / 2), -1, 1);
+        var ny = clamp((pendingEvent.clientY - (rect.top + rect.height / 2)) / (rect.height / 2), -1, 1);
+
+        logo.style.setProperty('--logo-tilt-x', (-ny * 13).toFixed(2) + 'deg');
+        logo.style.setProperty('--logo-tilt-y', (nx * 13).toFixed(2) + 'deg');
+        logo.style.setProperty('--logo-scale', '1.12');
+        logo.style.setProperty('--cyan-shadow-x', (-4 - nx * 7).toFixed(1) + 'px');
+        logo.style.setProperty('--cyan-shadow-y', (4 - ny * 7).toFixed(1) + 'px');
+        logo.style.setProperty('--pink-shadow-x', (4 + nx * 7).toFixed(1) + 'px');
+        logo.style.setProperty('--pink-shadow-y', (-4 + ny * 7).toFixed(1) + 'px');
+        logo.style.setProperty('--halo-x', (nx * 8).toFixed(1) + 'px');
+        logo.style.setProperty('--halo-y', (ny * 8).toFixed(1) + 'px');
+
+        document.body.style.setProperty('--page-tilt-x', (ny * 0.62).toFixed(2) + 'deg');
+        document.body.style.setProperty('--page-tilt-y', (-nx * 0.78).toFixed(2) + 'deg');
+        document.body.style.setProperty('--page-cyan-x', (-8 - nx * 10).toFixed(1) + 'px');
+        document.body.style.setProperty('--page-cyan-y', (9 - ny * 8).toFixed(1) + 'px');
+        document.body.style.setProperty('--page-pink-x', (8 + nx * 10).toFixed(1) + 'px');
+        document.body.style.setProperty('--page-pink-y', (-7 + ny * 8).toFixed(1) + 'px');
+      }
+
+      function queueTilt(event) {
+        if (event.pointerType === 'touch') return;
+        pendingEvent = event;
+        if (!frameRequest) frameRequest = window.requestAnimationFrame(paintTilt);
+      }
+
+      function startTilt(event) {
+        if (event.pointerType === 'touch') return;
+        logo.classList.add('is-tilting');
+        document.body.classList.add('logo-tilting');
+        queueTilt(event);
+      }
+
+      function resetTilt() {
+        pendingEvent = null;
+        if (frameRequest) window.cancelAnimationFrame(frameRequest);
+        frameRequest = 0;
+        logo.classList.remove('is-tilting');
+        document.body.classList.remove('logo-tilting');
+
+        logo.style.setProperty('--logo-tilt-x', '0deg');
+        logo.style.setProperty('--logo-tilt-y', '0deg');
+        logo.style.setProperty('--logo-scale', '1');
+        logo.style.setProperty('--cyan-shadow-x', '-3px');
+        logo.style.setProperty('--cyan-shadow-y', '3px');
+        logo.style.setProperty('--pink-shadow-x', '3px');
+        logo.style.setProperty('--pink-shadow-y', '-2px');
+        logo.style.setProperty('--halo-x', '0px');
+        logo.style.setProperty('--halo-y', '0px');
+
+        document.body.style.setProperty('--page-tilt-x', '0deg');
+        document.body.style.setProperty('--page-tilt-y', '0deg');
+      }
+
+      logo.addEventListener('pointerenter', startTilt);
+      logo.addEventListener('pointermove', queueTilt);
+      logo.addEventListener('pointerleave', resetTilt);
+      logo.addEventListener('pointercancel', resetTilt);
+    })();
+  </script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var audio = document.getElementById('ramdisk-audio');
+      var liveAudio = document.getElementById('ramdisk-live-audio');
+      var player = document.getElementById('ramdisk-player');
+      var playBtn = document.getElementById('ramdisk-play');
+      var timeEl = document.getElementById('ramdisk-time');
+      var statusEl = document.getElementById('ramdisk-status');
+      var vol = document.getElementById('ramdisk-vol');
+      var starCanvas = document.getElementById('starfield');
+      var scopeCanvas = document.getElementById('ramdisk-scope');
+      var scopeReadout = document.getElementById('ramdisk-scope-readout');
+      var capturePanel = document.getElementById('ramdisk-capture-panel');
+      var captureStatus = document.getElementById('ramdisk-capture-status');
+      var captureButton = document.getElementById('ramdisk-capture-button');
+      var shareDialog = document.getElementById('ramdisk-share-dialog');
+      var shareLiveButton = document.getElementById('ramdisk-share-live');
+      if (!audio || !player || !playBtn) return;
+
+      var starCtx = starCanvas && starCanvas.getContext ? starCanvas.getContext('2d') : null;
+      var scopeCtx = scopeCanvas && scopeCanvas.getContext ? scopeCanvas.getContext('2d') : null;
+      var audioCtx = null;
+      var analyser = null;
+      var silentGain = null;
+      var source = null;
+      var liveSource = null;
+      var captureSource = null;
+      var captureStream = null;
+      var captureLabel = 'SPEAKER OUTPUT';
+      var captureStoppedByUser = false;
+      var scopeMode = 'synthetic';
+      var liveStartPending = false;
+      var liveRetryTimer = null;
+      var syntheticWave = true;
+      var syntheticMix = 1;
+      var silenceBeganAt = 0;
+      var signalRecoveryFrames = 0;
+      var freqData = null;
+      var waveData = null;
+      var stars = [];
+      var starWidth = 0;
+      var starHeight = 0;
+      var scopeWidth = 0;
+      var scopeHeight = 0;
+      var lastFrame = 0;
+      var lastReadoutAt = 0;
+      var level = 0;
+      var bass = 0;
+      var treble = 0;
+      var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var TAU = Math.PI * 2;
+
+      audio.volume = parseFloat(vol.value) || 0.8;
+      if (liveAudio) {
+        liveAudio.volume = 1;
+        liveAudio.muted = true;
+      }
+
+      function setStatus(s) {
+        if (statusEl) statusEl.textContent = s;
+      }
+
+      function setScopeReadout(s) {
+        if (!scopeReadout || scopeReadout.textContent === s) return;
+        var now = Date.now();
+        if (s.indexOf('%') !== -1 && now - lastReadoutAt < 220) return;
+        scopeReadout.textContent = s;
+        lastReadoutAt = now;
+      }
+
+      function setCaptureStatus(s) {
+        if (captureStatus && captureStatus.textContent !== s) captureStatus.textContent = s;
+      }
+
+      function fmt(t) {
+        if (!isFinite(t) || t < 0) return '--:--';
+        t = Math.floor(t);
+        var m = Math.floor(t / 60), s = t % 60;
+        return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function setPlaying(on) {
+        player.classList.toggle('is-playing', on);
+        playBtn.innerHTML = on ? '&#9208;' : '&#9654;';
+        playBtn.setAttribute('aria-label', on ? 'Pause RAMDISK RADIO' : 'Play RAMDISK RADIO');
+        if (!on) setScopeReadout('STANDBY');
+      }
+
+      function initVisualizer() {
+        if (analyser) {
+          if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+          return true;
+        }
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return false;
+
+        try {
+          audioCtx = new AudioContextClass();
+          source = audioCtx.createMediaElementSource(audio);
+          if (liveAudio) liveSource = audioCtx.createMediaElementSource(liveAudio);
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
+          analyser.smoothingTimeConstant = 0.82;
+          silentGain = audioCtx.createGain();
+          silentGain.gain.value = 0;
+          /* Pull analyser data through a zero-gain sink: visuals receive audio, speakers do not. */
+          analyser.connect(silentGain);
+          silentGain.connect(audioCtx.destination);
+          /* The audible player has its own stable route; live web audio never uses this route. */
+          source.connect(audioCtx.destination);
+          source.connect(analyser);
+          freqData = new Uint8Array(analyser.frequencyBinCount);
+          waveData = new Uint8Array(analyser.fftSize);
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          return true;
+        } catch (e) {
+          /* Keep the player usable if Web Audio is unavailable or restricted. */
+          try {
+            if (source && audioCtx) source.connect(audioCtx.destination);
+          } catch (ignore) {}
+          analyser = null;
+          return false;
+        }
+      }
+
+      function clearLiveRetry() {
+        if (liveRetryTimer) window.clearTimeout(liveRetryTimer);
+        liveRetryTimer = null;
+      }
+
+      function scheduleLiveReconnect(delay) {
+        if (liveRetryTimer || !audio.paused || captureSource) return;
+        liveRetryTimer = window.setTimeout(function () {
+          liveRetryTimer = null;
+          if (audio.paused && !captureSource) activateLiveScope(true);
+        }, delay || 20000);
+      }
+
+      function stopLiveAudio() {
+        liveStartPending = false;
+        if (liveSource) {
+          try { liveSource.disconnect(); } catch (ignoreLiveSource) {}
+        }
+        if (liveAudio && !liveAudio.paused) {
+          try { liveAudio.pause(); } catch (ignoreLiveAudio) {}
+        }
+      }
+
+      function disconnectVisualGraph() {
+        /* Disconnect only analyser taps. The player's speaker route never changes. */
+        if (source && analyser) {
+          try { source.disconnect(analyser); } catch (ignoreSource) {}
+        }
+        if (liveSource && analyser) {
+          try { liveSource.disconnect(analyser); } catch (ignoreLiveSource) {}
+        }
+        if (captureSource && analyser) {
+          try { captureSource.disconnect(analyser); } catch (ignoreCaptureSource) {}
+        }
+      }
+
+      function routePlayerToScope() {
+        if (!source || !analyser || !audioCtx) return;
+        disconnectVisualGraph();
+        source.connect(analyser);
+      }
+
+      function routePlayerDirect() {
+        if (!source || !audioCtx) return;
+        disconnectVisualGraph();
+      }
+
+      function resetSignalGate(useCosine) {
+        silenceBeganAt = 0;
+        signalRecoveryFrames = 0;
+        syntheticWave = !!useCosine;
+      }
+
+      function activatePlayerScope() {
+        if (!initVisualizer()) return;
+        clearLiveRetry();
+        /* Keep the web stream buffered in the background for a click-free return. */
+        routePlayerToScope();
+        scopeMode = 'player';
+        resetSignalGate(false);
+        player.classList.remove('is-live-visual');
+        player.classList.remove('is-capture');
+        setScopeReadout('PLAYER AUDIO');
+      }
+
+      function activateSyntheticScope(label) {
+        stopLiveAudio();
+        if (source && audioCtx) routePlayerDirect();
+        scopeMode = 'synthetic';
+        resetSignalGate(true);
+        player.classList.remove('is-live-visual');
+        player.classList.remove('is-capture');
+        setScopeReadout(label || 'SILENT COSINE');
+      }
+
+      function activateLiveScope(automatic) {
+        if (!audio.paused) {
+          activatePlayerScope();
+          return;
+        }
+        if (captureSource) {
+          activateCaptureScope();
+          return;
+        }
+        if (liveStartPending) return;
+        if (!liveAudio || !initVisualizer() || !liveSource) {
+          activateSyntheticScope('SILENT COSINE');
+          return;
+        }
+
+        clearLiveRetry();
+        routePlayerDirect();
+        liveSource.connect(analyser);
+        scopeMode = 'live';
+        resetSignalGate(false);
+        player.classList.remove('is-capture');
+        player.classList.add('is-live-visual');
+
+        /* Reuse the buffered web stream instead of reloading it on every source switch. */
+        if (!liveAudio.paused && !liveAudio.ended && !liveAudio.error) {
+          liveStartPending = false;
+          if (!automatic) liveAudio.muted = false;
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          setScopeReadout('RAMDISK DATA · SILENT OUT');
+          return;
+        }
+
+        liveStartPending = true;
+        setScopeReadout('CONNECTING RAMDISK LIVE');
+        /* The free host appends a changing cache-buster after its fixed stream mount. */
+        var streamBase = liveAudio.getAttribute('data-stream-base');
+        if (streamBase) liveAudio.src = streamBase + String(Date.now());
+        /* Muted autoplay is attempted on load; its analyser branch ends at zero gain. */
+        liveAudio.muted = !!automatic;
+        try { liveAudio.load(); } catch (ignoreReload) {}
+
+        var playPromise;
+        try { playPromise = liveAudio.play(); }
+        catch (error) {
+          activateSyntheticScope('LIVE RETRY · COSINE');
+          scheduleLiveReconnect(20000);
+          return;
+        }
+
+        if (playPromise && playPromise.then) {
+          playPromise.then(function () {
+            liveStartPending = false;
+            /* Unmute the media element for analysis; zero-gain routing still guarantees silence. */
+            liveAudio.muted = false;
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            if (scopeMode === 'live') setScopeReadout('RAMDISK DATA · SILENT OUT');
+          }).catch(function () {
+            liveStartPending = false;
+            if (audio.paused) {
+              activateSyntheticScope('LIVE RETRY · COSINE');
+              scheduleLiveReconnect(20000);
+            }
+          });
+        } else {
+          liveStartPending = false;
+          liveAudio.muted = false;
+          setScopeReadout('RAMDISK DATA · SILENT OUT');
+        }
+      }
+
+      function activateCaptureScope() {
+        if (!captureSource || !captureStream || !initVisualizer()) {
+          activateLiveScope();
+          return;
+        }
+        clearLiveRetry();
+        routePlayerDirect();
+        captureSource.connect(analyser);
+        scopeMode = 'capture';
+        resetSignalGate(false);
+        player.classList.remove('is-live-visual');
+        player.classList.add('is-capture');
+        setScopeReadout(captureLabel + ' DATA');
+      }
+
+      function activateBestScope() {
+        if (!audio.paused) activatePlayerScope();
+        else if (captureSource && !captureStoppedByUser) activateCaptureScope();
+        else activateLiveScope();
+      }
+
+      function setupLiveFallback() {
+        if (!liveAudio) {
+          scopeMode = 'synthetic';
+          setScopeReadout('SILENT COSINE');
+          return;
+        }
+
+        liveAudio.addEventListener('playing', function () {
+          liveStartPending = false;
+          clearLiveRetry();
+          if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+          if (scopeMode === 'live') {
+            player.classList.add('is-live-visual');
+            setScopeReadout('RAMDISK DATA · SILENT OUT');
+          }
+        });
+        liveAudio.addEventListener('waiting', function () {
+          if (scopeMode === 'live') setScopeReadout('RAMDISK LIVE BUFFERING');
+        });
+        liveAudio.addEventListener('stalled', function () {
+          if (scopeMode === 'live') setScopeReadout('LIVE STALLED · COSINE');
+        });
+        liveAudio.addEventListener('error', function () {
+          liveStartPending = false;
+          if (audio.paused && scopeMode === 'live') {
+            activateSyntheticScope('LIVE OFFLINE · COSINE');
+            scheduleLiveReconnect(20000);
+          }
+        });
+        liveAudio.addEventListener('ended', function () {
+          if (audio.paused && scopeMode === 'live') {
+            activateSyntheticScope('LIVE ENDED · COSINE');
+            scheduleLiveReconnect(12000);
+          }
+        });
+
+        function beginLiveAfterGesture() {
+          if (audio.paused && scopeMode === 'live' && !liveAudio.paused) {
+            liveAudio.muted = false;
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            return;
+          }
+          if (!captureSource && audio.paused &&
+              (scopeMode === 'synthetic' || liveAudio.paused)) {
+            activateLiveScope(false);
+          }
+        }
+        document.addEventListener('pointerdown', beginLiveAfterGesture, { passive: true });
+        document.addEventListener('keydown', beginLiveAfterGesture);
+        window.addEventListener('pagehide', function () {
+          clearLiveRetry();
+          stopLiveAudio();
+        });
+        setScopeReadout('AUTO-CHECKING RAMDISK LIVE');
+        activateLiveScope(true);
+      }
+
+      function compactOutputLabel(label) {
+        var clean = (label || 'SPEAKER OUTPUT').replace(/\s+/g, ' ').trim();
+        return clean.slice(0, 26).toUpperCase();
+      }
+
+      function stopOutputCapture(byUser, noReroute) {
+        captureStoppedByUser = !!byUser;
+        var oldStream = captureStream;
+        captureStream = null;
+        if (captureSource) {
+          try { captureSource.disconnect(); } catch (ignoreCaptureSource) {}
+          captureSource = null;
+        }
+        if (oldStream && oldStream.getTracks) {
+          oldStream.getTracks().forEach(function (track) { track.stop(); });
+        }
+        player.classList.remove('is-capture');
+        if (captureButton) {
+          captureButton.disabled = false;
+          captureButton.textContent = 'SELECT SCREEN AUDIO';
+          captureButton.setAttribute('aria-pressed', 'false');
+        }
+        if (byUser) setCaptureStatus('SPEAKER OUTPUT CAPTURE STOPPED');
+        if (!noReroute) activateBestScope();
+      }
+
+      function openShareDialog() {
+        if (!shareDialog) return;
+        if (shareDialog.showModal) shareDialog.showModal();
+        else shareDialog.setAttribute('open', '');
+      }
+
+      function closeShareDialog() {
+        if (!shareDialog) return;
+        if (shareDialog.close) shareDialog.close();
+        else shareDialog.removeAttribute('open');
+      }
+
+      function requestOutputCapture() {
+        if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          setCaptureStatus('SPEAKER CAPTURE REQUIRES HTTPS AND A SUPPORTED BROWSER');
+          if (captureButton) captureButton.disabled = true;
+          return;
+        }
+        if (!initVisualizer()) {
+          setCaptureStatus('WEB AUDIO IS NOT AVAILABLE');
+          return;
+        }
+
+        captureStoppedByUser = false;
+        captureButton.disabled = true;
+        captureButton.textContent = 'CHOOSE SCREEN...';
+        setCaptureStatus('CHOOSE A SCREEN AND KEEP SHARE SYSTEM AUDIO ENABLED');
+
+        /* Browsers require a display surface for output-audio capture. Video is discarded immediately. */
+        var displayOptions = {
+          video: { displaySurface: 'monitor' },
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          },
+          systemAudio: 'include',
+          monitorTypeSurfaces: 'include',
+          surfaceSwitching: 'exclude',
+          selfBrowserSurface: 'exclude'
+        };
+        navigator.mediaDevices.getDisplayMedia(displayOptions).then(function (sharedStream) {
+          var audioTrack = sharedStream.getAudioTracks()[0];
+          if (!audioTrack) {
+            sharedStream.getTracks().forEach(function (track) { track.stop(); });
+            captureButton.disabled = false;
+            captureButton.textContent = 'TRY SHARE AUDIO AGAIN';
+            captureButton.setAttribute('aria-pressed', 'false');
+            setCaptureStatus('NO OUTPUT AUDIO SHARED · ENABLE SHARE AUDIO IN THE POPUP');
+            activateBestScope();
+            return;
+          }
+
+          /* Do not retain or display screen video; only the shared output-audio track is kept. */
+          sharedStream.getVideoTracks().forEach(function (track) { track.stop(); });
+          var audioOnlyStream = new MediaStream([audioTrack]);
+          var oldStream = captureStream;
+          if (captureSource) {
+            try { captureSource.disconnect(); } catch (ignoreOldSource) {}
+          }
+          captureStream = audioOnlyStream;
+          captureSource = audioCtx.createMediaStreamSource(audioOnlyStream);
+          if (oldStream && oldStream.getTracks) {
+            oldStream.getTracks().forEach(function (track) { track.stop(); });
+          }
+
+          captureLabel = compactOutputLabel(audioTrack.label || 'SPEAKER OUTPUT');
+          captureStoppedByUser = false;
+          clearLiveRetry();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          setCaptureStatus('CAPTURING: ' + captureLabel + ' · SILENT OUTPUT');
+          captureButton.disabled = false;
+          captureButton.textContent = 'STOP SPEAKER CAPTURE';
+          captureButton.setAttribute('aria-pressed', 'true');
+
+          audioTrack.addEventListener('ended', function () {
+            if (captureStream === audioOnlyStream) stopOutputCapture(false, false);
+          });
+          activateBestScope();
+        }).catch(function (error) {
+          captureButton.disabled = false;
+          captureButton.textContent = 'RETRY SPEAKER AUDIO';
+          captureButton.setAttribute('aria-pressed', 'false');
+          if (error && error.name === 'NotAllowedError') {
+            setCaptureStatus('SPEAKER AUDIO SHARE CANCELLED OR DENIED');
+          } else if (error && error.name === 'InvalidStateError') {
+            setCaptureStatus('CLICK THE BUTTON DIRECTLY TO OPEN THE SHARE POPUP');
+          } else {
+            setCaptureStatus('SPEAKER CAPTURE ERROR · WEB/COSINE FALLBACK ACTIVE');
+          }
+          activateBestScope();
+        });
+      }
+
+      function setupOutputCapture() {
+        if (!capturePanel || !captureStatus || !captureButton || !shareDialog || !shareLiveButton) return;
+        if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+          captureButton.disabled = true;
+          setCaptureStatus('SPEAKER CAPTURE REQUIRES HTTPS AND A SUPPORTED BROWSER');
+          return;
+        }
+        captureButton.addEventListener('click', function () {
+          if (captureStream) stopOutputCapture(true, false);
+          else openShareDialog();
+        });
+        shareLiveButton.addEventListener('click', function () {
+          closeShareDialog();
+          requestOutputCapture();
+        });
+        window.addEventListener('pagehide', function () { stopOutputCapture(true, true); });
+      }
+
+      function resizeCanvas(canvas, ctx, fallbackWidth, fallbackHeight) {
+        if (!canvas || !ctx) return { width: fallbackWidth, height: fallbackHeight };
+        var rect = canvas.getBoundingClientRect();
+        var width = Math.max(1, Math.round(rect.width || fallbackWidth));
+        var height = Math.max(1, Math.round(rect.height || fallbackHeight));
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { width: width, height: height };
+      }
+
+      function resetStar(star, initial) {
+        star.x = (Math.random() - 0.5) * 2.35;
+        star.y = (Math.random() - 0.5) * 1.7;
+        star.z = initial ? 0.12 + Math.random() * 1.45 : 1.55;
+        star.pz = star.z;
+        star.size = 0.45 + Math.random() * 1.65;
+        star.phase = Math.random() * TAU;
+        star.hue = Math.random() < 0.34 ? 0 : 120;
+      }
+
+      function seedStars() {
+        if (!starCanvas || !starCtx) return;
+        var count = Math.max(110, Math.min(270, Math.round((starWidth * starHeight) / 7200)));
+        stars = [];
+        for (var i = 0; i < count; i++) {
+          var star = {};
+          resetStar(star, true);
+          stars.push(star);
+        }
+      }
+
+      function resizeAll() {
+        var starSize = resizeCanvas(starCanvas, starCtx, window.innerWidth || 800, window.innerHeight || 600);
+        starWidth = starSize.width;
+        starHeight = starSize.height;
+        seedStars();
+
+        var scopeSize = resizeCanvas(scopeCanvas, scopeCtx, 640, 180);
+        scopeWidth = scopeSize.width;
+        scopeHeight = scopeSize.height;
+      }
+
+      function sampleAudio(now) {
+        var targetLevel = 0;
+        var targetBass = 0;
+        var targetTreble = 0;
+        var canSample = analyser && freqData && waveData && scopeMode !== 'synthetic';
+
+        if (canSample) {
+          analyser.getByteFrequencyData(freqData);
+          analyser.getByteTimeDomainData(waveData);
+
+          var bassBins = Math.max(1, Math.floor(freqData.length * 0.12));
+          var trebleStart = Math.floor(freqData.length * 0.66);
+          var bassSum = 0;
+          var trebleSum = 0;
+          var rmsSum = 0;
+          for (var i = 0; i < freqData.length; i++) {
+            if (i < bassBins) bassSum += freqData[i];
+            if (i >= trebleStart) trebleSum += freqData[i];
+          }
+          for (var j = 0; j < waveData.length; j += 2) {
+            var sample = (waveData[j] - 128) / 128;
+            rmsSum += sample * sample;
+          }
+          targetBass = bassSum / bassBins / 255;
+          targetTreble = trebleSum / Math.max(1, freqData.length - trebleStart) / 255;
+          targetLevel = Math.min(1, Math.sqrt(rmsSum / Math.ceil(waveData.length / 2)) * 3.4);
+
+          var rawSilence = targetLevel < 0.004 && targetBass < 0.004 && targetTreble < 0.004;
+          if (rawSilence) {
+            signalRecoveryFrames = 0;
+            if (!silenceBeganAt) silenceBeganAt = now;
+            /* Hold the real input for three seconds so brief web gaps do not click the scope. */
+            if (now - silenceBeganAt >= 3000) syntheticWave = true;
+          } else {
+            silenceBeganAt = 0;
+            signalRecoveryFrames += 1;
+            /* Require a short stable recovery before leaving the cosine fallback. */
+            if (!syntheticWave || signalRecoveryFrames >= 10) syntheticWave = false;
+          }
+        } else {
+          syntheticWave = true;
+          silenceBeganAt = 0;
+          signalRecoveryFrames = 0;
+        }
+
+        if (syntheticWave) {
+          var idle = now * 0.001;
+          targetLevel = 0.052 + Math.sin(idle * 1.6) * 0.014;
+          targetBass = targetLevel * 0.78;
+          targetTreble = targetLevel * 0.52;
+        }
+
+        syntheticMix += ((syntheticWave ? 1 : 0) - syntheticMix) * 0.075;
+        level += (targetLevel - level) * 0.10;
+        bass += (targetBass - bass) * 0.12;
+        treble += (targetTreble - treble) * 0.10;
+      }
+
+      function drawStarfield(now, dt) {
+        if (!starCtx || !starWidth || !starHeight) return;
+        var cx = starWidth / 2;
+        var cy = starHeight / 2;
+        var focal = Math.min(starWidth, starHeight) * 0.72;
+        var t = now * 0.001;
+        var motion = reducedMotion ? 0.42 : 1;
+        var speed = (0.105 + bass * 0.62 + level * 0.18) * dt * motion;
+        var sway = Math.sin(t * 0.8) * (0.008 + bass * 0.035);
+        var verticalSway = Math.cos(t * 0.63) * (0.006 + treble * 0.026);
+
+        starCtx.clearRect(0, 0, starWidth, starHeight);
+        starCtx.globalCompositeOperation = 'lighter';
+
+        var glow = starCtx.createRadialGradient(cx, cy, 0, cx, cy, focal * 0.85);
+        glow.addColorStop(0, 'rgba(0, 255, 0, ' + (0.018 + bass * 0.13) + ')');
+        glow.addColorStop(0.48, 'rgba(255, 0, 0, ' + (0.012 + treble * 0.055) + ')');
+        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        starCtx.fillStyle = glow;
+        starCtx.fillRect(0, 0, starWidth, starHeight);
+
+        for (var i = 0; i < stars.length; i++) {
+          var star = stars[i];
+          star.pz = star.z;
+          star.z -= speed * (0.72 + star.size * 0.2);
+          if (star.z < 0.045) {
+            resetStar(star, false);
+            continue;
+          }
+
+          var oscillationX = Math.sin(t * 1.15 + star.phase) * (0.006 + bass * 0.028) + sway;
+          var oscillationY = Math.cos(t * 0.92 + star.phase) * (0.005 + treble * 0.024) + verticalSway;
+          var x = (star.x + oscillationX) / star.z * focal + cx;
+          var y = (star.y + oscillationY) / star.z * focal + cy;
+          var previousX = (star.x + oscillationX) / star.pz * focal + cx;
+          var previousY = (star.y + oscillationY) / star.pz * focal + cy;
+          var alpha = Math.max(0.08, Math.min(1, (1.48 - star.z) * 0.72)) * (0.48 + level * 1.5);
+          var size = Math.max(0.45, star.size * (1.78 - star.z) * (1 + bass * 1.7));
+
+          if (x < -40 || x > starWidth + 40 || y < -40 || y > starHeight + 40) continue;
+          starCtx.strokeStyle = 'hsla(' + star.hue + ', 100%, 65%, ' + Math.min(0.9, alpha * 0.56) + ')';
+          starCtx.lineWidth = Math.max(0.35, size * 0.55);
+          starCtx.beginPath();
+          starCtx.moveTo(previousX, previousY);
+          starCtx.lineTo(x, y);
+          starCtx.stroke();
+
+          starCtx.fillStyle = 'hsla(' + star.hue + ', 100%, ' + (72 + bass * 18) + '%, ' + Math.min(1, alpha) + ')';
+          starCtx.beginPath();
+          starCtx.arc(x, y, size, 0, TAU);
+          starCtx.fill();
+        }
+
+        var ringRadius = 42 + bass * Math.min(starWidth, starHeight) * 0.22 + Math.sin(t * 2.2) * 4;
+        starCtx.strokeStyle = 'rgba(0, 255, 0, ' + (0.05 + bass * 0.18) + ')';
+        starCtx.lineWidth = 1;
+        starCtx.beginPath();
+        starCtx.arc(cx, cy, ringRadius, 0, TAU);
+        starCtx.stroke();
+        starCtx.globalCompositeOperation = 'source-over';
+      }
+
+      function drawScope(now) {
+        if (!scopeCtx || !scopeWidth || !scopeHeight) return;
+        var t = now * 0.001;
+        var center = scopeHeight / 2;
+        var amplitude = Math.max(2.2, scopeHeight * (0.08 + level * 0.37));
+        var gradient = scopeCtx.createLinearGradient(0, 0, scopeWidth, 0);
+        gradient.addColorStop(0, '#00ff00');
+        gradient.addColorStop(0.52, '#ffffff');
+        gradient.addColorStop(1, '#ff0000');
+
+        scopeCtx.clearRect(0, 0, scopeWidth, scopeHeight);
+        scopeCtx.fillStyle = 'rgba(1, 4, 12, 0.42)';
+        scopeCtx.fillRect(0, 0, scopeWidth, scopeHeight);
+
+        scopeCtx.strokeStyle = 'rgba(0, 255, 0, 0.13)';
+        scopeCtx.lineWidth = 1;
+        scopeCtx.beginPath();
+        for (var gx = 0; gx <= 6; gx++) {
+          var gridX = Math.round(scopeWidth * gx / 6) + 0.5;
+          scopeCtx.moveTo(gridX, 0);
+          scopeCtx.lineTo(gridX, scopeHeight);
+        }
+        for (var gy = 0; gy <= 4; gy++) {
+          var gridY = Math.round(scopeHeight * gy / 4) + 0.5;
+          scopeCtx.moveTo(0, gridY);
+          scopeCtx.lineTo(scopeWidth, gridY);
+        }
+        scopeCtx.stroke();
+
+        scopeCtx.strokeStyle = gradient;
+        scopeCtx.shadowColor = 'rgba(0, 255, 0, 0.8)';
+        scopeCtx.shadowBlur = 8 + level * 8;
+        scopeCtx.lineWidth = 1.6 + level * 0.8;
+        scopeCtx.beginPath();
+        for (var x = 0; x <= scopeWidth; x++) {
+          var realSample = 0;
+          var cosineSample = Math.sin(t * 4.2 + x * 0.055) * 0.18 + Math.sin(t * 1.7 + x * 0.013) * 0.08;
+          if (waveData && waveData.length) {
+            var index = Math.min(waveData.length - 1, Math.floor(x / Math.max(1, scopeWidth) * waveData.length));
+            realSample = (waveData[index] - 128) / 128;
+          }
+          var sample = realSample * (1 - syntheticMix) + cosineSample * syntheticMix;
+          var y = center + sample * amplitude;
+          if (x === 0) scopeCtx.moveTo(x, y); else scopeCtx.lineTo(x, y);
+        }
+        scopeCtx.stroke();
+        scopeCtx.shadowBlur = 0;
+
+        scopeCtx.strokeStyle = 'rgba(255, 0, 0, 0.32)';
+        scopeCtx.lineWidth = 1;
+        scopeCtx.beginPath();
+        scopeCtx.moveTo(0, center + 0.5);
+        scopeCtx.lineTo(scopeWidth, center + 0.5);
+        scopeCtx.stroke();
+
+        if (scopeMode === 'player') {
+          setScopeReadout(syntheticWave ? 'PLAYER SILENT · COSINE' : (Math.round(level * 100) + '% PLAYER AUDIO'));
+        } else if (scopeMode === 'live') {
+          setScopeReadout(syntheticWave ? 'LIVE SILENT · COSINE' : (Math.round(level * 100) + '% LIVE DATA · SILENT OUT'));
+        } else if (scopeMode === 'capture') {
+          setScopeReadout(syntheticWave ? 'INPUT SILENT · COSINE' : (Math.round(level * 100) + '% ' + captureLabel));
+        } else {
+          setScopeReadout(liveAudio ? 'WEB RETRY · COSINE' : 'SILENT COSINE');
+        }
+      }
+
+      function render(now) {
+        if (!lastFrame) lastFrame = now;
+        var dt = Math.min(0.05, Math.max(0.001, (now - lastFrame) / 1000));
+        lastFrame = now;
+        sampleAudio(now);
+        drawStarfield(now, dt);
+        drawScope(now);
+        window.requestAnimationFrame(render);
+      }
+
+      var canOgg = false;
+      try { canOgg = audio.canPlayType('audio/ogg; codecs="vorbis"') !== ''; } catch (e) {}
+
+      playBtn.addEventListener('click', function () {
+        if (!canOgg) { setStatus('NO OGG VORBIS HERE — TRY THE LISTEN BUTTONS ABOVE'); return; }
+        initVisualizer();
+        if (audio.paused) {
+          var p = audio.play();
+          if (p && p.catch) p.catch(function () {
+            setStatus(audio.error ? errStatus() : 'BLOCKED — PRESS AGAIN');
+          });
+        } else {
+          audio.pause();
+        }
+      });
+
+      audio.addEventListener('playing', function () {
+        activatePlayerScope();
+        setPlaying(true);
+        setStatus('ON AIR');
+      });
+      audio.addEventListener('pause', function () {
+        setPlaying(false);
+        setStatus('STANDBY');
+        activateBestScope();
+      });
+      audio.addEventListener('waiting', function () { setStatus('BUFFERING…'); });
+      audio.addEventListener('ended', function () {
+        setPlaying(false);
+        setStatus('STREAM ENDED');
+        activateBestScope();
+      });
+      function errStatus() {
+        var c = audio.error ? audio.error.code : 0;
+        if (c === 4) return 'IMAGE.OGG NOT FOUND (404) — UPLOAD IT TO /RAMDISKRADIO/';
+        if (c === 3) return 'DECODE ERROR — IS THE FILE REALLY VORBIS OGG?';
+        return 'OFFLINE / STREAM DOWN';
+      }
+      audio.addEventListener('error', function () {
+        setPlaying(false);
+        setStatus(errStatus());
+        activateBestScope();
+      });
+
+      vol.addEventListener('input', function () {
+        audio.volume = parseFloat(vol.value);
+      });
+
+      setInterval(function () {
+        timeEl.textContent = fmt(audio.currentTime);
+      }, 500);
+
+      window.addEventListener('resize', resizeAll);
+      window.addEventListener('orientationchange', resizeAll);
+      setupLiveFallback();
+      setupOutputCapture();
+      resizeAll();
+      window.requestAnimationFrame(render);
+
+      if (!canOgg) {
+        setStatus('NO OGG VORBIS IN THIS BROWSER — TRY THE LISTEN BUTTONS ABOVE');
+      } else {
+        setStatus('READY — PRESS PLAY');
+      }
+    })();
+  </script>
+
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3b858c1ab3b65fd',t:'MTc4OTQ4MjgwOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3b8996dcb2bfba9',t:'MTc4OTQ4NTQ1Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3b97824d8f1f5cd',t:'MTc4OTQ5NDU3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

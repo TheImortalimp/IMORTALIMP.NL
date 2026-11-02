@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CELERON // SIMULATION MATRIX</title>
+    <style>
+        :root {
+            --text-main: #a49cb3;
+            --bg-dark: #050208;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            color: #fff;
+        }
+
+        /* Ambient Cosmic & WebGL Canvas Background Layer */
+        #canvas-master-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        #webgl-engine-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        #cosmic-svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Minimal Technical Overlay HUD */
+        .ui-terminal-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            pointer-events: none; /* Allows direct interaction with Three.js camera orbit controls */
+        }
+
+        .ui-header {
+            text-align: left;
+            opacity: 0.65;
+        }
+
+        .celeron-title {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            transition: all 0.8s ease;
+        }
+
+        .status-text {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-main);
+            transition: all 0.8s ease;
+        }
+
+        .hud-telemetry {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            opacity: 0.5;
+        }
+
+        .hud-column {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .hud-column.right {
+            text-align: right;
+        }
+
+        .val {
+            font-weight: bold;
+            transition: color 0.8s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MASTER DUAL-ENGINE VISUAL SYSTEM -->
+    <div id="canvas-master-container">
+        <!-- SVG Layer: Particle Starfield, Magnetic Vector Waves, Asteroid Ring System -->
+        <svg id="cosmic-svg-layer" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <radialGradient id="magnetic-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#221a30" stop-opacity="0.35" id="grad-stop-0"/>
+                    <stop offset="100%" stop-color="#050208" stop-opacity="0" id="grad-stop-1"/>
+                </radialGradient>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#magnetic-glow)" />
+            <g id="svg-starfield-group"></g>
+            <g id="svg-magnetic-group"></g>
+            <g id="svg-asteroid-group"></g>
+        </svg>
+
+        <!-- WebGL Deformation Grid -->
+        <div id="webgl-engine-layer"></div>
+    </div>
+
+    <!-- HUD TERMINAL OVERLAY -->
+    <div class="ui-terminal-wrapper">
+        <header class="ui-header">
+            <h1 class="celeron-title" id="main-title">CELERON — NOMINAL BASELINE</h1>
+            <div class="status-text" id="status-text">Topology: Pure Nominal // Environmental State: Neutral</div>
+        </header>
+
+        <footer class="hud-telemetry">
+            <div class="hud-column">
+                <div>CORE LENS: <span class="val" id="lensing-val">PURE_NOMINAL</span></div>
+                <div>MASS CONFIG: <span class="val" id="hud-mass">4.2M SOL</span></div>
+            </div>
+            <div class="hud-column right">
+                <div>RELATIVISTIC VELOCITY: <span class="val" id="vel-val">0.10c</span></div>
+                <div>RADIATION THRESHOLD: <span class="val" id="hud-rad">NATURAL FLUX</span></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Import Maps Module Strategy -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+                "gsap": "https://unpkg.com/gsap@3.12.5/index.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import gsap from 'gsap';
+
+        // Core 9-Cycle Matrix Configuration Matrix
+        const config = [
+            { 
+                title: "CELERON — NOMINAL BASELINE", status: "Topology: Pure Nominal // Environmental State: Neutral", 
+                morph: 0.0, compress: 1.0, intensity: 0.8, rotate: 0.1, camY: 10, camDist: 42,
+                color: "#a49cb3", glowColor: "#221a30", vel: "0.10c", license: "PURE_NOMINAL", rad: "NATURAL FLUX",
+                astSpeed: 0.2, astChaos: 0.0, fieldPulse: 1.0
+            },
+            { 
+                title: "CELERON — TURBULENT BASELINE", status: "Topology: Pure Turbulent // Environmental State: Neutral", 
+                morph: 1.2, compress: 1.0, intensity: 1.1, rotate: 0.8, camY: 20, camDist: 48,
+                color: "#88ffcc", glowColor: "#053322", vel: "0.55c", license: "PURE_TURB", rad: "STABLE BASELINE",
+                astSpeed: 0.6, astChaos: 0.3, fieldPulse: 2.5
+            },
+            { 
+                title: "CELERON — CRITICAL BASELINE", status: "Topology: Pure Critical // Environmental State: Neutral", 
+                morph: 0.3, compress: 0.35, intensity: 1.5, rotate: 1.5, camY: 5, camDist: 35,
+                color: "#ff6666", glowColor: "#401010", vel: "0.90c", license: "PURE_CRIT", rad: "THERMAL DRIFT",
+                astSpeed: 1.5, astChaos: 0.1, fieldPulse: 4.0
+            },
+            { 
+                title: "CELERON — NOMINAL SOLAR STRAIN", status: "Topology: Nominal // Solar Radiation: Active", 
+                morph: 0.08, compress: 0.95, intensity: 1.2, rotate: 0.3, camY: 15, camDist: 45,
+                color: "#ff884b", glowColor: "#b300ff", vel: "0.42c", license: "SOLAR_TELEM", rad: "HIGH ION MASS",
+                astSpeed: 0.4, astChaos: 0.15, fieldPulse: 1.8
+            },
+            { 
+                title: "CELERON — TURBULENT RAIN INTERCEPT", status: "Topology: Turbulent // Precipitation Vector: Dense", 
+                morph: 1.6, compress: 1.4, intensity: 2.0, rotate: 2.2, camY: 25, camDist: 52,
+                color: "#00d5ff", glowColor: "#ff0077", vel: "0.81c", license: "RAIN_MESH", rad: "ATTENUATED",
+                astSpeed: 0.9, astChaos: 0.7, fieldPulse: 3.2
+            },
+            { 
+                title: "CELERON — CRITICAL STORM SINGULARITY", status: "Topology: Critical // Storm Vector: Maximum Burst", 
+                morph: 0.45, compress: 0.15, intensity: 4.0, rotate: 6.0, camY: 2, camDist: 30,
+                color: "#ff003c", glowColor: "#4400aa", vel: "0.99c", license: "STORM_CORE", rad: "CRITICAL EMISSION",
+                astSpeed: 3.5, astChaos: 0.9, fieldPulse: 8.0
+            },
+            { 
+                title: "CELERON — NOMINAL PRECIPITATION CURVE", status: "Topology: Nominal // Precipitation Vector: Rain", 
+                morph: 0.04, compress: 1.20, intensity: 0.9, rotate: 0.2, camY: 12, camDist: 44,
+                color: "#3ba2ff", glowColor: "#1d2440", vel: "0.38c", license: "STREAM_SYS", rad: "DAMPENED SCATTER",
+                astSpeed: 0.3, astChaos: 0.05, fieldPulse: 1.2
+            },
+            { 
+                title: "CELERON — TURBULENT RADIATION FLARE", status: "Topology: Turbulent // Solar Radiation: Eruptive", 
+                morph: 2.2, compress: 0.70, intensity: 2.8, rotate: 3.5, camY: -15, camDist: 50,
+                color: "#ffbb00", glowColor: "#ff4b00", vel: "0.89c", license: "FLARE_WARN", rad: "MAX CORONAL INDUCT",
+                astSpeed: 2.0, astChaos: 0.5, fieldPulse: 5.5
+            },
+            { 
+                title: "CELERON — CRITICAL VORTEX DISPLACEMENT", status: "Topology: Critical // Storm Vector: Rain & Shield Collapse", 
+                morph: 0.9, compress: 0.05, intensity: 5.0, rotate: 8.0, camY: 0, camDist: 28,
+                color: "#e600ff", glowColor: "#1a0033", vel: "0.998c", license: "VOID_MATRIX", rad: "EXTREME QUANTUM BURST",
+                astSpeed: 5.0, astChaos: 1.2, fieldPulse: 10.0
+            }
+        ];
+
+        let stateIdx = 0;
+        let currentAstSpeed = config[0].astSpeed;
+        let currentAstChaos = config[0].astChaos;
+        let currentFieldPulse = config[0].fieldPulse;
+        let svgColorStr = config[0].color;
+
+        // DOM Interfaces
+        const container = document.getElementById('webgl-engine-layer');
+        const mainTitle = document.getElementById('main-title');
+        const statusText = document.getElementById('status-text');
+        const licenseVal = document.getElementById('lensing-val');
+        const velVal = document.getElementById('vel-val');
+        const hudMass = document.getElementById('hud-mass');
+        const hudRad = document.getElementById('hud-rad');
+        const gradStop0 = document.getElementById('grad-stop-0');
+
+        // SVG Mapping Nodes
+        const starfieldGroup = document.getElementById('svg-starfield-group');
+        const magneticGroup = document.getElementById('svg-magnetic-group');
+        const asteroidGroup = document.getElementById('svg-asteroid-group');
+
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let centerX = width / 2;
+        let centerY = height / 2;
+
+        // WEBGL ENGINE INITIALIZATION
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(35, 12, 35);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.5;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = config[0].rotate;
+
+        const noiseChunk = `
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+            float snoise(vec3 v) {
+                const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+                const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+                vec3 i  = floor(v + dot(v, C.yyy) );
+                vec3 x0 = v - i + dot(i, C.xxx) ;
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min( g.xyz, l.zxy );
+                vec3 i2 = max( g.xyz, l.zxy );
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + C.yyy;
+                vec3 x3 = x0 - D.yyy;
+                i = mod289(i);
+                vec4 p = permute( permute( permute( i.z + vec4(0.0, i1.z, i2.z, 1.0 )) + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+                float n_ = 0.142857142857;
+                vec3  ns = n_ * D.wyz - D.xzx;
+                vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_ );
+                vec4 x = x_ *ns.x + ns.yyyy;
+                vec4 y = y_ *ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+                vec4 b0 = vec4( x.xy, y.xy );
+                vec4 b1 = vec4( x.zw, y.zw );
+                vec4 s0 = floor(b0)*2.0 + 1.0;
+                vec4 s1 = floor(b1)*2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+                vec3 p0 = vec3(a0.xy,h.x);
+                vec3 p1 = vec3(a0.zw,h.y);
+                vec3 p2 = vec3(a1.xy,h.z);
+                vec3 p3 = vec3(a1.zw,h.w);
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+            }
+        `;
+
+        const coreGroup = new THREE.Group();
+        scene.add(coreGroup);
+
+        const bhMat = new THREE.MeshBasicMaterial({ color: 0x030105 });
+        const bhGeo = new THREE.SphereGeometry(9.8, 64, 64);
+        coreGroup.add(new THREE.Mesh(bhGeo, bhMat));
+
+        const auraMat = new THREE.ShaderMaterial({
+            uniforms: { 
+                uTime: { value: 0 }, 
+                uIntensity: { value: 0.8 },
+                uColor: { value: new THREE.Color('#221a30') }
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                varying vec3 vView;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    vView = normalize(-(modelViewMatrix * vec4(position, 1.0)).xyz);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float uIntensity;
+                uniform vec3 uColor;
+                varying vec3 vNormal;
+                varying vec3 vView;
+                void main() {
+                    float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), 4.0);
+                    gl_FragColor = vec4(uColor * rim * uIntensity * 5.0, rim * 0.4);
+                }
+            `,
+            side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending
+        });
+        const auraMesh = new THREE.Mesh(new THREE.SphereGeometry(10.3, 64, 64), auraMat);
+        coreGroup.add(auraMesh);
+
+        const RADIUS = 10;
+        const RING_COUNT = 12;
+        const ringSegments = 128;
+
+        const vectorMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uMorph: { value: 0.0 },
+                uCompression: { value: 1.0 },
+                uIntensity: { value: 0.8 },
+                uColor: { value: new THREE.Color('#a49cb3') }
+            },
+            vertexShader: `
+                ${noiseChunk}
+                uniform float uTime;
+                uniform float uMorph;
+                uniform float uCompression;
+                varying float vOpacity;
+                varying vec3 vNormal;
+
+                void main() {
+                    vNormal = normalize(normal);
+                    vec3 pos = position;
+                    
+                    float noise = snoise(vec3(pos.x * 0.12, pos.y * 0.12, uTime * 0.35));
+                    pos += normal * noise * uMorph * 3.2;
+                    pos.y *= uCompression;
+
+                    vec3 viewDir = normalize(cameraPosition - pos);
+                    float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.5);
+
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    vOpacity = (0.3 + fresnel * 0.7);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 uColor;
+                uniform float uIntensity;
+                uniform float uTime;
+                varying float vOpacity;
+                void main() {
+                    float wavePulse = 0.75 + 0.25 * sin(uTime * 2.5);
+                    gl_FragColor = vec4(uColor * uIntensity * wavePulse, vOpacity * 0.7);
+                }
+            `,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        for (let i = 1; i < 9; i++) {
+            const phi = (i * Math.PI) / 9;
+            const rY = RADIUS * Math.cos(phi);
+            const rX = RADIUS * Math.sin(phi);
+
+            const points = [];
+            const normals = [];
+            for (let j = 0; j <= ringSegments; j++) {
+                const theta = (j * Math.PI * 2) / ringSegments;
+                const pt = new THREE.Vector3(Math.cos(theta) * rX, rY, Math.sin(theta) * rX);
+                points.push(pt);
+                normals.push(pt.clone().normalize());
+            }
+            const geo = new THREE.BufferGeometry().setFromPoints(points);
+            geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals.flatMap(n => [n.x, n.y, n.z]), 3));
+            coreGroup.add(new THREE.LineLoop(geo, vectorMaterial));
+        }
+
+        for (let i = 0; i < RING_COUNT; i++) {
+            const points = [];
+            const normals = [];
+            const targetAngle = (i * Math.PI) / RING_COUNT;
+            
+            for (let j = 0; j <= ringSegments; j++) {
+                const latAngle = (j * Math.PI * 2) / ringSegments;
+                const pt = new THREE.Vector3(
+                    RADIUS * Math.sin(latAngle) * Math.cos(targetAngle),
+                    RADIUS * Math.cos(latAngle),
+                    RADIUS * Math.sin(latAngle) * Math.sin(targetAngle)
+                );
+                points.push(pt);
+                normals.push(pt.clone().normalize());
+            }
+            const geo = new THREE.BufferGeometry().setFromPoints(points);
+            geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals.flatMap(n => [n.x, n.y, n.z]), 3));
+            coreGroup.add(new THREE.LineLoop(geo, vectorMaterial));
+        }
+
+        const camControl = { distance: 42 };
+
+        // TWO-DIMENSIONAL COORDINATE GENERATOR
+        const stars = [];
+        const starCount = 250;
+        const asteroidCount = 200;
+        const asteroids = [];
+        const fieldLines = 16;
+
+        function initializeSvgUniverse() {
+            starfieldGroup.innerHTML = '';
+            asteroidGroup.innerHTML = '';
+            magneticGroup.innerHTML = '';
+
+            for(let i=0; i<starCount; i++) {
+                const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const r = Math.random() * 1.3 + 0.3;
+                star.setAttribute("cx", x);
+                star.setAttribute("cy", y);
+                star.setAttribute("r", r);
+                star.setAttribute("fill", "#ffffff");
+                star.setAttribute("opacity", Math.random() * 0.5 + 0.1);
+                starfieldGroup.appendChild(star);
+                stars.push({ element: star, phase: Math.random() * 100, speed: Math.random() * 0.02 + 0.005 });
+            }
+
+            for(let i=0; i<fieldLines; i++) {
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("fill", "none");
+                path.setAttribute("stroke-width", "1");
+                path.setAttribute("opacity", "0.12");
+                magneticGroup.appendChild(path);
+            }
+
+            for(let i=0; i<asteroidCount; i++) {
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                const angle = Math.random() * Math.PI * 2;
+                const minRadius = Math.min(width, height) * 0.25;
+                const maxRadius = Math.max(width, height) * 0.5;
+                const orbitRadius = minRadius + (Math.random() * (maxRadius - minRadius));
+                const size = Math.random() * 2.2 + 0.4;
+
+                circle.setAttribute("r", size);
+                asteroidGroup.appendChild(circle);
+
+                asteroids.push({
+                    element: circle,
+                    angle: angle,
+                    orbitRadius: orbitRadius,
+                    baseSpeed: (Math.random() * 0.0035 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
+                    driftPhase: Math.random() * 50
+                });
+            }
+        }
+
+        function animateSvgElements(time) {
+            stars.forEach(s => {
+                s.phase += s.speed * currentFieldPulse;
+                const o = 0.2 + (Math.sin(s.phase) * 0.5 + 0.5) * 0.6;
+                s.element.setAttribute("opacity", o);
+            });
+
+            const paths = magneticGroup.children;
+            const compressionSetting = config[stateIdx].compress; 
+            
+            for(let i=0; i<paths.length; i++) {
+                const p = paths[i];
+                const widthRadius = Math.min(width, height) * 0.38 * (0.6 + (i * 0.12));
+                const heightRadius = widthRadius * 0.55 * compressionSetting;
+
+                const offsetX = Math.sin(time * 0.8 + i) * (currentAstChaos * 12);
+                const offsetY = Math.cos(time * 0.6 + i) * (currentAstChaos * 8);
+
+                let d = "";
+                for(let a=0; a<=360; a+=5) {
+                    const rad = (a * Math.PI) / 180;
+                    const wave = Math.sin(rad * 4 + time * 2.0) * (currentAstChaos * 14);
+                    
+                    const x = centerX + Math.cos(rad) * (widthRadius + wave) + offsetX;
+                    const y = centerY + Math.sin(rad) * (heightRadius + wave) * compressionSetting + offsetY;
+                    
+                    if (a === 0) d += `M ${x} ${y}`;
+                    else d += ` L ${x} ${y}`;
+                }
+                d += " Z";
+                p.setAttribute("d", d);
+                p.setAttribute("stroke", svgColorStr);
+                p.setAttribute("opacity", (0.06 + (Math.sin(time + i) * 0.04) * currentFieldPulse));
+            }
+
+            asteroids.forEach(ast => {
+                ast.angle += ast.baseSpeed * currentAstSpeed;
+                
+                const chaosWaveX = Math.sin(time + ast.driftPhase) * (currentAstChaos * 22);
+                const chaosWaveY = Math.cos(time * 1.3 + ast.driftPhase) * (currentAstChaos * 18);
+                
+                const curRadiusX = ast.orbitRadius;
+                const curRadiusY = ast.orbitRadius * compressionSetting;
+
+                const x = centerX + Math.cos(ast.angle) * curRadiusX + chaosWaveX;
+                const y = centerY + Math.sin(ast.angle) * curRadiusY + chaosWaveY;
+
+                ast.element.setAttribute("cx", x);
+                ast.element.setAttribute("cy", y);
+                ast.element.setAttribute("fill", svgColorStr);
+                ast.element.setAttribute("opacity", 0.25 + (Math.sin(ast.angle + time) * 0.3 + 0.3));
+            });
+        }
+
+        // CYCLE ROTATOR MATRIX SWITCH
+        function triggerStateMatrixTransition() {
+            stateIdx = (stateIdx + 1) % config.length;
+            const nextMatrixState = config[stateIdx];
+            
+            const transitionTimeline = gsap.timeline({ defaults: { duration: 2.8, ease: "power2.inOut" } });
+            
+            transitionTimeline.to(vectorMaterial.uniforms.uMorph, { value: nextMatrixState.morph }, 0);
+            transitionTimeline.to(vectorMaterial.uniforms.uCompression, { value: nextMatrixState.compress }, 0);
+            transitionTimeline.to(vectorMaterial.uniforms.uIntensity, { value: nextMatrixState.intensity }, 0);
+            transitionTimeline.to(auraMat.uniforms.uIntensity, { value: nextMatrixState.intensity }, 0);
+            transitionTimeline.to(controls, { autoRotateSpeed: nextMatrixState.rotate }, 0);
+            transitionTimeline.to(camera.position, { y: nextMatrixState.camY }, 0);
+            transitionTimeline.to(camControl, { distance: nextMatrixState.camDist }, 0);
+
+            const colorObject = new THREE.Color(nextMatrixState.color);
+            const glowObject = new THREE.Color(nextMatrixState.glowColor);
+            transitionTimeline.to(vectorMaterial.uniforms.uColor.value, { r: colorObject.r, g: colorObject.g, b: colorObject.b }, 0);
+            transitionTimeline.to(auraMat.uniforms.uColor.value, { r: glowObject.r, g: glowObject.g, b: glowObject.b }, 0);
+
+            transitionTimeline.to(window, {
+                customAstSpeed: nextMatrixState.astSpeed,
+                customAstChaos: nextMatrixState.astChaos,
+                customFieldPulse: nextMatrixState.fieldPulse,
+                duration: 2.8,
+                ease: "power2.inOut",
+                onUpdate: () => {
+                    currentAstSpeed = nextMatrixState.astSpeed;
+                    currentAstChaos = nextMatrixState.astChaos;
+                    currentFieldPulse = nextMatrixState.fieldPulse;
+                }
+            }, 0);
+
+            svgColorStr = nextMatrixState.color;
+
+            gsap.to([mainTitle, statusText, licenseVal, velVal, hudMass, hudRad], { 
+                opacity: 0, 
+                duration: 0.5, 
+                onComplete: () => {
+                    mainTitle.innerText = nextMatrixState.title;
+                    mainTitle.style.color = nextMatrixState.color;
+                    statusText.innerText = nextMatrixState.status;
+                    statusText.style.color = nextMatrixState.color;
+                    licenseVal.innerText = nextMatrixState.license;
+                    licenseVal.style.color = nextMatrixState.color;
+                    velVal.innerText = nextMatrixState.vel;
+                    velVal.style.color = nextMatrixState.color;
+                    hudRad.innerText = nextMatrixState.rad;
+                    hudRad.style.color = nextMatrixState.color;
+                    gradStop0.setAttribute("stop-color", nextMatrixState.glowColor);
+
+                    gsap.to([mainTitle, statusText, licenseVal, velVal, hudMass, hudRad], { opacity: 0.65, duration: 0.7 });
+                }
+            });
+        }
+
+        const clock = new THREE.Clock();
+        function mainRenderLoop() {
+            const time = clock.getElapsedTime();
+            
+            vectorMaterial.uniforms.uTime.value = time;
+            auraMat.uniforms.uTime.value = time;
+            coreGroup.rotation.y = time * 0.02;
+
+            const currentDirection = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+            camera.position.x = controls.target.x + currentDirection.x * camControl.distance;
+            camera.position.z = controls.target.z + currentDirection.z * camControl.distance;
+            
+            controls.update();
+            renderer.render(scene, camera);
+            animateSvgElements(time);
+
+            requestAnimationFrame(mainRenderLoop);
+        }
+
+        window.addEventListener('resize', () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+
+            initializeSvgUniverse();
+        });
+
+        initializeSvgUniverse();
+        mainRenderLoop();
+        setInterval(triggerStateMatrixTransition, 8000);
+    </script>
+</body>
+</html>

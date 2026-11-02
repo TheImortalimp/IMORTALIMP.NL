@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASCII Rainbow Grid</title>
+    <style>
+/* ascii-rainbow-grid.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+#bg-canvas,
+#matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#bg-canvas {
+    z-index: 1;
+    pointer-events: none;
+}
+
+#matrix-canvas {
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.badge {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    font: 14px/1.4 'Segoe UI', system-ui, sans-serif;
+    color: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(4px);
+    padding: 6px 16px;
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: 0.3px;
+    transition: color 0.6s ease, background 0.6s ease;
+}
+
+@media (max-width: 600px) {
+    .badge {
+        font-size: 10px;
+        padding: 4px 12px;
+        bottom: 12px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="badge" id="badge">✦ move mouse · click for surge ✦</div>
+
+    <script>
+// ascii-rainbow-grid.js
+const latin      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:"<>,./?`~ ';
+const cyrillic   = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяІЇЄЎЃЅЋЌЏіїєўѓѕћќџ';
+const greek      = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωςΆΈΉΊΌΎΏάέήίόύώΐΰϊϋ';
+const katakana   = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォッヴー';
+const hebrew     = 'אבגדהוזחטיכךלמםנןסעפףצץקרשת׳״־';
+const arabic     = 'ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهويأبتثجحخدذرزسشصضطظعغفقكلمنهويى';
+const devanagari = 'अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसहँंःॐ०१२३४५६७८९';
+const thai       = 'กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮัาำิีึืุูใไ่้็๋์ๆ๐๑๒๓๔๕๖๗๘๙';
+const hangul     = 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣㄲㄸㅃㅆㅉㅐㅒㅔㅖㅘㅙㅚㅝㅞㅟㅢ';
+const hanzi      = '的一是在不了有和人这中大为上个国我以要他时来用们生到作地于出就分的一是在不了有和人这中大为上个国我以要他时来用们生到作地于出就分的一是在不了有和人這中大為上個國我以要他時來用們生到作地於出就分子你说年着那她也得里后自会家可下而过天去能对小多然心学么之都好看起发当没成只如事把还第样道想种开美总从无情己面最女但现前些所同日手又行意动方期它头经长儿回位爱老因很给名法间斯知世什两次使身者被高已亲其进此话常与活正感';
+const javanese   = 'ꦀꦄꦅꦆꦇꦈꦉꦊꦋꦌꦍꦎꦏꦐꦑꦒꦓꦔꦕꦖꦗꦘꦙꦚꦛꦜꦝꦞꦟꦠꦡꦢꦣꦤꦥꦦꦧꦨꦩꦪꦫꦬꦭꦮꦯꦰꦱꦲ꧀꧐꧑꧒꧓꧔꧕꧖꧗꧘꧙';
+const symbols    = '░▒▓█─│┌┐└┘├┤┬┴┼═║╒╓╔╕╖╗╘╙╚╛╜╝╞╟╠╡╢╣╤╥╦╧╨╩╪╫╬━┃┄┅┆┇┈┉┊┋┍┎┏┑┒┓┕┖┗┙┚┛┝┞┟┠┡┢┣┥┦┧┨┩┪┫┭┮┯┰┱┲┳┵┶┷┸┹┺┻┽┾┿╀╁╂╃╄╅╆╇╈╉╊╋╌╍╎╏╭╮╯╰╱╲╳╴╵╶╷╸╹╺╻╼╽╾╿▀▁▂▃▄▅▆▇▉▊▋▌▍▎▏▐▔▕■□◆◇▲△▼▽●○◦★☆←↑→↓↔×÷±≠≈≤≥∞√∑∏∫∂∆';
+const superscript= 'ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø×ƒáíóúñÑªº¿®¬½¼¡«»ÁÂÀ©¢¥ãÃ¤ðÐÊËÈıÍÎÏ¦ÌÓßÔÒõÕµþÞÚÛÙýÝ¯´≡±‗¾¶§÷¸°¨·¹³²■•̫͡ʕ͓ʔ❁◡‿♥♠♦♣♪♫☼►◄↕‼▬↨↑↓→←∟↔▲▼≈≠≤≥∑∏∫☮☯✞✡☪☢☣⚕⚖⚗⚙⚛☘☤⚚⚜✠☥♀♂⚢⚣⚤⚥⚦⚧✂✒✉☎✆✇✈☏⛴⛷⛸♨♻⚐⚑⚔⚘⚝⚞⚟✁✃✄☦☧☨☩☫☬☭☸☹☺☻☽☾♡♢♤♧♬♭♮♯⚒✎✏✑✓✔✕✖✗✘✙✚✛✜✝✟□△▶▷▽◀◁◆◇○●◦★☆⚰⚱🗜🛰🛩🕹ᔑʖᓵ↸ᒷ⎓⊣⍑⋮ꖎᒲᑑ∷ᓭℸ⚍⍊⨅';
+const mathop     = '∀∁∂∃∄∆∇∎−∓∔∕∗∙√∛∜∝∞∴∵∸∺∿≀⊌⊍⊎⊓⊔⊕⊖⊗⊘⊙⊚⊛⊜⊝⊞⊟⊠⊡⊢⊺⊼⊽⊿⋄⋆⋇⋉⋊⋋⋌⋒⋓⟎⟏⟑⟒⟓⧜⧝⧞⧸⧹⨝⨠⨹⨺⨻⨼⨿⩤⩥⫶⫼⫽⫾⫿≫∦𝕲∭∄∂⋥⊶≋⧉⨇⩈𝕸𝛙ℵ⪌⟁⟆⦆⌘𝛴⦻⎈';
+
+const allChars = (latin + cyrillic + greek + katakana + hebrew + arabic + devanagari + thai + hangul + hanzi + javanese + symbols + superscript + mathop).split('');
+
+// DOM
+const bgCanvas     = document.getElementById('bg-canvas');
+const matrixCanvas = document.getElementById('matrix-canvas');
+const bgCtx        = bgCanvas.getContext('2d');
+const matrixCtx    = matrixCanvas.getContext('2d');
+
+// Sizing — square viewport centred in window
+let W, H, SQ, SQ_X, SQ_Y;
+function resize() {
+    W  = window.innerWidth;
+    H  = window.innerHeight;
+    SQ = Math.min(W, H);           // side of the square
+    SQ_X = Math.floor((W - SQ) / 2);
+    SQ_Y = Math.floor((H - SQ) / 2);
+    bgCanvas.width      = W;
+    bgCanvas.height     = H;
+    matrixCanvas.width  = W;
+    matrixCanvas.height = H;
+    computeCellSizes();
+}
+
+// Grid settings
+const COLS = 25;
+const ROWS = 25;
+let cellWidth, cellHeight;
+function computeCellSizes() {
+    cellWidth  = SQ / COLS;
+    cellHeight = SQ / ROWS;
+}
+
+// Build grid
+const grid = [];
+for (let r = 0; r < ROWS; r++) {
+    grid[r] = [];
+    for (let c = 0; c < COLS; c++) {
+        grid[r][c] = {
+            char:  allChars[Math.floor(Math.random() * allChars.length)],
+            timer: Math.random() * 0.5,
+        };
+    }
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+// Mouse state — smooth parallax
+let mouseX = W / 2;
+let mouseY = H / 2;
+let smoothMX = W / 2;
+let smoothMY = H / 2;
+
+// Drag surge state
+let isDown      = false;
+let dragSurge   = 0;       // 0..1 — builds while held, drives continuous aberration boost
+let lastDragX   = W / 2;
+let lastDragY   = H / 2;
+let dragVelX    = 0;       // drag velocity for directional surge
+let dragVelY    = 0;
+let surgeTimer  = 0;       // time accumulator for held-pulse ripples
+
+// Ripple pool
+const ripples = [];
+
+function spawnRipple(x, y, strength) {
+    ripples.push({ x, y, age: 0, maxAge: 1.1, strength });
+}
+
+function getCanvasXY(clientX, clientY) {
+    const rect = matrixCanvas.getBoundingClientRect();
+    return [
+        (clientX - rect.left) * (W / rect.width),
+        (clientY - rect.top)  * (H / rect.height),
+    ];
+}
+
+// --- Mouse ---
+matrixCanvas.addEventListener('mousemove', (e) => {
+    [mouseX, mouseY] = getCanvasXY(e.clientX, e.clientY);
+    if (isDown) {
+        dragVelX = mouseX - lastDragX;
+        dragVelY = mouseY - lastDragY;
+        lastDragX = mouseX;
+        lastDragY = mouseY;
+    }
+});
+
+matrixCanvas.addEventListener('mousedown', (e) => {
+    [mouseX, mouseY] = getCanvasXY(e.clientX, e.clientY);
+    lastDragX = mouseX;
+    lastDragY = mouseY;
+    dragVelX  = 0;
+    dragVelY  = 0;
+    isDown    = true;
+    dragSurge = 0.2;
+    spawnRipple(mouseX, mouseY, 26);
+});
+
+matrixCanvas.addEventListener('mouseup', () => {
+    isDown = false;
+    dragVelX = 0;
+    dragVelY = 0;
+});
+
+matrixCanvas.addEventListener('mouseleave', () => {
+    isDown = false;
+});
+
+// --- Touch ---
+matrixCanvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const [tx, ty] = getCanvasXY(e.touches[0].clientX, e.touches[0].clientY);
+    if (isDown) {
+        dragVelX = tx - lastDragX;
+        dragVelY = ty - lastDragY;
+        lastDragX = tx;
+        lastDragY = ty;
+    }
+    mouseX = tx;
+    mouseY = ty;
+}, { passive: false });
+
+matrixCanvas.addEventListener('touchstart', (e) => {
+    const [tx, ty] = getCanvasXY(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    mouseX = tx; mouseY = ty;
+    lastDragX = tx; lastDragY = ty;
+    dragVelX = 0; dragVelY = 0;
+    isDown    = true;
+    dragSurge = 0.2;
+    spawnRipple(tx, ty, 26);
+}, { passive: true });
+
+matrixCanvas.addEventListener('touchend', () => {
+    isDown = false;
+    dragVelX = 0;
+    dragVelY = 0;
+});
+
+// Animation params
+const SPEED                = 0.08;
+const BG_SPEED             = 0.55;
+const CHAR_CHANGE_INTERVAL = 0.04;   // 3× faster char refresh
+const PARALLAX_STRENGTH    = 18;     // max pixel offset for mouse parallax aberration
+const SMOOTH_FACTOR        = 0.07;   // mouse smoothing (lower = more lag = more parallax feel)
+
+let lastTime = 0;
+let time     = 0;
+
+function loop(timestamp) {
+    const delta = Math.min((timestamp - lastTime) / 1000, 0.1); // cap delta to avoid jump on tab restore
+    lastTime = timestamp;
+    time    += delta;
+
+    // 1. Update grid characters
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            const cell = grid[r][c];
+            cell.timer += delta;
+            if (cell.timer >= CHAR_CHANGE_INTERVAL) {
+                cell.timer = 0;
+                cell.char  = allChars[Math.floor(Math.random() * allChars.length)];
+            }
+        }
+    }
+
+    // 2. Advance ripples + drag surge
+    for (let i = ripples.length - 1; i >= 0; i--) {
+        ripples[i].age += delta;
+        if (ripples[i].age >= ripples[i].maxAge) ripples.splice(i, 1);
+    }
+
+    if (isDown) {
+        // Build surge while held (ramps to 1 over ~0.6s)
+        dragSurge = Math.min(1, dragSurge + delta * 1.65);
+
+        // Emit held-pulse ripples — faster when dragging, slower when still
+        const dragSpeed   = Math.sqrt(dragVelX * dragVelX + dragVelY * dragVelY);
+        const pulseRate   = 0.08 + (1 - Math.min(1, dragSpeed / 12)) * 0.18; // 0.08–0.26s between pulses
+        surgeTimer += delta;
+        if (surgeTimer >= pulseRate) {
+            surgeTimer = 0;
+            const str = 14 + dragSurge * 20 + Math.min(dragSpeed, 20) * 0.8;
+            spawnRipple(mouseX, mouseY, str);
+        }
+
+        // Decay drag velocity each frame (friction)
+        dragVelX *= 0.75;
+        dragVelY *= 0.75;
+    } else {
+        // Release: surge decays quickly, surgeTimer resets
+        dragSurge  = Math.max(0, dragSurge - delta * 3.5);
+        surgeTimer = 0;
+    }
+
+    // 3. Smooth mouse (parallax lag)
+    smoothMX += (mouseX - smoothMX) * SMOOTH_FACTOR;
+    smoothMY += (mouseY - smoothMY) * SMOOTH_FACTOR;
+
+    // Normalised offset from square centre (-1..1 on each axis)
+    const cx  = SQ_X + SQ / 2;
+    const cy  = SQ_Y + SQ / 2;
+    const ndx = (smoothMX - cx) / Math.max(SQ / 2, 1);  // -1..1
+    const ndy = (smoothMY - cy) / Math.max(SQ / 2, 1);
+
+    // Parallax base aberration (X and Y independently)
+    const parX = ndx * PARALLAX_STRENGTH;
+    const parY = ndy * PARALLAX_STRENGTH;
+
+    // 4. Background — fast white→grey→black→grey→white loop
+    const brightness = (1 + Math.cos(time * BG_SPEED * Math.PI * 2)) / 2;
+    const gray       = Math.floor(brightness * 64);  // 0..64: black to dark grey only
+
+
+    bgCtx.fillStyle  = '#000';
+    bgCtx.fillRect(0, 0, W, H);
+    bgCtx.fillStyle  = `rgb(${gray},${gray},${gray})`;
+    bgCtx.fillRect(SQ_X, SQ_Y, SQ, SQ);
+
+    // 5. Matrix layer
+    matrixCtx.clearRect(0, 0, W, H);
+    matrixCtx.save();
+    matrixCtx.beginPath();
+    matrixCtx.rect(SQ_X, SQ_Y, SQ, SQ);
+    matrixCtx.clip();
+
+    const fontSize = Math.min(cellWidth, cellHeight) * 0.78;
+    matrixCtx.textAlign    = 'center';
+    matrixCtx.textBaseline = 'middle';
+    matrixCtx.font = `${fontSize}px "Segoe UI", "Arial Unicode MS", "Noto Sans", sans-serif`;
+
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            const cell = grid[r][c];
+            const x    = SQ_X + c * cellWidth  + cellWidth  / 2;
+            const y    = SQ_Y + r * cellHeight + cellHeight / 2;
+
+            // --- Ripple contribution for this cell ---
+            let ripX = 0, ripY = 0;
+            for (let k = 0; k < ripples.length; k++) {
+                const rp  = ripples[k];
+                const rdx = x - rp.x;
+                const rdy = y - rp.y;
+                const dist = Math.sqrt(rdx * rdx + rdy * rdy) || 1;
+
+                // Ripple ring: travels outward at ~400px/s, ring width ~60px
+                const ringRadius = rp.age * 420;
+                const ringDist   = Math.abs(dist - ringRadius);
+                const falloff    = Math.max(0, 1 - ringDist / 55);
+
+                // Amplitude decays as ring expands and fades with age
+                const amp = rp.strength * falloff * (1 - rp.age / rp.maxAge);
+
+                // Push aberration radially outward from click
+                if (dist > 0) {
+                    ripX += (rdx / dist) * amp;
+                    ripY += (rdy / dist) * amp;
+                }
+            }
+
+            // Total aberration per channel: parallax + drag surge + ripple
+            const surgeBoost = 1 + dragSurge * 2.8;
+            const aX = parX * surgeBoost + ripX;
+            const aY = parY * surgeBoost * 0.6 + ripY * 0.6;
+
+            const hue = ((time * SPEED + (r / ROWS) + (c / COLS) * 0.15) % 1) * 360;
+
+            // Red channel
+            matrixCtx.globalAlpha = 0.88;
+            matrixCtx.fillStyle   = `hsl(${hue}, 80%, 50%)`;
+            matrixCtx.fillText(cell.char, x + aX, y + aY);
+
+            // Green channel (centre — no offset)
+            matrixCtx.globalAlpha = 0.92;
+            matrixCtx.fillStyle   = `hsl(${hue}, 90%, 52%)`;
+            matrixCtx.fillText(cell.char, x, y);
+
+            // Blue channel (opposite direction)
+            matrixCtx.globalAlpha = 0.88;
+            matrixCtx.fillStyle   = `hsl(${hue + 30}, 80%, 50%)`;
+            matrixCtx.fillText(cell.char, x - aX, y - aY);
+
+            matrixCtx.globalAlpha = 1.0;
+        }
+    }
+
+    matrixCtx.restore();
+
+    requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080711">
+  <meta name="description" content="Chema64 — Dataslave, track 02 from VIZIERS.">
+  <title>Chema64 — Dataslave | VIZIERS</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      overflow: hidden; color: #f2edff;
+      background: radial-gradient(ellipse at center, #251737 0%, #090811 70%);
+      font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+    #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+    #film {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: contain; background: transparent;
+    }
+    #poster {
+      position: absolute; inset: 0; z-index: 2; cursor: pointer;
+      background: url("dataslave_ai_edit.png") center / contain no-repeat;
+      transition: opacity .65s ease;
+    }
+    #poster::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(8,7,17,.68), transparent 28%, transparent 66%, rgba(8,7,17,.72));
+    }
+    body.playing #poster { opacity: 0; pointer-events: none; }
+    header {
+      position: absolute; z-index: 4; inset: 0 0 auto; padding: 4vh 5vw 0;
+      text-align: center; pointer-events: none; transition: opacity .5s ease;
+    }
+    header h1 {
+      margin: 0; font-size: clamp(1.45rem, 4.7vw, 3.8rem); font-weight: 800;
+      letter-spacing: .16em; text-transform: uppercase;
+      text-shadow: 0 0 13px rgba(0,229,255,.75), 0 0 38px rgba(0,229,255,.38);
+    }
+    header h1 span { color: #20e0c6; }
+    header p {
+      margin: .65em 0 0; font-size: clamp(.72rem, 1.4vw, 1rem);
+      letter-spacing: .28em; text-transform: uppercase; opacity: .88;
+    }
+    body.playing header { opacity: 0; }
+    #links {
+      position: absolute; z-index: 4; left: 0; right: 0; bottom: 12vh;
+      display: flex; justify-content: center; flex-wrap: wrap; gap: .9rem;
+      padding: 0 5vw; transition: opacity .5s ease;
+    }
+    #links a {
+      color: #fff; text-decoration: none; padding: .8em 1.35em;
+      border: 1px solid #20e0c6; border-radius: 999px;
+      background: rgba(9,8,20,.68); letter-spacing: .1em;
+      text-transform: uppercase; font-size: clamp(.72rem, 1.15vw, .95rem);
+      backdrop-filter: blur(8px); transition: .2s ease;
+    }
+    #links a:hover, #links a:focus-visible {
+      color: #090811; background: #20e0c6; box-shadow: 0 0 24px rgba(32,224,198,.7);
+    }
+    body.playing #links { opacity: 0; pointer-events: none; }
+    #play {
+      position: absolute; z-index: 5; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: clamp(82px, 11vw, 136px); aspect-ratio: 1; border-radius: 50%;
+      border: 2px solid #20e0c6; background: rgba(8,7,17,.55); cursor: pointer;
+      box-shadow: 0 0 30px rgba(32,224,198,.6); animation: pulse 2.2s infinite;
+    }
+    #play::before {
+      content: ""; position: absolute; top: 50%; left: 55%; transform: translate(-50%,-50%);
+      border-style: solid; border-width: 1.35rem 0 1.35rem 2.1rem;
+      border-color: transparent transparent transparent #20e0c6;
+    }
+    #play:hover { scale: 1.07; }
+    body.playing #play { display: none; }
+    @keyframes pulse { 50% { box-shadow: 0 0 54px rgba(32,224,198,.95); } }
+    #bar {
+      position: absolute; z-index: 6; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 1rem clamp(1rem, 3vw, 2.5rem);
+      background: linear-gradient(0deg, rgba(0,0,0,.82), transparent);
+      opacity: 0; pointer-events: none; transition: opacity .35s ease;
+    }
+    body.playing #bar { opacity: 1; pointer-events: auto; }
+    #bar .group { display: flex; align-items: center; gap: 1.15rem; flex-wrap: wrap; }
+    #bar a, #bar button {
+      color: #20e0c6; font: inherit; font-size: .8rem; letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    #bar a { text-decoration: none; }
+    #bar a:hover { text-decoration: underline; }
+    #bar button {
+      border: 1px solid #20e0c6; border-radius: 6px; padding: .4em .8em;
+      background: rgba(0,0,0,.4); cursor: pointer;
+    }
+    #bar button:hover { color: #080711; background: #20e0c6; }
+    #status {
+      position: absolute; z-index: 7; left: 1rem; right: 1rem; bottom: 4.8rem;
+      text-align: center; color: #ffd2f3; font-size: .9rem;
+    }
+    @media (max-width: 560px) {
+      #bar { align-items: flex-end; }
+      #bar .group { gap: .6rem; }
+      #bar a, #bar button { font-size: .68rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main id="stage" aria-label="Chema64 Dataslave music video">
+    <video id="film" playsinline loop preload="metadata" poster="dataslave_ai_edit.png">
+      <source src="Dataslave_animated_video.mp4" type="video/mp4">
+      <source src="Dataslave_animated_video_web.mp4" type="video/mp4">
+      Your browser does not support HTML video. Use the VIZIERS links below to listen to the track.
+    </video>
+    <div id="poster" role="button" tabindex="0" aria-label="Play Dataslave music video"></div>
+
+    <header>
+      <h1>Chema64 <span>//</span> Dataslave</h1>
+      <p>From the album VIZIERS · Track 02</p>
+    </header>
+
+    <button id="play" type="button" aria-label="Play Dataslave"></button>
+
+    <nav id="links" aria-label="Chema64 music links">
+      <a href="https://chema64.bandcamp.com/album/viziers" target="_blank" rel="noopener noreferrer">VIZIERS on Bandcamp</a>
+      <a href="https://chema64.bandcamp.com/music" target="_blank" rel="noopener noreferrer">All Chema64 music</a>
+    </nav>
+
+    <div id="status" role="status" aria-live="polite"></div>
+    <footer id="bar">
+      <div class="group">
+        <a href="https://chema64.bandcamp.com/album/viziers" target="_blank" rel="noopener noreferrer">VIZIERS on Bandcamp</a>
+        <a href="https://chema64.bandcamp.com/music" target="_blank" rel="noopener noreferrer">Chema64 Music</a>
+      </div>
+      <div class="group">
+        <button id="sound" type="button" aria-pressed="false">Mute</button>
+        <button id="fullscreen" type="button">Fullscreen</button>
+      </div>
+    </footer>
+  </main>
+  <script>
+    const film = document.getElementById('film');
+    const status = document.getElementById('status');
+
+    async function startVideo() {
+      try {
+        status.textContent = '';
+        await film.play(); // The MP4 carries the soundtrack, so audio and picture stay in sync.
+        document.body.classList.add('playing');
+      } catch (error) {
+        status.textContent = 'Could not start the video. Please try again.';
+      }
+    }
+
+    document.getElementById('play').addEventListener('click', startVideo);
+    document.getElementById('poster').addEventListener('click', startVideo);
+    document.getElementById('poster').addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); startVideo(); }
+    });
+
+    document.getElementById('sound').addEventListener('click', event => {
+      film.muted = !film.muted;
+      event.currentTarget.textContent = film.muted ? 'Unmute' : 'Mute';
+      event.currentTarget.setAttribute('aria-pressed', String(film.muted));
+    });
+    document.getElementById('fullscreen').addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch (error) { /* Fullscreen may be unavailable in some embedded browsers. */ }
+    });
+    film.addEventListener('error', () => {
+      status.textContent = 'Video unavailable. Check that the MP4 is uploaded beside this page.';
+    });
+  </script>
+</body>
+</html>

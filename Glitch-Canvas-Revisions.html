@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Glitch Canvas Revisions — /glitch-canvas-html/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Staatliches&amp;family=Unica+One&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cyan: #00ffff;
+      --magenta: #ff00cc;
+      --lime: #76ff03;
+      --bg: #05030a;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: #e8f6ff;
+      font-family: 'Unica One', 'Courier New', monospace;
+    }
+    body {
+      background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(255, 0, 204, 0.18), transparent 55%),
+        radial-gradient(900px 600px at 110% 10%, rgba(0, 255, 255, 0.16), transparent 50%),
+        linear-gradient(180deg, #0a0614 0%, #05030a 40%, #120018 100%);
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      opacity: 0.09;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0 2px,
+        rgba(0, 255, 255, 0.25) 2px 3px
+      );
+    }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 80px;
+    }
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--lime);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0 0 10px;
+      color: var(--cyan);
+      font-family: 'Staatliches', Impact, sans-serif;
+      font-size: clamp(2.1rem, 7vw, 4.4rem);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      line-height: 0.95;
+      text-shadow: 2px 0 var(--magenta), -2px 0 var(--cyan), 0 0 18px rgba(0, 255, 255, 0.45);
+    }
+    .lede {
+      max-width: 46rem;
+      margin: 0 0 22px;
+      color: #b9c7d8;
+      font-size: 1.05rem;
+      line-height: 1.45;
+    }
+    .lede code {
+      color: var(--lime);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.92em;
+    }
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0 0 28px;
+    }
+    .nav a, .filter-box input {
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .nav a {
+      display: inline-block;
+      padding: 10px 14px;
+      color: #05030a;
+      background: linear-gradient(90deg, var(--cyan), #9effff);
+      border: 1px solid #fff;
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      box-shadow: 4px 4px 0 var(--magenta);
+    }
+    .nav a.ghost {
+      color: var(--cyan);
+      background: transparent;
+      box-shadow: 4px 4px 0 rgba(255, 0, 204, 0.45);
+    }
+    .nav a:hover { filter: brightness(1.12); transform: translate(-1px, -1px); }
+    .filter-box { flex: 1 1 220px; }
+    .filter-box input {
+      width: 100%;
+      min-width: 180px;
+      padding: 10px 12px;
+      color: var(--cyan);
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid var(--cyan);
+      outline: none;
+    }
+    .filter-box input:focus {
+      border-color: var(--magenta);
+      box-shadow: 0 0 12px rgba(255, 0, 204, 0.35);
+    }
+    section {
+      margin: 0 0 28px;
+      padding: 16px 16px 8px;
+      border: 1px solid rgba(0, 255, 255, 0.28);
+      background: rgba(8, 6, 18, 0.55);
+    }
+    section h2 {
+      margin: 0 0 12px;
+      color: var(--magenta);
+      font-family: 'Staatliches', Impact, sans-serif;
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+      letter-spacing: 0.14em;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    a.rev {
+      display: block;
+      padding: 12px 13px 11px;
+      color: inherit;
+      text-decoration: none;
+      border: 1px solid rgba(0, 255, 255, 0.45);
+      background: rgba(0, 20, 28, 0.55);
+      min-height: 92px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+    a.rev:hover, a.rev:focus-visible {
+      border-color: var(--magenta);
+      box-shadow: 0 0 0 1px var(--magenta), 0 0 18px rgba(255, 0, 204, 0.35);
+      transform: translateY(-2px);
+      outline: none;
+    }
+    a.rev .name {
+      display: block;
+      color: #fff;
+      font-size: 1.12rem;
+      letter-spacing: 0.04em;
+    }
+    a.rev .path {
+      display: block;
+      margin-top: 6px;
+      color: var(--lime);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.72rem;
+      word-break: break-all;
+      opacity: 0.9;
+    }
+    a.rev .note {
+      display: block;
+      margin-top: 5px;
+      color: #8aa0b8;
+      font-size: 0.8rem;
+    }
+    a.rev.featured { border-color: #ffe56a; }
+    a.rev.featured .name { color: #ffe56a; }
+    .empty {
+      display: none;
+      margin: 20px 0;
+      color: #ff8ad4;
+      text-align: center;
+      letter-spacing: 0.12em;
+    }
+    footer {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(0, 255, 255, 0.3);
+      color: #7d8b99;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.78rem;
+      line-height: 1.55;
+    }
+    footer a { color: var(--cyan); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="kicker">imortalimp.nl &nbsp;//&nbsp; root mount</p>
+    <h1>GLITCH CANVAS<br>REVISIONS</h1>
+    <p class="lede">
+      Directory of every latest Glitch Canvas revision. Place this page and the HTML/CSS pairs in
+      <code>/glitch-canvas-html/</code> on the site root so each build is reached at
+      <code>https://www.imortalimp.nl/glitch-canvas-html/&lt;file&gt;</code>.
+      Matching <code>.css</code> files stay beside their HTML.
+    </p>
+    <div class="nav">
+      <a href="/index.html">← HOME</a>
+      <a class="ghost" href="/glitch-canvas-html/Glitch-Canvas-Revisions.html">/glitch-canvas-html/</a>
+      <div class="filter-box">
+        <input id="filter" type="search" placeholder="filter revisions…" autocomplete="off">
+      </div>
+    </div>
+    <p class="empty" id="empty">NO MATCHING REVISION</p>
+
+    <section data-group>
+      <h2>River revisions — SOFT-EYE → HARD-LIGHT</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/Glitch-Revision-1.html"><span class="name">Glitch Revision 1</span><span class="path">/glitch-canvas-html/Glitch-Revision-1.html</span><span class="note">Deepseek machine presets</span></a>
+        <a class="rev" href="/glitch-canvas-html/Glitch-Revision-1%20(3).html"><span class="name">Glitch Revision 1 (3)</span><span class="path">/glitch-canvas-html/Glitch-Revision-1 (3).html</span><span class="note">home “complete version”</span></a>
+        <a class="rev" href="/glitch-canvas-html/Glitch-Revision-2.html"><span class="name">Glitch Revision 2</span><span class="path">/glitch-canvas-html/Glitch-Revision-2.html</span><span class="note">SOFT-EYE · live source mash</span></a>
+        <a class="rev featured" href="/glitch-canvas-html/Glitch-Revision-3.html"><span class="name">Glitch Revision 3</span><span class="path">/glitch-canvas-html/Glitch-Revision-3.html</span><span class="note">NEW remix · HARD-LIGHT / MOONLIGHT</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>Core canvas</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas.html"><span class="name">Glitch Canvas</span><span class="path">/glitch-canvas-html/glitch-canvas.html</span><span class="note">original line</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas%20(1).html"><span class="name">Glitch Canvas (1)</span><span class="path">/glitch-canvas-html/glitch-canvas (1).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas%20(2).html"><span class="name">Glitch Canvas (2)</span><span class="path">/glitch-canvas-html/glitch-canvas (2).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas%20(3).html"><span class="name">Glitch Canvas (3)</span><span class="path">/glitch-canvas-html/glitch-canvas (3).html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>Final / complete</h2>
+      <div class="grid">
+        <a class="rev featured" href="/glitch-canvas-html/glitch-canvas-final.html"><span class="name">Glitch Canvas Final</span><span class="path">/glitch-canvas-html/glitch-canvas-final.html</span><span class="note">home CRT link target family</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-final%20(2).html"><span class="name">Glitch Canvas Final (2)</span><span class="path">/glitch-canvas-html/glitch-canvas-final (2).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-complete.html"><span class="name">Glitch Canvas Complete</span><span class="path">/glitch-canvas-html/glitch-canvas-complete.html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>New line</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-new.html"><span class="name">Glitch Canvas New</span><span class="path">/glitch-canvas-html/glitch-canvas-new.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-new%20(1).html"><span class="name">Glitch Canvas New (1)</span><span class="path">/glitch-canvas-html/glitch-canvas-new (1).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-new%20(2).html"><span class="name">Glitch Canvas New (2)</span><span class="path">/glitch-canvas-html/glitch-canvas-new (2).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-new-grok.html"><span class="name">New + Grok</span><span class="path">/glitch-canvas-html/glitch-canvas-new-grok.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-new-grok2.html"><span class="name">New + Grok 2</span><span class="path">/glitch-canvas-html/glitch-canvas-new-grok2.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-new-grok3.html"><span class="name">New + Grok 3</span><span class="path">/glitch-canvas-html/glitch-canvas-new-grok3.html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>Grok canvases</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-grok.html"><span class="name">Glitch Canvas Grok</span><span class="path">/glitch-canvas-html/glitch-canvas-grok.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-grok-canvas.html"><span class="name">Grok Canvas</span><span class="path">/glitch-canvas-html/glitch-grok-canvas.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-grok-canvas-complete.html"><span class="name">Grok Canvas Complete</span><span class="path">/glitch-canvas-html/glitch-grok-canvas-complete.html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>YouTube line</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-youtube.html"><span class="name">Canvas YouTube</span><span class="path">/glitch-canvas-html/glitch-canvas-youtube.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-youtube%20(2).html"><span class="name">Canvas YouTube (2)</span><span class="path">/glitch-canvas-html/glitch-canvas-youtube (2).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-youtube-video.html"><span class="name">YouTube Video</span><span class="path">/glitch-canvas-html/glitch-canvas-youtube-video.html</span><span class="note">old version linked from home</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-youtube-video%20(2).html"><span class="name">YouTube Video (2)</span><span class="path">/glitch-canvas-html/glitch-canvas-youtube-video (2).html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>Agent 006</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/006-glitch-canvas.html"><span class="name">006 Glitch Canvas</span><span class="path">/glitch-canvas-html/006-glitch-canvas.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/final-006-glitch-canvas.html"><span class="name">Final 006 Glitch Canvas</span><span class="path">/glitch-canvas-html/final-006-glitch-canvas.html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>Lite / V-Sync / Rapidfire</h2>
+      <div class="grid">
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-lite.html"><span class="name">Glitch Canvas Lite</span><span class="path">/glitch-canvas-html/glitch-canvas-lite.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch-canvas-v-sync.html"><span class="name">V-Sync</span><span class="path">/glitch-canvas-html/glitch-canvas-v-sync.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/glitch_v9_rapidfire.html"><span class="name">V9 Rapidfire</span><span class="path">/glitch-canvas-html/glitch_v9_rapidfire.html</span></a>
+      </div>
+    </section>
+
+    <section data-group>
+      <h2>Deepseek 2026-09-05</h2>
+      <div class="grid">
+        <a class="rev featured" href="/glitch-canvas-html/deepseek_html_20260905_cbbbb8.html"><span class="name">cbbbb8</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_cbbbb8.html</span><span class="note">home “NEW AND IMPROVED”</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_6f11b1.html"><span class="name">6f11b1</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_6f11b1.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_9ab582.html"><span class="name">9ab582</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_9ab582.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_9ab582%20(1).html"><span class="name">9ab582 (1)</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_9ab582 (1).html</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_9cc4c1.html"><span class="name">9cc4c1</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_9cc4c1.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_470baf.html"><span class="name">470baf</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_470baf.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_611c07.html"><span class="name">611c07</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_611c07.html</span></a>
+        <a class="rev" href="/glitch-canvas-html/deepseek_html_20260905_a9e80f.html"><span class="name">a9e80f</span><span class="path">/glitch-canvas-html/deepseek_html_20260905_a9e80f.html</span></a>
+      </div>
+    </section>
+
+    <footer>
+      37 HTML revisions · link base <code>/glitch-canvas-html/</code> ·
+      drop this file at <a href="/glitch-canvas-html/Glitch-Canvas-Revisions.html">/glitch-canvas-html/Glitch-Canvas-Revisions.html</a>
+      together with each revision and its CSS.
+      Home: <a href="/index.html">/index.html</a>
+    </footer>
+  </div>
+  <script>
+    const filter = document.getElementById('filter');
+    const empty = document.getElementById('empty');
+    const cards = [...document.querySelectorAll('a.rev')];
+    const groups = [...document.querySelectorAll('[data-group]')];
+    filter.addEventListener('input', () => {
+      const q = filter.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach((card) => {
+        const hit = !q || card.textContent.toLowerCase().includes(q);
+        card.style.display = hit ? '' : 'none';
+        if (hit) shown += 1;
+      });
+      groups.forEach((section) => {
+        const any = [...section.querySelectorAll('a.rev')].some((c) => c.style.display !== 'none');
+        section.style.display = any ? '' : 'none';
+      });
+      empty.style.display = shown ? 'none' : 'block';
+    });
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3a77752ff26ff2d',t:'MTc4OTMwNTgwMg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

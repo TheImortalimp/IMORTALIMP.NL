@@ -1,0 +1,3435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>River Glitch Canvas — GROK</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='black'/%3E%3Cpath d='M14 32h36' stroke='lime' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M22 20l-8 12 8 12' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cpath d='M42 20l8 12-8 12' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="glitch-canvas-grok.css">
+<!--
+  GLITCH CANVAS — NEW
+  Architecture: glitch-canvas-lite (smaller, cleaner)
+  Logic & features: final-006-glitch-canvas + glitch-canvas (3)
+    • Night City suggested entry (silver/crimson shine)
+    • Improved V-Sync modes (OFF / GHOST_OFF / FULL + hard-off latch visuals)
+    • Ghost Protocol + V-Sync stay more legible at rest
+    • DEFCON 1 + all classic suggested links
+    • Local MP3/MP4 + YouTube + presets + AI Warp + continual randomize
+    • Sharper effects + confluence blending (final-006 style):
+      stacked Ghost/V-Sync/Warp raise sat, glow, contrast together
+  Only external network dependency: YouTube IFrame API.
+-->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="ai-warp-filter" color-interpolation-filters="sRGB">
+    <feTurbulence id="ai-turbulence" type="turbulence" baseFrequency="0.0010" numOctaves="1" seed="7" result="noise"/>
+    <feDisplacementMap id="ai-displacement" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="warped"/>
+    <feColorMatrix id="ai-color-matrix" in="warped" type="hueRotate" values="0"/>
+  </filter>
+  <!-- V-Sync color-ghosting (from final-006) -->
+  <filter id="vsync-hue-ghost-filter" color-interpolation-filters="sRGB">
+    <feColorMatrix id="vsync-ghost-hue" in="SourceGraphic" type="hueRotate" values="0" result="vsync_hue_shifted"/>
+    <feColorMatrix id="vsync-ghost-saturate" in="vsync_hue_shifted" type="saturate" values="1" result="vsync_saturated"/>
+    <feConvolveMatrix id="vsync-ghost-sharpen" in="vsync_saturated" order="3" kernelMatrix="0 -1 0 -1 5 -1 0 -1 0" divisor="1" edgeMode="duplicate" preserveAlpha="true"/>
+  </filter>
+</svg>
+</head>
+<body>
+<!-- media/effects stack (z-order: artwork/shell below canvas, video overlay) -->
+<div id="effects-wrapper">
+  <img id="localArt" alt="Album art">
+  <video id="video" playsinline></video>
+  <audio id="localAudio" playsinline></audio>
+  <div id="ytWarpShell"><div id="ytFrame"><div id="ytPlayerMount"></div></div></div>
+  <canvas id="glitchCanvas"></canvas>
+</div>
+
+<!-- back link -->
+<a href="/index.html" id="wired-btn" class="wired-button"><strong>&lt;-WIRED</strong></a>
+
+<!-- right rack (post-playback) -->
+<div id="rightRack">
+  <button id="autoGlitchBtn" class="wired-button">Auto Glitch: OFF</button>
+  <button id="randomizeBtn" class="wired-button">Randomize</button>
+  <button id="continualRandomizeBtn" class="wired-button">Continual Randomization: OFF</button>
+  <button id="aiWarpBtn" class="wired-button">AI Video Warp: OFF</button>
+</div>
+
+<!-- bottom-left rack -->
+<div id="ghostBtnRack">
+  <button id="ghostProtocolBtn" class="wired-button">GHOST PROTOCOL: OFF</button>
+  <button id="vsyncScanBtn" class="wired-button" title="TV simulator · vertical scan-phasing">V-SYNC: OFF</button>
+</div>
+
+<!-- effect sliders (JS appends the per-effect rows) -->
+<div id="sliderContainer">
+  <div class="slider-group">
+    <label>Ghost Protocol:</label>
+    <input type="range" min="0" max="1" step="0.01" value="1" id="ghostProtocolSlider">
+  </div>
+  <div class="slider-group">
+    <label id="vsyncScanLabel">V-Sync: OFF (parked)</label>
+    <input type="range" min="0" max="1" step="0.001" value="0.6" id="vsyncScanSlider" disabled>
+    <button type="button" id="vsyncLockBtn" class="lock-button" title="Lock V-Sync level">&#60;LOCK!&#62;</button>
+  </div>
+  <div class="slider-group">
+    <label>Random Seed:</label>
+    <input type="range" min="0" max="1" step="0.001" value="0" id="randomSeedSlider">
+  </div>
+</div>
+
+<!-- init screen -->
+<input id="ytInput" type="text" placeholder="Paste YouTube URL or 11-character video ID" autocomplete="off" spellcheck="false">
+<button id="startBtn">Start and Play</button>
+<h2 id="suggestedVideo" class="suggested">SUGGESTED VIDEO : https://www.youtube.com/watch?v=gopYmb38DgM</h2>
+<h2 id="suggestedVideo3" class="suggested">SUGGESTED LINK : https://www.youtube.com/watch?v=uvSXL6ypLlw</h2>
+<h2 id="suggestedVideo2" class="suggested">SUGGESTED *.* : https://www.youtube.com/watch?v=8o6bdTOhIyE</h2>
+<h2 id="suggestedYoutube" class="suggested">SUGGESTED YOUTUBE : https://www.youtube.com/watch?v=QsUmvGkXhnk</h2>
+<h2 id="suggestedPlaylist" class="suggested">SUGGESTED PLAYLIST : https://www.youtube.com/watch?v=RgFaK6ZQifE&amp;list=RDEMWUbu7UjvrEYUSE4m8ATOcw&amp;start_radio=1</h2>
+<h2 id="suggestedMoonlight" class="suggested">MOONLIGHT</h2>
+<h2 id="suggestedFractals" class="suggested">§§3+ Hours of Trippy Fractals§§</h2>
+<h2 id="suggestedNightCity" class="suggested">Night City Walk ✧ Cyberpunk Neon Rain Ambience | Dreamy Synthwave Vibes | Sleep ✧ Chill ✧ Relax</h2>
+<h2 id="testCanvas" class="suggested">Fade "WHITE 2 BLACK 2 WHITE"</h2>
+<h2 id="Defcon1Video">DEFCON 1</h2>
+
+<div id="openFileWrap">
+  <span id="openFileBtn">Open Local MP3 / MP4</span>
+  <input type="file" id="fileInput" accept=".mp3,.mp4,.m4a,.wav,.ogg,.flac,.webm,.mov,audio/*,video/*" title="Select a local mp3 or mp4 file">
+</div>
+
+<!-- presets -->
+<button id="preset-toggle-btn">Show Presets</button>
+<div id="preset-dropdown-container">
+  <div class="preset-bar">
+    <div class="current-preset-display" id="current-preset-display">NO PRESET LOADED</div>
+    <select id="presetSelect" title="Saved presets"></select>
+    <input id="presetNameInput" type="text" placeholder="preset name">
+    <button id="presetSaveBtn" title="Save current board as preset">Save</button>
+    <button id="presetDeleteBtn" title="Delete selected preset">Delete</button>
+    <button id="presetDeleteAllBtn" title="Delete every preset">Delete All</button>
+    <button id="presetPrevBtn" title="Previous preset">&lsaquo;</button>
+    <button id="presetNextBtn" title="Next preset">&rsaquo;</button>
+  </div>
+</div>
+
+<!-- UI hide tab -->
+<div id="ui-toggle-tab">
+  <button id="toggle-ui-btn">HIDE CONTROL U.I.</button>
+</div>
+
+<!-- YouTube IFrame API (only network dependency) -->
+<!-- YouTube IFrame API loaded on demand in injectYouTubeApiScript() for faster first paint -->
+<script>
+'use strict';
+/* ============================================================================
+   GLITCH CANVAS — LITE REVISION
+   Derived from the 006 lineage (final-006-glitch-canvas.html):
+   - No three.js: Tech Artist runs on a tiny hand-rolled WebGL1 quad at
+     half resolution with fewer raymarch steps.
+   - One rAF loop, one controller, one render pass. No per-frame layout
+     reads, no per-frame full-frame snapshots unless Ghost/V-Sync ask for one.
+   - Shared scratch + snapshot canvases instead of 4 full-size offscreens.
+   - ASCII rain: column Matrix trails (index-glitch style) with multi-script glyphs
+     of tens of thousands of fillText calls per frame.
+   - Curated phrase/glyph tables (the old file carried ~60KB of duplicated
+     word lists with junk entries).
+   - V-Sync ghosting is CSS-only (no full-screen feConvolveMatrix on the
+     iframe); AI Warp turbulence is 1 octave and attribute updates are
+     throttled to ~12Hz.
+   ---------------------------------------------------------------------------- */
+(function () {
+
+/* ------------------------------------------------------------------ *
+ *  1. DOM + canvases                                                  *
+ * ------------------------------------------------------------------ */
+const $ = (id) => document.getElementById(id);
+const mainCanvas = $('glitchCanvas');
+const gctx = mainCanvas.getContext('2d');
+const ytWarpShell = $('ytWarpShell');
+const ytFrame = $('ytFrame');
+const ytPlayerMount = $('ytPlayerMount');
+const video = $('video');
+const localAudio = $('localAudio');
+const localArtEl = $('localArt');
+const ytInput = $('ytInput');
+const startBtn = $('startBtn');
+const openFileBtn = $('openFileBtn');
+const fileInput = $('fileInput');
+const openFileWrap = $('openFileWrap');
+const wiredBtn = $('wired-btn');
+const rightRack = $('rightRack');
+const ghostBtnRack = $('ghostBtnRack');
+const sliderContainer = $('sliderContainer');
+const presetToggleBtn = $('preset-toggle-btn');
+const presetDropdown = $('preset-dropdown-container');
+const uiToggleTab = $('ui-toggle-tab');
+const toggleUiBtn = $('toggle-ui-btn');
+const ghostProtocolBtn = $('ghostProtocolBtn');
+const ghostProtocolSlider = $('ghostProtocolSlider');
+const vsyncScanBtn = $('vsyncScanBtn');
+const vsyncScanSlider = $('vsyncScanSlider');
+const vsyncScanLabelEl = $('vsyncScanLabel');
+const vsyncLockBtn = $('vsyncLockBtn');
+const randomSeedSlider = $('randomSeedSlider');
+const testCanvasEl = $('testCanvas');
+
+/* Shared scratch + snapshot offscreens (always at most two, lazily sized). */
+const scratch = document.createElement('canvas');
+const scratchCtx = scratch.getContext('2d');
+const snap = document.createElement('canvas');
+const snapCtx = snap.getContext('2d');
+
+/* ------------------------------------------------------------------ *
+ *  2. Core state                                                      *
+ * ------------------------------------------------------------------ */
+let player = null;                 // YT IFrame API player
+let isApiReady = false;
+let localMediaUrl = null;
+let masterOpacity = 1.0;
+let customTime = 0;
+let timeScale = 1.0;
+let beat = 0;                      // smoothed board energy (replaces old masterBeat)
+let activeEffects = [];
+let isLooping = false;
+let isContinuallyRandomizing = false;
+let isAutoGlitching = false;
+let isAiWarpActive = false;
+let randomTargets = {};
+const sliderLocks = {};
+const sliderElements = {};
+/* Master dock controls — user-facing 0..1 (displayed as 0–100%). */
+const masterControls = {
+  effectIntensity: 1,   // scales all effect paint (0 = full mute)
+  motionScale: 1,       // Warp / Data Bands / VHS motion amplitude
+  blendSoftness: 0.55,  // higher = softer stack harmony
+  continualSpeed: 0.5,  // continual retarget / ease tempo
+  autoGlitchPower: 0.55,// auto-glitch envelope power
+  boardEnergy: 0.5      // beat / flash reactivity
+};
+
+let renderBudget = { lowPower: false, drawEveryN: 1, pixelCap: 1.25, scale: 1, asciiCells: 22000 };
+let lastFrameTime = performance.now();
+let lastDrawTime = 0;
+let frameCount = 0;
+const domCache = {};
+
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const clamp01 = (v) => clamp(v, 0, 1);
+const easeExp = (cur, tgt, dt, rate) => cur + (tgt - cur) * (1 - Math.exp(-rate * dt));
+
+function applyStyleIfChanged(el, prop, value) {
+  if (!el || domCache[el.id + ':' + prop] === value) return;
+  domCache[el.id + ':' + prop] = value;
+  el.style[prop] = value;
+}
+function setElementDisplay(el, display) {
+  if (el) el.style.display = display;
+}
+
+/* ------------------------------------------------------------------ *
+ *  3. Performance profile (kept from 006, slightly leaner caps)       *
+ * ------------------------------------------------------------------ */
+(function computeProfile() {
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cores = navigator.hardwareConcurrency || 8;
+  const mem = navigator.deviceMemory || 8;
+  const low = !!(prefersReducedMotion || cores <= 4 || mem <= 4);
+  renderBudget.lowPower = low;
+  renderBudget.pixelCap = low ? 1 : 1.25;
+  renderBudget.scale = low ? 0.85 : 1;
+  renderBudget.drawEveryN = low ? 2 : 1;         // low-power: render every 2nd frame
+  renderBudget.asciiCells = low ? 15000 : 42000; // denser ASCII matrix needs a bigger budget
+})();
+
+window.addEventListener('wheel', (ev) => { if (ev.ctrlKey) ev.preventDefault(); }, { passive: false });
+
+/* ------------------------------------------------------------------ *
+ *  4. Local MP3 / MP4 path (kept from 006, includes ID3 artwork)      *
+ * ------------------------------------------------------------------ */
+function tryPlayElement(el) {
+  if (!el) return;
+  const attempt = () => { try { const p = el.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {} };
+  attempt();
+  el.addEventListener('canplay', attempt, { once: true });
+  el.addEventListener('loadeddata', attempt, { once: true });
+}
+
+function readCString(bytes, start, encoding) {
+  let end = start;
+  while (end < bytes.length && bytes[end] !== 0) end++;
+  try { return new TextDecoder(encoding).decode(bytes.slice(start, end)); } catch (e) { return ''; }
+}
+function extractId3Artwork(file) {
+  return file.slice(0, Math.min(file.size, 2 * 1024 * 1024)).arrayBuffer().then((buf) => {
+    const bytes = new Uint8Array(buf);
+    if (bytes.length < 10 || String.fromCharCode(bytes[0], bytes[1], bytes[2]) !== 'ID3') return null;
+    let pos = 10, found = null;
+    while (pos + 10 <= bytes.length) {
+      const id = String.fromCharCode(bytes[pos], bytes[pos + 1], bytes[pos + 2], bytes[pos + 3]);
+      let size = ((bytes[pos + 4] & 0x7f) << 21) | ((bytes[pos + 5] & 0x7f) << 14) | ((bytes[pos + 6] & 0x7f) << 7) | (bytes[pos + 7] & 0x7f);
+      if (size <= 0) break;
+      if (id === 'APIC') {
+        const codeByte = bytes[pos + 10];
+        const enc = codeByte === 0 ? 'latin1' : (codeByte === 1 ? 'utf-16' : (codeByte === 2 ? 'utf-16be' : 'utf-8'));
+        const mimeStart = pos + 11;
+        let mimeEnd = mimeStart;
+        while (mimeEnd < pos + 10 + size && bytes[mimeEnd] !== 0) mimeEnd++;
+        const mime = readCString(bytes, mimeStart, 'latin1');
+        let imgStart = mimeEnd + 1 + (enc === 'utf-16' || enc === 'utf-16be' ? 2 : 1);
+        if (imgStart < pos + 10 + size) {
+          found = { mime, blob: bytes.slice(imgStart, pos + 10 + size) };
+        }
+        break;
+      }
+      pos += 10 + size;
+    }
+    if (!found) return null;
+    return URL.createObjectURL(new Blob([found.blob], { type: found.mime || 'image/jpeg' }));
+  }).catch(() => null);
+}
+
+if (fileInput) {
+  fileInput.addEventListener('change', (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const name = (file.name || '').toLowerCase();
+    const type = (file.type || '').toLowerCase();
+    const isAudio = type.startsWith('audio/') || /\.(mp3|m4a|wav|ogg|flac)$/.test(name);
+    const isVideo = type.startsWith('video/') || /\.(mp4|webm|mov|m4v)$/.test(name);
+    if (!isAudio && !isVideo) return;
+
+    if (localMediaUrl) { try { URL.revokeObjectURL(localMediaUrl); } catch (e) {} }
+    if (window.__localArtUrl) { try { URL.revokeObjectURL(window.__localArtUrl); } catch (e) {} window.__localArtUrl = null; }
+    localMediaUrl = URL.createObjectURL(file);
+
+    try { if (player && player.pauseVideo) player.pauseVideo(); } catch (e) {}
+    try { if (player && player.stopVideo) player.stopVideo(); } catch (e) {}
+    if (ytWarpShell) ytWarpShell.style.display = 'none';
+    if (ytFrame) ytFrame.style.display = 'none';
+
+    if (isAudio) {
+      document.body.classList.add('local-audio');
+      document.body.classList.remove('local-video');
+      if (localArtEl) { localArtEl.removeAttribute('src'); localArtEl.style.display = 'none'; }
+      localAudio.src = localMediaUrl;
+      tryPlayElement(localAudio);
+      extractId3Artwork(file).then((url) => {
+        if (url && localArtEl) { localArtEl.src = url; localArtEl.style.display = 'block'; window.__localArtUrl = url; }
+      });
+    } else {
+      document.body.classList.add('local-video');
+      document.body.classList.remove('local-audio');
+      video.src = localMediaUrl;
+      tryPlayElement(video);
+    }
+    activatePlaybackUi(isAudio ? 'local-audio' : 'local-video');
+    if (openFileWrap) openFileWrap.style.display = 'none';
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ *  5. YouTube path (IFrame API, lean)                                 *
+ * ------------------------------------------------------------------ */
+function isHttpOrigin() {
+  return window.location.protocol === 'http:' || window.location.protocol === 'https:';
+}
+
+function parseAllowedYouTubeInput(input) {
+  const trimmed = (input || '').trim();
+  if (!trimmed) return null;
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return { videoId: trimmed, playlistId: '' };
+  let parsed;
+  try { parsed = new URL(trimmed); } catch (e) { return null; }
+  const host = parsed.hostname.toLowerCase();
+  if (!['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtu.be', 'www.youtu.be'].includes(host)) return null;
+  let videoId = '';
+  let playlistId = parsed.searchParams.get('list') || '';
+  if (host.endsWith('youtu.be')) {
+    videoId = parsed.pathname.replace(/^\/+/, '').split('/')[0] || '';
+  } else {
+    videoId = parsed.searchParams.get('v') || '';
+    if (!videoId) {
+      const seg = parsed.pathname.split('/').filter(Boolean);
+      if (['embed', 'shorts', 'live'].includes(seg[0])) videoId = seg[1] || '';
+    }
+  }
+  if (videoId && !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return null;
+  if (playlistId && !/^[a-zA-Z0-9_-]+$/.test(playlistId)) return null;
+  if (!videoId && !playlistId) return null;
+  return { videoId, playlistId };
+}
+
+function injectYouTubeApiScript() {
+  if (window.YT && window.YT.Player) { isApiReady = true; return; }
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+window.onYouTubeIframeAPIReady = function () { isApiReady = true; };
+
+function getYouTubeIframeElement() {
+  try { if (player && typeof player.getIframe === 'function') { const f = player.getIframe(); if (f) return f; } } catch (e) {}
+  return ytFrame ? ytFrame.querySelector('iframe') : null;
+}
+
+let apiRetryCount = 0;
+function startPlayback(url, loop = false) {
+  if (!isHttpOrigin()) {
+    showNotificationMessage('YouTube playback needs an http(s) origin — local MP3/MP4 still works from file://.', 5600);
+    return;
+  }
+  if (!isApiReady) {
+    injectYouTubeApiScript();
+    if (apiRetryCount++ < 60) {
+      if (apiRetryCount === 1) showNotificationMessage('Loading YouTube player API...', 3000);
+      setTimeout(() => startPlayback(url, loop), 300);
+    } else {
+      showNotificationMessage('YouTube player API still unavailable (offline / ad blocker?). Local MP3/MP4 still works.', 6500);
+    }
+    return;
+  }
+  apiRetryCount = 0;
+
+  const target = parseAllowedYouTubeInput(url);
+  if (!target) { alert('Please enter a valid YouTube video, playlist URL, or 11-character video ID'); return; }
+  const { videoId, playlistId } = target;
+
+  const playerVars = {
+    controls: 0, rel: 0, showinfo: 0, modestbranding: 1,
+    autoplay: 1, enablejsapi: 1, playsinline: 1,
+    fs: 0, iv_load_policy: 3, disablekb: 0
+  };
+  if (loop && videoId && !playlistId) { playerVars.loop = 1; playerVars.playlist = videoId; }
+  const origin = isHttpOrigin() ? window.location.origin : undefined;
+  if (origin) playerVars.origin = origin;
+  if (playlistId) { playerVars.listType = 'playlist'; playerVars.list = playlistId; }
+
+  if (!player) {
+    player = new YT.Player('ytPlayerMount', {
+      height: '100%', width: '100%', playerVars,
+      videoId: videoId || undefined,
+      events: {
+        onReady: onPlayerReady,
+        onStateChange: onPlayerStateChange,
+        onError: function () {
+          showNotificationMessage('YouTube could not load that video (private / region / embed blocked). Try another link or local MP3/MP4.', 6500);
+        }
+      }
+    });
+  } else {
+    player.unMute(); player.setVolume(100);
+    if (playlistId) player.loadPlaylist({ list: playlistId, listType: 'playlist', index: 0 });
+    else player.loadVideoById(videoId);
+  }
+  activeLoopVideoId = loop && videoId && !playlistId ? videoId : null;
+  activatePlaybackUi('youtube');
+}
+
+let activeLoopVideoId = null;
+function onPlayerReady() {
+  if (ytWarpShell) ytWarpShell.style.display = 'block';
+  if (ytFrame) ytFrame.style.display = 'block';
+  video.style.display = 'none';
+  document.body.classList.remove('local-audio', 'local-video');
+}
+function onPlayerStateChange(ev) {
+  // Lightweight ENDED -> restart for loop mode (the IFrame API ignores loop on its own).
+  if (ev.data === 0 && activeLoopVideoId && player) {
+    try { player.seekTo(0); player.playVideo(); } catch (e) {}
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  6. Shared drawing assets                                           *
+ * ------------------------------------------------------------------ */
+/* Pre-rendered glyph atlas: one drawImage per cell instead of fillText. */
+const atlas = (function buildAtlas() {
+  /* Rich multi-script banks (from index-glitch / 006 lineage) so the rain
+     feels like the homepage overlay: latin + cyrillic + greek + katakana +
+     hebrew + arabic + hangul + block/box + math. */
+    const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,./?`~ ' + String.fromCharCode(34,39,60,62);
+  const cyrillic = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+  const greek = "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω";
+  const katakana = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+  const hebrew = "אבגדהוזחטיכךלמםנןסעפףצץקרשת";
+  const hangul = "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ";
+  const symbols = "░▒▓█─│┌┐└┘├┤┬┴┼═║╔╗╚╝╬╦╩╠╣▀▁▂▃▄▅▆▇▉▊▋▌▍■□◆◇▲△▼▽●○◦★☆←↑→↓↔×÷±≠≈≤≥∞√∑∏∫∂∆";
+  const chars = (latin + cyrillic + greek + katakana + hebrew + hangul + symbols).split('');
+  const fontPx = 16, cols = 16, pad = 2, tile = fontPx + pad * 2;
+  const rows = Math.ceil(chars.length / cols);
+  const cv = document.createElement('canvas');
+  cv.width = cols * tile; cv.height = rows * tile;
+  const cx = cv.getContext('2d');
+  cx.font = 'bold ' + fontPx + 'px "Courier New", monospace';
+  cx.textBaseline = 'top';
+  cx.fillStyle = '#fff';
+  chars.forEach((ch, i) => cx.fillText(ch, (i % cols) * tile + pad, Math.floor(i / cols) * tile + pad));
+  return { canvas: cv, tile, count: chars.length, chars: chars };
+})();
+window.__ASCII_CHARS = atlas.chars;
+
+/* ------------------------------------------------------------------ *
+ *  6b. Video/artwork palette engine                                   *
+ *  The 006 effects were hard-wired to synthetic hues (random or fixed  *
+ *  cyan). "True to the background" means the board's colour comes from *
+ *  what is actually playing: a tiny 32x18 sample of the local video or *
+ *  the ID3 artwork yields an anchor hue, saturation, light and energy. *
+ *  YouTube frames are cross-origin and unreadable, so there the palette*
+ *  stays anchored on this piece's own artwork language (nocturne indigo*
+ *  /cyan + magenta accent) and drifts gently — styling stays true to   *
+ *  the artwork even when the pixels are not readable.                 *
+ * ------------------------------------------------------------------ */
+const PALETTE_FALLBACK = { hue: 205, sat: 78, light: 60, energy: 0.45 };
+const videoPalette = {
+  hue: PALETTE_FALLBACK.hue, sat: PALETTE_FALLBACK.sat, light: PALETTE_FALLBACK.light,
+  energy: PALETTE_FALLBACK.energy,
+  colors: [],            // [{h,s,l}] key colours rebuilt from the sample
+  complement: (PALETTE_FALLBACK.hue + 180) % 360,
+  accent: (PALETTE_FALLBACK.hue + 115) % 360,
+  target: null, lastSampleAt: 0, valid: false
+};
+function paletteKeyColors(hue, sat, light) {
+  return [
+    { h: hue, s: Math.max(62, sat), l: Math.min(76, light + 8) },
+    { h: (hue + 34) % 360, s: sat * 0.85, l: light * 0.82 },
+    { h: (hue + 300) % 360, s: sat * 0.78, l: light * 0.66 },
+    { h: (hue + 160) % 360, s: sat * 0.62, l: Math.min(88, light + 18) }
+  ];
+}
+videoPalette.colors = paletteKeyColors(PALETTE_FALLBACK.hue, PALETTE_FALLBACK.sat, PALETTE_FALLBACK.light);
+function palH(off) { return (((videoPalette.hue + off) % 360) + 360) % 360; }
+function palHSL(off, satPct, lightPct, alpha) {
+  return 'hsla(' + palH(off).toFixed(1) + ',' + satPct.toFixed(0) + '%,' + lightPct.toFixed(0) + '%,' + alpha + ')';
+}
+
+const paletteBuf = document.createElement('canvas');
+paletteBuf.width = 32; paletteBuf.height = 18;
+const paletteCtx = paletteBuf.getContext('2d', { willReadFrequently: true });
+
+function samplePaletteNow() {
+  /* Best readable source wins: ID3 artwork first, then a local video. */
+  let src = null;
+  if (localArtEl && localArtEl.style.display !== 'none' && (localArtEl.naturalWidth || localArtEl.videoWidth)) src = localArtEl;
+  if (!src && video && video.style.display !== 'none' && video.readyState >= 2) src = video;
+  if (!src) return; // null target => drift path in stepPalette
+  let data = null;
+  try {
+    paletteCtx.clearRect(0, 0, 32, 18);
+    paletteCtx.drawImage(src, 0, 0, 32, 18);
+    data = paletteCtx.getImageData(0, 0, 32, 18).data;
+  } catch (e) { return; } // cross-origin / security: keep fallback
+  /* Hue histogram weighted by chroma; circular mean around the peak. */
+  const H = new Float32Array(36);
+  let sSum = 0, lSum = 0, wSum = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    const l = (mx + mn) / 2;
+    const d = mx - mn;
+    const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+    let h = 0;
+    if (d > 0) {
+      if (mx === r) h = 60 * (((g - b) / d) % 6);
+      else if (mx === g) h = 60 * ((b - r) / d + 2);
+      else h = 60 * ((r - g) / d + 4);
+      if (h < 0) h += 360;
+    }
+    const w = s * (0.3 + l);
+    H[Math.min(35, (h / 10) | 0)] += w;
+    sSum += s * w; lSum += l * w; wSum += w;
+  }
+  if (wSum <= 0) return; // greyscale/black frame: keep current palette
+  let peak = 0;
+  for (let i = 1; i < 36; i++) if (H[i] > H[peak]) peak = i;
+  let num = 0, den = 0;
+  for (let i = 0; i < 36; i++) {
+    let d = (i - peak) * 10;
+    if (d > 180) d -= 360; if (d < -180) d += 360;
+    if (Math.abs(d) > 80) continue;
+    num += d * H[i]; den += H[i];
+  }
+  const hue = (((peak * 10 + (den > 0 ? num / den : 0)) % 360) + 360) % 360;
+  const lAvg = lSum / wSum, sAvg = sSum / wSum;
+  videoPalette.target = {
+    hue: hue,
+    sat: clamp(sAvg * 100, 12, 96),
+    light: clamp(lAvg * 100, 10, 90),
+    energy: clamp(lAvg * 0.72 + sAvg * 0.28, 0.05, 1)
+  };
+  videoPalette.valid = true;
+}
+
+/* Tinted glyph atlas: white glyphs recoloured to the palette. Rebuilt only
+   when the palette moves ~2.5deg / 6% — a few hundred ms of work spread
+   over a 2 minute song, not per frame. */
+let tintAtlas = null, tintAtlasKey = '';
+function maybeRebuildTintedAtlas(force) {
+  const key = (force ? '!' : '') + Math.round(videoPalette.hue / 2.5) + ':' +
+    Math.round(videoPalette.sat / 6) + ':' + Math.round(videoPalette.light / 6);
+  if (tintAtlas && tintAtlasKey === key) return;
+  tintAtlasKey = key;
+  if (!tintAtlas) tintAtlas = document.createElement('canvas');
+  tintAtlas.width = atlas.canvas.width; tintAtlas.height = atlas.canvas.height;
+  const tx = tintAtlas.getContext('2d');
+  tx.clearRect(0, 0, tintAtlas.width, tintAtlas.height);
+  tx.drawImage(atlas.canvas, 0, 0);
+  tx.globalCompositeOperation = 'source-in';
+  tx.fillStyle = 'hsla(' + videoPalette.hue.toFixed(1) + ',' + videoPalette.sat.toFixed(1) + '%,' + videoPalette.light.toFixed(1) + '%,1)';
+  tx.fillRect(0, 0, tintAtlas.width, tintAtlas.height);
+}
+maybeRebuildTintedAtlas(true);
+
+function stepPalette(now, dt) {
+  if (now - videoPalette.lastSampleAt > 420) {
+    videoPalette.lastSampleAt = now;
+    try { samplePaletteNow(); } catch (e) {}
+  }
+  let t = videoPalette.target;
+  if (!t) {
+    /* No readable pixels (YouTube iframe / nothing loaded): breathe around
+       the fallback so even pure-YouTube boards stay true to the artwork. */
+    t = {
+      hue: (PALETTE_FALLBACK.hue + Math.sin(now * 0.00013) * 18 + Math.cos(now * 0.00007 + 1.2) * 10) % 360,
+      sat: clamp(PALETTE_FALLBACK.sat + Math.sin(now * 0.0002) * 8, 12, 96),
+      light: clamp(PALETTE_FALLBACK.light + Math.cos(now * 0.00017) * 6, 10, 90),
+      energy: clamp(0.45 + Math.sin(now * 0.00016) * 0.1, 0.05, 1)
+    };
+  }
+  /* Shortest-arc ease so a cut in the video never snaps the palette. */
+  let dh = t.hue - videoPalette.hue;
+  if (dh > 180) dh -= 360; if (dh < -180) dh += 360;
+  const k = 1 - Math.exp(-1.6 * dt);
+  videoPalette.hue = (videoPalette.hue + dh * k + 360) % 360;
+  videoPalette.sat += (t.sat - videoPalette.sat) * k;
+  videoPalette.light += (t.light - videoPalette.light) * k;
+  videoPalette.energy += (t.energy - videoPalette.energy) * k;
+  videoPalette.complement = (videoPalette.hue + 180) % 360;
+  videoPalette.accent = (videoPalette.hue + 115) % 360;
+  videoPalette.colors = paletteKeyColors(videoPalette.hue, videoPalette.sat, videoPalette.light);
+  maybeRebuildTintedAtlas();
+}
+
+/* Tiny debug/test handle (read-only snapshot + palette force hook). */
+window.__glitchDebug = {
+  palette: () => ({
+    hue: videoPalette.hue, sat: videoPalette.sat, light: videoPalette.light,
+    energy: videoPalette.energy, complement: videoPalette.complement,
+    accent: videoPalette.accent, tinted: !!tintAtlas,
+    source: videoPalette.valid ? 'sample' : 'fallback',
+    colors: videoPalette.colors.map((c) => ({ h: c.h, s: c.s, l: c.l }))
+  }),
+  forcePalette: (h, s, l) => {
+    h = ((h % 360) + 360) % 360;
+    videoPalette.hue = h; videoPalette.sat = clamp(s, 12, 96); videoPalette.light = clamp(l, 10, 90);
+    videoPalette.target = { hue: h, sat: videoPalette.sat, light: videoPalette.light, energy: clamp(l / 100 + s / 300, 0.05, 1) };
+    videoPalette.complement = (h + 180) % 360;
+    videoPalette.accent = (h + 115) % 360;
+    videoPalette.colors = paletteKeyColors(h, videoPalette.sat, videoPalette.light);
+    maybeRebuildTintedAtlas(true);
+  }
+};
+
+/* Curated font-burn vocabulary (the 006 file carried ~1000 duplicated words). */
+const BURN_WORDS = [
+  'GL1TCH', 'BURN', 'DATA', 'CORRUPT', 'X///Z', 'SIGNAL', 'NEON', 'CYBER', 'PUNK',
+  '404', 'SYSFAIL', 'HACK', 'BYTE', 'V1RUS', 'NULL', 'OVERCLOCK', 'FATAL', 'REBOOT',
+  'MATRIX', 'DECRYPT', 'ENCRYPT', 'CRASH', 'WIRED', 'PIXEL', 'NOISE', 'ERROR', 'FREQ',
+  'JACK IN', 'DEFRAG', 'MEMORY LEAK', 'BINARY', 'CODEX', 'SYNTH', 'DYSTOPIA', 'NEXUS',
+  'NAN0', 'ROGUE', 'OVERRIDE', 'ICE', 'NETRUN', 'GHOST', 'Z3R0', 'IMPLANT', 'SYNAPSE',
+  'GL1TCHWAVE', 'FREQSHIFT', 'DATADIVE', 'NEONCORE', 'V1RTUAL', 'SPECTRE', 'PHREAK',
+  'PROTOCOL', 'SUBROUTINE', 'ROOTKIT', 'FIREWALL', 'BLACK ICE', 'GLITCHMODE',
+  'BYTECRASH', 'MEMFRAG', 'VIRAL', 'RETROBYTE', 'PIXELDUST', 'WIREFRAME', 'DARKNET',
+  'UPLINK', 'DOWNLINK', 'REPLICANT', 'VOIDLOOP', 'HYPERLINK', 'QUANTUM', 'PARADOX',
+  'RECURSION', 'ENTROPY', 'ANOMALY', 'DISTORTION', 'FLUX', 'CASCADE', 'RESONANCE',
+  'SPECTRUM', 'HARMONIC', 'KALEIDOSCOPE', 'HOLOGRAPHIC', 'FRACTAL', 'VORONOI',
+  'D4T4-BURN', 'N3ON_V1RU5', '404-ERROR', 'HACK_THE_PLANET', 'NULL-SEC',
+  'GHOST_PROTOCOL', 'SYSTEM_CRASH', 'MATRIX_CODE', 'WHITE_NOISE', 'MEMORY_DUMP',
+  'OVERRIDE_FAILED', 'VIRTUAL_HELL', 'NEON-RAIN', 'WIREFRAME-PRISON', 'ZERO-DAY',
+  'BLACK_ICE', 'EXECUTE_ORDER_66', 'PIXEL-GRID', 'NOISE-FLOOR', 'FREQ-OUT'
+];
+const BURN_FONTS = ['"Courier New"', 'Impact', '"Arial Black"', 'Georgia'];
+
+/* ------------------------------------------------------------------ *
+ *  7. Effect factories (signature-compatible with 006)                *
+ * ------------------------------------------------------------------ */
+function createTimedEffect(fn, duration) {
+  if (duration === undefined) duration = Math.random() < 0.38 ? 900 + Math.random() * 1100 : 2800 + Math.random() * 2600;
+  const start = performance.now();
+  let self;
+  self = function () {
+    if (performance.now() - start > duration) {
+      const i = activeEffects.indexOf(self);
+      if (i > -1) activeEffects.splice(i, 1);
+      return;
+    }
+    fn();
+  };
+  return self;
+}
+
+function glitchNeonGradientOverlayFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const w = mainCanvas.width, h = mainCanvas.height;
+    const x = w * (0.5 + (Math.random() - 0.5) * beat * 0.5);
+    const y = h * (0.5 + (Math.random() - 0.5) * beat * 0.5);
+    const radius = (w / 5) + beat * (w / 3.2) * s;
+    /* Colours come from the artwork/video sample: the board wears the
+       media's own key colours, not a random wheel. */
+    const pc = videoPalette.colors;
+    const grad = gctx.createRadialGradient(x, y, 0, x, y, radius);
+    grad.addColorStop(0, 'hsla(' + pc[0].h.toFixed(0) + ',' + pc[0].s.toFixed(0) + '%,' + Math.min(86, pc[0].l + 6).toFixed(0) + '%,0.42)');
+    grad.addColorStop(0.45, 'hsla(' + pc[1].h.toFixed(0) + ',' + pc[1].s.toFixed(0) + '%,' + pc[1].l.toFixed(0) + '%,0.26)');
+    grad.addColorStop(0.75, 'hsla(' + pc[2].h.toFixed(0) + ',' + pc[2].s.toFixed(0) + '%,' + pc[2].l.toFixed(0) + '%,0.15)');
+    grad.addColorStop(1, 'hsla(' + pc[3].h.toFixed(0) + ',' + pc[3].s.toFixed(0) + '%,' + pc[3].l.toFixed(0) + '%,0)');
+    gctx.save();
+    gctx.globalCompositeOperation = 'screen';
+    gctx.globalAlpha = effectPaintAlpha('Neon Grad', s, comboProfile.glowMult);
+    gctx.fillStyle = grad;
+    gctx.fillRect(0, 0, w, h);
+    /* Sharp hot core: a tight bright centre so the gradient reads crisp
+       instead of a mushy full-wheel wash. */
+    const core = gctx.createRadialGradient(x, y, 0, x, y, radius * 0.22);
+    core.addColorStop(0, 'hsla(' + pc[0].h.toFixed(0) + ',100%,' + Math.min(90, pc[0].l + 20).toFixed(0) + '%,0.5)');
+    core.addColorStop(1, 'hsla(' + pc[0].h.toFixed(0) + ',100%,70%,0)');
+    gctx.globalAlpha = effectPaintAlpha('Neon Grad', s, comboProfile.glowMult * 0.7);
+    gctx.fillStyle = core;
+    gctx.fillRect(0, 0, w, h);
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+function glitchScanlinesFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    /* One device-pixel line, palette coloured: the line pitch carries the
+       strength, the colour carries the artwork. Every 5th line flips to
+       the magenta accent so the raster reads like broadcast chroma. */
+    const lineHeight = 1;
+    const lineGap = 3 + Math.floor((1 - s) * 5);
+    const yOffset = beat * 5 * s;
+    const baseCol = 'hsl(' + palH(0).toFixed(1) + ',' + Math.min(95, videoPalette.sat + 12).toFixed(0) + '%,60%)';
+    const accentCol = 'hsl(' + palH(115).toFixed(1) + ',96%,68%)';
+    gctx.save();
+    gctx.globalCompositeOperation = 'screen';
+    gctx.globalAlpha = Math.min(0.20, s * 0.20 * comboProfile.glowMult);
+    let n = 0;
+    for (let y = yOffset % (lineHeight + lineGap); y < mainCanvas.height; y += lineHeight + lineGap, n++) {
+      gctx.fillStyle = (n % 5 === 2) ? accentCol : baseCol;
+      gctx.fillRect(0, y, mainCanvas.width, lineHeight);
+    }
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+function glitchBrightFlashFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    /* Flashes in the media's own key colours: reads as exposure bloom on
+       the artwork instead of a random colour kick. */
+    const pc = videoPalette.colors;
+    const c = pc[(Math.random() * pc.length) | 0];
+    gctx.save();
+    gctx.globalCompositeOperation = 'screen';
+    gctx.globalAlpha = effectPaintAlpha('Flash', (0.25 + Math.random() * 0.75) * s, comboProfile.glowMult);
+    gctx.fillStyle = 'hsl(' + c.h.toFixed(0) + ',' + c.s.toFixed(0) + '%,92%)';
+    gctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+function glitchHSLRainbowFactory(getStrength, isPersistent) {
+  const start = performance.now();
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    gctx.save();
+    gctx.globalCompositeOperation = 'soft-light';
+    gctx.globalAlpha = effectPaintAlpha('HSL Rainbow', s, comboProfile.glowMult);
+    /* Full-spectrum sweep, but orbiting the artwork's anchor hue: a true
+       rainbow that never strays far from the video's own colour story. */
+    const hue = (videoPalette.hue + Math.sin((customTime - start) * 0.00009) * 130 + 360) % 360;
+    gctx.fillStyle = 'hsl(' + hue.toFixed(0) + ', 100%, 55%)';
+    gctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+function glitchStrobeFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    gctx.save();
+    gctx.globalCompositeOperation = 'screen';
+    gctx.globalAlpha = Math.random() < (s * 0.22 * timeScale) ? effectPaintAlpha('Strobe', s, comboProfile.glowMult) : 0;
+    gctx.fillStyle = Math.random() < 0.5
+      ? 'hsl(' + videoPalette.hue.toFixed(0) + ',96%,92%)'
+      : 'hsl(' + ((videoPalette.hue + 40) % 360).toFixed(0) + ',96%,90%)';
+    gctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+/* ASCII rain — column-based Matrix style (ported from index-glitch.js).
+   Live columns fall with long trails, per-column hue/speed/trail length,
+   multi-script glyphs, and strength-driven density/alpha. Atlas still used
+   for cheap drawImage when available; falls back to fillText. */
+const ASCII_RAIN = {
+  cols: 0, rows: 0, spacing: 14,
+  drops: null, glyphs: null, hues: null, live: null, trails: null, speeds: null,
+  rainFrac: 0.77,   // fraction of columns that are active (index-glitch asciiRain)
+  scale: 2.35,      // glyph size vs cell (index-glitch asciiScale ~2.5)
+  alphaMin: 0.55,
+  alphaMax: 0.92
+};
+
+function rebuildAsciiRain(w, h, strength) {
+  // Tighter spacing at high strength → denser cascade
+  const spacing = Math.max(10, Math.round(18 - strength * 7));
+  let cols = Math.max(4, Math.ceil(w / spacing));
+  let rows = Math.max(4, Math.ceil(h / spacing));
+  // Adaptive cell budget (same governor as before)
+  const cells = cols * rows;
+  if (cells > renderBudget.asciiCells) {
+    const scale = Math.sqrt(cells / renderBudget.asciiCells);
+    cols = Math.max(4, Math.floor(cols / scale));
+    rows = Math.max(4, Math.floor(rows / scale));
+  }
+  const A = ASCII_RAIN;
+  if (A.cols === cols && A.rows === rows && A.spacing === spacing && A.drops) return;
+  A.spacing = spacing;
+  A.cols = cols;
+  A.rows = rows;
+  A.drops = new Float32Array(cols);
+  A.glyphs = new Uint16Array(cols * rows);
+  A.hues = new Float32Array(cols);
+  A.live = new Uint8Array(cols);
+  A.trails = new Uint16Array(cols);
+  A.speeds = new Float32Array(cols);
+  const liveCount = Math.max(3, Math.round(cols * A.rainFrac));
+  const setLen = atlas.count || 200;
+  for (let c = 0; c < cols; c++) {
+    A.drops[c] = Math.random() * rows;
+    A.hues[c] = (videoPalette.hue + Math.random() * 140) % 360;
+    A.live[c] = c < liveCount ? 1 : 0;
+    A.trails[c] = Math.max(8, Math.round(rows * (0.22 + Math.random() * 0.50)));
+    A.speeds[c] = 0.75 + Math.random() * 1.15;
+    for (let r = 0; r < rows; r++) {
+      A.glyphs[c * rows + r] = (Math.random() * setLen) | 0;
+    }
+  }
+  // scatter live columns so rain is not left-biased
+  for (let i = 0; i < cols; i++) {
+    const j = (Math.random() * cols) | 0;
+    const tmp = A.live[i]; A.live[i] = A.live[j]; A.live[j] = tmp;
+  }
+}
+
+function glitchASCIIArtOverlayFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const w = mainCanvas.width, h = mainCanvas.height;
+    if (w < 8 || h < 8) return;
+    rebuildAsciiRain(w, h, s);
+
+    const A = ASCII_RAIN;
+    const cols = A.cols, rows = A.rows, sp = A.spacing;
+    const setLen = atlas.count || 1;
+    const glyphPx = Math.max(10, (sp - 2) * A.scale);
+    const aMin = A.alphaMin, aMax = A.alphaMax;
+    // Frame-rate independent fall (index-glitch uses dt/16.67; here we use a fixed step)
+    const speed = 1.15 * (0.85 + s * 0.55);
+
+    gctx.save();
+    gctx.font = 'bold ' + glyphPx.toFixed(0) + 'px "Courier New", monospace';
+    gctx.textBaseline = 'top';
+    gctx.globalCompositeOperation = 'lighter';
+
+    const chSet = atlas.chars || window.__ASCII_CHARS || ['0', '1'];
+
+    for (let c = 0; c < cols; c++) {
+      if (!A.live[c]) continue;
+      A.drops[c] += speed * A.speeds[c];
+      if (A.drops[c] >= rows) {
+        A.drops[c] -= rows;
+        A.hues[c] = (videoPalette.hue + 40 + Math.random() * 160) % 360;
+      }
+      // slow per-column hue drift (index-glitch)
+      A.hues[c] = (A.hues[c] + 0.3 * A.speeds[c]) % 360;
+      const head = A.drops[c] | 0;
+      if (head >= 0 && head < rows) {
+        A.glyphs[c * rows + head] = (Math.random() * setLen) | 0;
+      }
+      let trail = A.trails[c];
+      if (trail > rows) trail = rows;
+      for (let k = 0; k < trail; k++) {
+        let r = head - k;
+        if (r < 0) r += rows;
+        if (r < 0 || r >= rows) continue;
+        const gid = A.glyphs[c * rows + r] % setLen;
+        const tt = trail <= 1 ? 1 : (1 - k / (trail - 1));
+        const alpha = (aMin + (aMax - aMin) * tt) * s;
+        if (alpha < 0.02) continue;
+        const jump = (gid % 23) - 11;
+        if (k === 0) {
+          // bright head glyph
+          gctx.fillStyle = 'hsla(' + ((A.hues[c] + jump + 360) % 360).toFixed(0) + ',100%,' +
+            (86 + (gid % 10)) + '%,' + Math.min(0.75, alpha * 0.85 * (comboProfile.glowMult || 1)).toFixed(3) + ')';
+        } else {
+          gctx.fillStyle = 'hsla(' + ((A.hues[c] + k * 6 + jump + 360) % 360).toFixed(0) + ',' +
+            (72 + (gid % 19)) + '%,' + (40 + (gid % 24)) + '%,' + alpha.toFixed(3) + ')';
+        }
+        gctx.fillText(chSet[gid % chSet.length], c * sp, r * sp);
+      }
+    }
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+/* Font burn: still fillText (a few per frame is fine), with shadowBlur capped. */
+function glitchFontBurnFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const words = BURN_WORDS;
+    const text = Math.random() < 0.5
+      ? words[(Math.random() * words.length) | 0] + (Math.random() < 0.5 ? ' ' : '-') + words[(Math.random() * words.length) | 0]
+      : words[(Math.random() * words.length) | 0];
+    gctx.save();
+    gctx.font = (10 + Math.random() * 80 * s).toFixed(0) + 'px ' + BURN_FONTS[(Math.random() * BURN_FONTS.length) | 0] + ', monospace';
+    const hueCycleStrength = effectAlphas['Hue/Color Cycle'] || 0;
+    let fill, shadow;
+    if (hueCycleStrength < 0.05) {
+      /* Pure "burn": black text, but the glow is the artwork's light. */
+      fill = 'hsla(0,0%,0%,' + (0.8 * s).toFixed(2) + ')';
+      shadow = palHSL(0, Math.max(60, videoPalette.sat), 88, 1);
+      gctx.shadowBlur = 2 + s * 4 * (comboProfile.glowMult || 1);
+      gctx.globalCompositeOperation = 'multiply';
+    } else if (hueCycleStrength > 0.95) {
+      fill = 'hsla(0,0%,100%,' + (0.8 * s).toFixed(2) + ')';
+      shadow = 'hsla(0,0%,0%,1)';
+      gctx.shadowBlur = 2 + s * 5;
+      gctx.globalCompositeOperation = 'lighter';
+    } else {
+      /* Hue cycle anchored to the media hue: the full cycle still runs,
+         but it rotates around the video's own colour instead of 0. */
+      const progress = clamp01((hueCycleStrength - 0.05) / 0.9);
+      const cyc = (videoPalette.hue + progress * 360) % 360;
+      fill = 'hsla(' + cyc.toFixed(0) + ',100%,55%,' + (0.8 * s).toFixed(2) + ')';
+      shadow = 'hsla(' + ((cyc + 180) % 360).toFixed(0) + ',85%,60%,1)';
+      gctx.shadowBlur = 5 + s * 18;
+      gctx.globalCompositeOperation = 'lighter';
+    }
+    gctx.fillStyle = fill;
+    gctx.shadowColor = shadow;
+    gctx.fillText(text, Math.random() * mainCanvas.width, Math.random() * mainCanvas.height);
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+/* Gemini Bomb: same particle-burst, shape count clamped by strength. */
+function glitchGeminiBombFactory(getStrength, isPersistent) {
+  const kind = ['rect', 'circle', 'triangle', 'star', 'cross'];
+  const patt = ['solid', 'striped-h', 'striped-v'];
+  const paletteHue = () => videoPalette.colors[(Math.random() * videoPalette.colors.length) | 0].h + (Math.random() * 24 - 12);
+  const n = 4 + ((Math.random() * 18) | 0);
+  const shapes = [];
+  for (let i = 0; i < n; i++) {
+    shapes.push({
+      x: mainCanvas.width * 0.5, y: mainCanvas.height * 0.5,
+      size: 5 + Math.random() * 15,
+      kind: kind[(Math.random() * kind.length) | 0],
+      patt: patt[(Math.random() * patt.length) | 0],
+      angle: Math.random() * Math.PI * 2,
+      speed: 1 + Math.random() * 8,
+      hue: paletteHue()
+    });
+  }
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    gctx.save();
+    gctx.globalCompositeOperation = 'lighter';
+    const w = mainCanvas.width, h = mainCanvas.height;
+    for (let k = 0; k < shapes.length; k++) {
+      const sh = shapes[k];
+      const mv = sh.speed * s * timeScale;
+      sh.x += Math.cos(sh.angle) * mv;
+      sh.y += Math.sin(sh.angle) * mv;
+      const cur = (sh.size + beat * 10) * s;
+      if (!isPersistent) sh.speed *= 0.99;
+      else if (sh.x < 0 || sh.x > w || sh.y < 0 || sh.y > h) {
+        sh.x = w * 0.5; sh.y = h * 0.5;
+        sh.angle = Math.random() * Math.PI * 2;
+        sh.speed = 1 + Math.random() * 8;
+        sh.hue = paletteHue();
+      }
+      const col = 'hsla(' + sh.hue.toFixed(0) + ',' + Math.max(55, videoPalette.sat).toFixed(0) + '%,72%,' + (0.45 * s * comboProfile.glowMult).toFixed(3) + ')';
+      gctx.fillStyle = col;
+      gctx.strokeStyle = col;
+      gctx.lineWidth = 1;
+      gctx.beginPath();
+      if (sh.kind === 'rect') {
+        gctx.rect(sh.x - cur / 2, sh.y - cur / 2, cur, cur);
+      } else if (sh.kind === 'circle') {
+        gctx.arc(sh.x, sh.y, cur / 2, 0, Math.PI * 2);
+      } else if (sh.kind === 'triangle') {
+        for (let a = 0; a < 3; a++) {
+          const ang = Math.PI / 2 + a * 2 * Math.PI / 3;
+          const px = sh.x + cur / 2 * Math.cos(ang), py = sh.y + cur / 2 * Math.sin(ang);
+          if (a === 0) gctx.moveTo(px, py); else gctx.lineTo(px, py);
+        }
+        gctx.closePath();
+      } else if (sh.kind === 'star') {
+        for (let a = 0; a < 10; a++) {
+          const r = a % 2 === 0 ? cur / 2 : cur / 5;
+          const ang = -Math.PI / 2 + a * Math.PI / 5;
+          const px = sh.x + r * Math.cos(ang), py = sh.y + r * Math.sin(ang);
+          if (a === 0) gctx.moveTo(px, py); else gctx.lineTo(px, py);
+        }
+        gctx.closePath();
+      } else {
+        gctx.rect(sh.x - cur / 6, sh.y - cur / 2, cur / 3, cur);
+        gctx.rect(sh.x - cur / 2, sh.y - cur / 6, cur, cur / 3);
+      }
+      if (sh.patt === 'solid') {
+        gctx.fill();
+      } else {
+        gctx.save();
+        gctx.clip();
+        gctx.beginPath();
+        const vert = sh.patt === 'striped-v';
+        for (let x = sh.x - cur / 2 - 4; x < sh.x + cur / 2 + 4; x += 4) {
+          if (vert) { gctx.moveTo(x, sh.y - cur / 2 - 4); gctx.lineTo(x, sh.y + cur / 2 + 4); }
+          else { gctx.moveTo(sh.x - cur / 2 - 4, x); gctx.lineTo(sh.x + cur / 2 + 4, x); }
+        }
+        gctx.stroke();
+        gctx.restore();
+      }
+    }
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+/* Data Bands — final-006 VHS roll: horizontal slice wobble + tape noise.
+   Matches final-006-glitch-canvas glitchVHSFactory (slice 5px, sin wobble,
+   overlay white grain). YouTube: CSS still tears the picture; canvas adds
+   the same grain/roll cues on top when the iframe cannot be sampled. */
+function glitchVHSFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const w = mainCanvas.width, h = mainCanvas.height;
+    if (w < 4 || h < 4) return;
+    const ytLive = !!(ytWarpShell && ytWarpShell.style.display !== 'none' && document.body.classList.contains('playback-on'));
+    const localVid = !!(video && document.body.classList.contains('local-video') && video.readyState >= 2);
+
+    if (scratch.width !== w || scratch.height !== h) { scratch.width = w; scratch.height = h; }
+
+    const wobbleAmount = s * 6;
+    const rollSpeed = customTime / 1400;
+    const sliceHeight = 6;
+    let sliced = false;
+
+    if (localVid) {
+      try {
+        scratchCtx.clearRect(0, 0, w, h);
+        scratchCtx.drawImage(video, 0, 0, w, h);
+        scratchCtx.drawImage(mainCanvas, 0, 0);
+        gctx.clearRect(0, 0, w, h);
+        for (let y = 0; y < h; y += sliceHeight) {
+          const wobbleOffset = Math.sin(y / 30 + rollSpeed) * wobbleAmount;
+          gctx.drawImage(scratch, 0, y, w, sliceHeight, wobbleOffset, y, w, sliceHeight);
+        }
+        sliced = true;
+      } catch (e) {}
+    }
+    if (!sliced && !ytLive) {
+      // final-006 path: slice whatever is already on the glitch canvas
+      scratchCtx.clearRect(0, 0, w, h);
+      scratchCtx.drawImage(mainCanvas, 0, 0);
+      gctx.clearRect(0, 0, w, h);
+      for (let y = 0; y < h; y += sliceHeight) {
+        const wobbleOffset = Math.sin(y / 30 + rollSpeed) * wobbleAmount;
+        gctx.drawImage(scratch, 0, y, w, sliceHeight, wobbleOffset, y, w, sliceHeight);
+      }
+      sliced = true;
+    }
+
+    // final-006 tape noise (overlay white grain) — always, including YouTube
+    gctx.save();
+    gctx.globalCompositeOperation = 'overlay';
+    gctx.globalAlpha = s * 0.10 * motionGlow() * boardHarmony();
+    const dots = Math.min(50, Math.floor(40 * s));
+    for (let i = 0; i < dots; i++) {
+      const x = Math.random() * w;
+      const y = (Math.random() * h + customTime / 10) % h;
+      const size = Math.random() * 2;
+      gctx.fillStyle = 'hsla(0, 0%, 100%, ' + (Math.random() * 0.5).toFixed(3) + ')';
+      gctx.fillRect(x, y, size, size);
+    }
+    // When YouTube is live (no pixel slice), add a soft tracking roll cue so
+    // the effect still reads like final-006's band motion over the iframe.
+    if (ytLive && !sliced) {
+      gctx.globalCompositeOperation = 'screen';
+      const rollY = ((customTime / 900) % 1) * h;
+      const bh = Math.max(3, 4 + s * 10);
+      const wob = Math.sin(rollY / 30 + rollSpeed) * wobbleAmount;
+      gctx.globalAlpha = Math.min(0.18, s * 0.14);
+      gctx.fillStyle = 'rgba(255,255,255,0.35)';
+      gctx.fillRect(wob, rollY, w, bh);
+      gctx.fillStyle = 'rgba(255,255,255,0.18)';
+      gctx.fillRect(-wob * 0.5, (rollY + h * 0.5) % h, w, bh * 0.6);
+    }
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+/* VHS Glitch — final-006 hard slice jitter.
+   Matches final-006-glitch-canvas glitchVHSGlitchFactory (variable slice
+   height, sin+random jitter scaled by comboProfile.glowMult). */
+function glitchVHSGlitchFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const w = mainCanvas.width, h = mainCanvas.height;
+    if (w < 4 || h < 4) return;
+    const ytLive = !!(ytWarpShell && ytWarpShell.style.display !== 'none' && document.body.classList.contains('playback-on'));
+    const localVid = !!(video && document.body.classList.contains('local-video') && video.readyState >= 2);
+    const glow = (comboProfile && comboProfile.glowMult) || 1;
+
+    if (scratch.width !== w || scratch.height !== h) { scratch.width = w; scratch.height = h; }
+
+    const sliceHeight = 5 + Math.floor(Math.random() * 2);
+    let sliced = false;
+
+    if (localVid) {
+      try {
+        scratchCtx.clearRect(0, 0, w, h);
+        scratchCtx.drawImage(video, 0, 0, w, h);
+        scratchCtx.drawImage(mainCanvas, 0, 0);
+        gctx.clearRect(0, 0, w, h);
+        for (let y = 0; y < h; y += sliceHeight) {
+          const jitter = Math.sin(y / 28 + customTime / 320) * 3.2 * s * glow + (Math.random() - 0.5) * 1.4 * s;
+          try { gctx.drawImage(scratch, 0, y, w, sliceHeight, jitter, y, w, sliceHeight); } catch (e) {}
+        }
+        sliced = true;
+      } catch (e) {}
+    }
+    if (!sliced && !ytLive) {
+      scratchCtx.clearRect(0, 0, w, h);
+      scratchCtx.drawImage(mainCanvas, 0, 0);
+      gctx.clearRect(0, 0, w, h);
+      for (let y = 0; y < h; y += sliceHeight) {
+        const jitter = Math.sin(y / 28 + customTime / 320) * 3.2 * s * glow + (Math.random() - 0.5) * 1.4 * s;
+        try { gctx.drawImage(scratch, 0, y, w, sliceHeight, jitter, y, w, sliceHeight); } catch (e) {}
+      }
+      sliced = true;
+    }
+
+    // YouTube-only: paint final-006-style hard tear bars so the glitch still
+    // reads without sampling the iframe (CORS).
+    if (ytLive && !sliced) {
+      gctx.save();
+      gctx.globalCompositeOperation = 'lighter';
+      // denser, jittery horizontal tears matching the slice loop feel
+      for (let y = 0; y < h; y += sliceHeight) {
+        const jitter = Math.sin(y / 28 + customTime / 320) * 3.2 * s * glow + (Math.random() - 0.5) * 1.4 * s;
+        if (Math.abs(jitter) < 1.2) continue;
+        gctx.globalAlpha = Math.min(0.18, 0.05 + s * 0.14) * glow;
+        gctx.fillStyle = 'rgba(255,255,255,0.12)';
+        gctx.fillRect(jitter, y, w, Math.max(1, sliceHeight - 1));
+      }
+      // occasional hard snap (final-006 had pure geometry; this is the cue)
+      if (Math.random() < 0.04 * s) {
+        const y = Math.random() * h;
+        const th = sliceHeight + Math.random() * 6 * s;
+        const dx = (Math.random() - 0.5) * 16 * s * glow;
+        gctx.globalAlpha = 0.12 * s * glow;
+        gctx.fillStyle = 'rgba(255,255,255,0.28)';
+        gctx.fillRect(dx, y, w, th);
+      }
+      gctx.restore();
+    }
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+
+/* Data Bomb (restored in the lite revision): a short digital-rain detonation. */
+function glitchDataBombFactory(getStrength, isPersistent) {
+  const start = performance.now();
+  const drops = [];
+  const n = 90;
+  for (let i = 0; i < n; i++) drops.push({ x: Math.random(), y: Math.random(), v: 0.35 + Math.random() * 0.9 });
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const t = (performance.now() - start) * 0.001;
+    const env = Math.sin(Math.min(1, t / 1.6) * Math.PI); // rise + fall
+    const w = mainCanvas.width, h = mainCanvas.height;
+    gctx.save();
+    gctx.globalCompositeOperation = 'lighter';
+    /* No per-frame hue-rotate filter: the pre-tinted atlas replaces it, so
+       the rain is already in the artwork's colour for free. */
+    gctx.globalAlpha = clamp01(s * env * 0.9);
+    const tile = atlas.tile;
+    const src = tintAtlas || atlas.canvas;
+    for (let i = 0; i < n; i++) {
+      const d = drops[i];
+      d.y = (d.y + d.v * 0.016 * (1 + t)) % 1; // accelerates as it falls
+      const gx = (d.x * w * 2) % w;
+      const gy = d.y * h;
+      const idx = (Math.random() * atlas.count) | 0;
+      gctx.drawImage(src, (idx % 16) * tile, ((idx / 16) | 0) * tile, tile, tile, gx, gy, tile * 0.9, tile * 0.9);
+    }
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn, 1700);
+}
+
+/* Tech Artist — raw WebGL1 kaleidoscope field (replaces the three.js one).
+   Half resolution, 8 marching layers (was 20), 2 fold iterations (was 3),
+   created lazily, only rendered while the effect is visible. */
+const techArtist = { gl: null, canvas: null, prog: null, uni: {}, failed: false, w: 0, h: 0 };
+let taVel = { x: 0, y: 0 };
+function techArtistInit() {
+  if (techArtist.gl || techArtist.failed) return techArtist.gl;
+  const cv = document.createElement('canvas');
+  const gl = cv.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false, powerPreference: 'low-power' });
+  if (!gl) { techArtist.failed = true; return null; }
+  const vs = 'attribute vec2 aP;void main(){gl_Position=vec4(aP,0.0,1.0);}';
+  const fs = [
+    'precision mediump float;',
+    'uniform vec2 uRes;uniform float uT;uniform vec2 uM;uniform vec2 uV;uniform float uHue;uniform float uE;',
+    'mat2 rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);}',
+    'void main(){',
+    '  vec2 uv=(gl_FragCoord.xy*2.0-uRes)/uRes.y;',
+    '  float vm=length(uV);',
+    '  uv+=(uM-0.5)*0.35+uV*0.4*(0.6+0.4*sin(uT*0.6));',
+    '  vec3 rd=normalize(vec3(uv,1.0+vm*0.8));',
+    '  vec3 col=vec3(0.0);',
+    '  for(float i=0.0;i<9.0;i++){',
+    '    float z=i*1.05+0.1;',
+    '    vec3 p=z*rd;',
+    '    p.xz=rot(uT*0.2+uM.x*1.4+uV.x*2.0)*p.xz;',
+    '    p.yz=rot(uT*0.15+uM.y*1.2+uV.y*2.0)*p.yz;',
+    '    p.xy=rot(sin(uT*0.35+z*0.8+vm*5.0)*0.3)*p.xy;',
+    '    for(float d=1.0;d<4.0;d+=1.0){p-=sin(p*d+uT+i*0.1).yzx/(d*0.8);}',
+    '    vec3 q=abs(p);float mx=max(max(q.x,q.y),q.z);',
+    '    float s=p.z+p.y-uT;',
+    '    float dist=abs(2.0-mx)+abs(cos(s))/7.0;',
+    '    vec4 ph=vec4((uM.x-uM.y)*2.0+vm*3.0,2.0+uM.y*2.5+vm*2.0,4.0-uM.y*2.5-vm*2.0,0.0);',
+    '    col+=(cos(s-z*0.5-dist+ph.xyz+uHue)+1.0)/(dist*(0.5+vm*0.6)+0.015);',
+    '  }',
+    '  col=col*0.38/9.0;col=col/(1.0+col);col*=1.0+uE*0.12;',
+    '  col=clamp((col-0.18)/(0.62-0.18),0.0,1.0);',
+    '  col=col*col*(3.0-2.0*col);',
+    '  gl_FragColor=vec4(col,1.0);',
+    '}'
+  ].join('\n');
+  function sh(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('TA shader:', gl.getShaderInfoLog(s)); return null; }
+    return s;
+  }
+  const vsh = sh(gl.VERTEX_SHADER, vs), fsh = sh(gl.FRAGMENT_SHADER, fs);
+  if (!vsh || !fsh) { techArtist.failed = true; return null; }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vsh); gl.attachShader(prog, fsh); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { techArtist.failed = true; return null; }
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, 'aP');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  techArtist.gl = gl; techArtist.canvas = cv; techArtist.prog = prog;
+  techArtist.uni = {
+    res: gl.getUniformLocation(prog, 'uRes'),
+    t: gl.getUniformLocation(prog, 'uT'),
+    m: gl.getUniformLocation(prog, 'uM'),
+    v: gl.getUniformLocation(prog, 'uV'),
+    hue: gl.getUniformLocation(prog, 'uHue'),
+    e: gl.getUniformLocation(prog, 'uE')
+  };
+  return gl;
+}
+function glitchTechArtistShaderFactory(getStrength, isPersistent) {
+  const renderFn = () => {
+    const s = getStrength();
+    if (s <= 0) return;
+    const gl = techArtistInit();
+    if (!gl) return;
+    const w = Math.max(2, (mainCanvas.width * 0.5) | 0);
+    const h = Math.max(2, (mainCanvas.height * 0.5) | 0);
+    if (techArtist.canvas.width !== w || techArtist.canvas.height !== h) {
+      techArtist.canvas.width = w; techArtist.canvas.height = h;
+      gl.viewport(0, 0, w, h);
+    }
+    taVel.x *= 0.92; taVel.y *= 0.92;
+    gl.uniform2f(techArtist.uni.res, w, h);
+    gl.uniform1f(techArtist.uni.t, customTime * 0.002);
+    gl.uniform2f(techArtist.uni.m, techArtistMouse.x, techArtistMouse.y);
+    gl.uniform2f(techArtist.uni.v, taVel.x, taVel.y);
+    /* The field's colour wheel rotates to the artwork's anchor hue, and the
+       sampled frame energy lifts the contrast so bright passages pop. */
+    gl.uniform1f(techArtist.uni.hue, videoPalette.hue * 0.0174533);
+    gl.uniform1f(techArtist.uni.e, videoPalette.energy);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gctx.save();
+    gctx.globalCompositeOperation = 'screen';
+    gctx.globalAlpha = Math.min(0.55, s * 0.55 * comboProfile.glowMult);
+    gctx.drawImage(techArtist.canvas, 0, 0, mainCanvas.width, mainCanvas.height);
+    gctx.restore();
+  };
+  return isPersistent ? renderFn : createTimedEffect(renderFn);
+}
+let techArtistMouse = { x: 0.5, y: 0.5 };
+window.addEventListener('mousemove', (ev) => {
+  const nx = ev.clientX / window.innerWidth;
+  const ny = 1 - (ev.clientY / window.innerHeight);
+  const dx = nx - techArtistMouse.x, dy = ny - techArtistMouse.y;
+  techArtistMouse = { x: nx, y: ny };
+  taVel.x = clamp(dx * 6, -1, 1);
+  taVel.y = clamp(dy * 6, -1, 1);
+}, { passive: true });
+
+/* ------------------------------------------------------------------ *
+ *  8. Effect registry, alphas, slider panel                           *
+ * ------------------------------------------------------------------ */
+const timedEffectsDefs = [
+  { name: 'Neon Grad', factory: glitchNeonGradientOverlayFactory, defaultAlpha: 0 },
+  { name: 'Scanlines', factory: glitchScanlinesFactory, defaultAlpha: 0 },
+  { name: 'Flash', factory: glitchBrightFlashFactory, defaultAlpha: 0 },
+  { name: 'HSL Rainbow', factory: glitchHSLRainbowFactory, defaultAlpha: 0 },
+  { name: 'ASCII', factory: glitchASCIIArtOverlayFactory, defaultAlpha: 0 },
+  { name: 'Font Burn', factory: glitchFontBurnFactory, defaultAlpha: 0 },
+  { name: 'Strobe', factory: glitchStrobeFactory, defaultAlpha: 0 },
+  { name: 'Gemini Bomb', factory: glitchGeminiBombFactory, defaultAlpha: 0 },
+  { name: 'Tech Artist', factory: glitchTechArtistShaderFactory, defaultAlpha: 0 },
+  { name: 'Data Bands', factory: glitchVHSFactory, defaultAlpha: 0 },
+  { name: 'VHS Glitch', factory: glitchVHSGlitchFactory, defaultAlpha: 0 },
+  { name: 'Data Bomb', factory: glitchDataBombFactory, defaultAlpha: 0 }
+];
+const masterEffectsDefs = [
+  { name: 'B&W Invert', defaultAlpha: 0 },
+  { name: 'Hue/Color Cycle', defaultAlpha: 0 }
+];
+const effectAlphas = {};
+const smoothedStrength = {};
+const continuousEffectCache = {};
+const triggerTimestamps = {};
+const STRENGTH_SETTLE_EPSILON = 0.004;
+let globalSliderEl = null;
+
+const blendProfiles = {
+  /* Finesse ranges: quieter floors, softer peaks, slower rates. */
+  'ASCII': { ambient: [0.02, 0.08], peak: [0.12, 0.32], rate: 0.12 },
+  'B&W Invert': { ambient: [0.0, 0.02], peak: [0.03, 0.10], rate: 0.08 },
+  'Data Bands': { ambient: [0.02, 0.08], peak: [0.10, 0.24], rate: 0.10 },
+  'Data Bomb': { ambient: [0.0, 0.03], peak: [0.04, 0.12], rate: 0.09 },
+  'Flash': { ambient: [0.0, 0.02], peak: [0.03, 0.08], rate: 0.14 },
+  'Font Burn': { ambient: [0.02, 0.07], peak: [0.08, 0.20], rate: 0.11 },
+  'Gemini Bomb': { ambient: [0.0, 0.02], peak: [0.03, 0.10], rate: 0.09 },
+  'HSL Rainbow': { ambient: [0.02, 0.07], peak: [0.10, 0.24], rate: 0.12 },
+  'Hue/Color Cycle': { ambient: [0.03, 0.09], peak: [0.14, 0.32], rate: 0.13 },
+  'Neon Grad': { ambient: [0.02, 0.07], peak: [0.08, 0.20], rate: 0.11 },
+  'Scanlines': { ambient: [0.03, 0.10], peak: [0.10, 0.24], rate: 0.10 },
+  'Strobe': { ambient: [0.0, 0.02], peak: [0.02, 0.06], rate: 0.16 },
+  'Tech Artist': { ambient: [0.02, 0.07], peak: [0.08, 0.18], rate: 0.10 },
+  'VHS Glitch': { ambient: [0.02, 0.07], peak: [0.08, 0.20], rate: 0.10 }
+};
+const profileNames = Object.keys(blendProfiles);
+const peakPool = ['Hue/Color Cycle', 'HSL Rainbow', 'Neon Grad', 'Data Bands', 'VHS Glitch', 'Scanlines', 'ASCII', 'Font Burn', 'Tech Artist'];
+const MAX_EFFECT_CAP = 1.0;
+/* Finesse ceilings — softer paint so stacked layers stay elegant, not busy. */
+const EFFECT_ALPHA_CAPS = {
+  'Neon Grad': 0.22,
+  'Scanlines': 0.20,
+  'Flash': 0.10,
+  'HSL Rainbow': 0.14,
+  'ASCII': 0.62,
+  'Font Burn': 0.36,
+  'Strobe': 0.08,
+  'Gemini Bomb': 0.26,
+  'Tech Artist': 0.48,
+  'Data Bands': 0.28,
+  'VHS Glitch': 0.30,
+  'Data Bomb': 0.24,
+  'B&W Invert': 0.40,
+  'Hue/Color Cycle': 0.85
+};
+function effectPaintAlpha(name, strength, mult) {
+  // Full fade: strength 0 → 0 paint; strength 1 → effect's designed ceiling.
+  // Master intensity + optional mild stack harmony (never forces a residual).
+  const s = clamp01(strength);
+  if (s <= 0.0005) return 0;
+  const cap = EFFECT_ALPHA_CAPS[name];
+  const m = (mult === undefined || mult === null) ? 1 : mult;
+  const intensity = (masterControls && masterControls.effectIntensity != null)
+    ? clamp01(masterControls.effectIntensity) : 1;
+  // Soft stack only when many systems are live — never blocks a true zero.
+  const h = (typeof boardHarmony === 'function') ? (0.82 + 0.18 * boardHarmony()) : 1;
+  const peak = (cap === undefined) ? 1 : cap;
+  return Math.min(peak, s * peak * m * intensity * h);
+}
+
+/* Board harmony: when many systems stack, scale motion & paint so nothing
+   fights. One shared breath for Warp / Bands / VHS / overlays / combo. */
+function boardHarmony() {
+  let lit = 0, sum = 0;
+  for (let i = 0; i < profileNames.length; i++) {
+    const a = effectAlphas[profileNames[i]] || 0;
+    if (a > 0.03) { lit++; sum += a; }
+  }
+  const systems = (isAiWarpActive ? 1 : 0)
+    + (isAutoGlitching ? 1 : 0)
+    + (isContinuallyRandomizing ? 0.5 : 0)
+    + ((getGhostMode && getGhostMode() !== 'OFF') ? 1 : 0)
+    + ((typeof getVsyncMode === 'function' && getVsyncMode() !== 'OFF') ? 1 : 0);
+  // denser board → quieter each voice (0.55..1)
+  const softAmt = (masterControls && masterControls.blendSoftness != null)
+    ? clamp01(masterControls.blendSoftness) : 0.55;
+  const crowd = clamp(1 - lit * 0.045 * softAmt - systems * 0.06 * softAmt, 0.55, 1);
+  const energy = lit ? sum / lit : 0;
+  const soft = crowd * (0.88 + 0.12 * (1 - Math.min(1, energy)));
+  // blendSoftness 0 = almost no crowd damping; 1 = full soft stack
+  return 1 - (1 - soft) * softAmt;
+}
+function motionGlow() {
+  // Cap glow so CSS/transform motion never spikes when confluence is high.
+  const g = (comboProfile && comboProfile.glowMult) || 1;
+  return 1 + (g - 1) * 0.45 * boardHarmony();
+}
+
+
+
+function updateSmoothedStrengths(dt) {
+  let settling = false;
+  // Extra glitchyness while Auto Glitch is ON.
+  const glitchBoost = isAutoGlitching ? (1 + (0.08 + 0.35 * clamp01(masterControls.autoGlitchPower)) * (autoGlitchLevel || 0)) : 1;
+  // Timing mode softens or tightens the visual blend so overlays, colour
+  // and geometry share one interpolation clock with continual randomization.
+  const mode = (typeof randBehavior === 'string' ? randBehavior : 'smooth');
+  const blendTempo = {
+    smooth: 1.0,
+    snap: 2.6,
+    flipflop: 1.55,
+    burst: 2.2,
+    linger: 0.45
+  }[mode] || 1;
+  // Cross-effect harmony: when many effects are lit, ease a touch slower so
+  // colours/overlays merge instead of strobing against each other.
+  let lit = 0, energy = 0;
+  for (let i = 0; i < profileNames.length; i++) {
+    const a = effectAlphas[profileNames[i]] || 0;
+    if (a > 0.04) { lit++; energy += a; }
+  }
+  const crowd = lit > 4 ? 0.72 : lit > 2 ? 0.88 : 1;
+  const harmony = crowd * (0.85 + 0.15 * Math.min(1, energy / Math.max(1, lit)));
+
+  const intensity = clamp01(masterControls.effectIntensity);
+  for (let i = 0; i < profileNames.length; i++) {
+    const name = profileNames[i];
+    // True 0–100% from the slider: 0 parks the effect fully; 1 is full strength.
+    const raw = clamp01((effectAlphas[name] || 0) * masterOpacity * glitchBoost * intensity);
+    const rate = (blendProfiles[name].rate || 0.2) * 8 * blendTempo * harmony;
+    const prev = smoothedStrength[name] === undefined ? raw : smoothedStrength[name];
+    // When user parks at 0, snap toward zero a bit faster so fade-out is clean.
+    const rateUse = raw < 0.01 ? rate * 1.8 : rate;
+    const next = dt > 0 ? easeExp(prev, raw, dt, rateUse) : raw;
+    smoothedStrength[name] = next;
+    if (Math.abs(next - raw) > STRENGTH_SETTLE_EPSILON) settling = true;
+  }
+  return settling;
+}
+
+const timedEffectDefByName = {};
+timedEffectsDefs.forEach((d) => { timedEffectDefByName[d.name] = d; });
+function updateContinuousEffectsCache(specificName) {
+  const sync = (name) => {
+    const alpha = effectAlphas[name] || 0;
+    const cached = continuousEffectCache[name];
+    const def = timedEffectDefByName[name];
+    if (alpha > 0.0005) {
+      if (!cached && def) {
+        const getStrength = () => smoothedStrength[name] || 0;
+        continuousEffectCache[name] = def.factory(getStrength, true);
+        activeEffects.push(continuousEffectCache[name]);
+      } else if (cached && activeEffects.indexOf(cached) === -1) {
+        activeEffects.push(cached);
+      }
+    } else if (cached && (smoothedStrength[name] || 0) <= STRENGTH_SETTLE_EPSILON) {
+      const idx = activeEffects.indexOf(cached);
+      if (idx > -1) activeEffects.splice(idx, 1);
+      delete continuousEffectCache[name];
+    }
+  };
+  if (specificName) { sync(specificName); return; }
+  for (let i = 0; i < timedEffectsDefs.length; i++) sync(timedEffectsDefs[i].name);
+}
+
+/* Build the slider panel: global + one row per effect with lock + trigger. */
+(function buildSliders() {
+  const globalLabel = document.createElement('label');
+  globalLabel.textContent = 'Global Opacity:';
+  const globalSlider = document.createElement('input');
+  globalSlider.type = 'range'; globalSlider.min = 0; globalSlider.max = 1; globalSlider.step = 0.01;
+  globalSlider.value = masterOpacity;
+  globalSlider.addEventListener('input', () => { masterOpacity = parseFloat(globalSlider.value); });
+  const globalLock = document.createElement('button');
+  globalLock.className = 'lock-button';
+  globalLock.textContent = '<LOCK!>';
+  globalLock.addEventListener('click', () => {
+    sliderLocks.global = !sliderLocks.global;
+    globalLock.classList.toggle('locked', sliderLocks.global);
+    globalLock.textContent = sliderLocks.global ? '[LOCKED!]' : '<LOCK!>';
+  });
+  const row = document.createElement('div');
+  row.className = 'slider-group';
+  row.appendChild(globalLabel); row.appendChild(globalSlider); row.appendChild(globalLock);
+  sliderContainer.appendChild(row);
+  globalSliderEl = globalSlider;
+
+  const allDefs = [...timedEffectsDefs, ...masterEffectsDefs].sort((a, b) => (a.name < b.name ? -1 : 1));
+  allDefs.forEach((def) => {
+    effectAlphas[def.name] = def.defaultAlpha;
+    sliderLocks[def.name] = false;
+    const group = document.createElement('div');
+    group.className = 'slider-group';
+    const label = document.createElement('label');
+    label.textContent = def.name + ':';
+    const slider = document.createElement('input');
+    slider.type = 'range'; slider.min = 0; slider.max = 1; slider.step = 0.01;
+    slider.value = def.defaultAlpha;
+    sliderElements[def.name] = slider;
+    slider.addEventListener('input', () => {
+      const v = parseFloat(slider.value);
+      effectAlphas[def.name] = v;
+      // Keep continual from immediately fighting a manual fade (incl. park at 0%).
+      randomTargets[def.name] = v;
+      sliderWritten[def.name] = v;
+      updateContinuousEffectsCache(def.name);
+    });
+    group.appendChild(label); group.appendChild(slider);
+
+    if (timedEffectsDefs.some((t) => t.name === def.name)) {
+      const trigger = document.createElement('button');
+      trigger.className = 'trigger-button';
+      trigger.textContent = 'Trigger';
+      trigger.addEventListener('click', () => {
+        const now = Date.now();
+        triggerTimestamps[def.name] = (triggerTimestamps[def.name] || []).filter((ts) => now - ts < 5000);
+        if (triggerTimestamps[def.name].length < 5) {
+          triggerTimestamps[def.name].push(now);
+          triggerTimedEffect(def);
+        }
+      });
+      group.appendChild(trigger);
+    }
+
+    const lock = document.createElement('button');
+    lock.className = 'lock-button';
+    lock.textContent = '<LOCK!>';
+    lock.addEventListener('click', () => {
+      sliderLocks[def.name] = !sliderLocks[def.name];
+      lock.classList.toggle('locked', sliderLocks[def.name]);
+      lock.textContent = sliderLocks[def.name] ? '[LOCKED!]' : '<LOCK!>';
+    });
+    group.appendChild(lock);
+    sliderContainer.appendChild(group);
+  });
+})();
+
+/* Master / global aspect sliders in the dock */
+(function buildMasterDockSliders() {
+  if (!sliderContainer) return;
+  const defs = [
+    { key: 'effectIntensity', label: 'Effect Intensity', title: 'Master opacity for all effect layers (0 = mute all)' },
+    { key: 'motionScale', label: 'Motion Scale', title: 'AI Warp / Data Bands / VHS motion amplitude' },
+    { key: 'blendSoftness', label: 'Blend Softness', title: 'How gently stacked effects share the board' },
+    { key: 'continualSpeed', label: 'Continual Speed', title: 'How fast continual randomization moves' },
+    { key: 'autoGlitchPower', label: 'Auto Glitch Power', title: 'Strength of Auto Glitch envelope' },
+    { key: 'boardEnergy', label: 'Board Energy', title: 'Beat / flash reactivity' }
+  ];
+  const header = document.createElement('div');
+  header.className = 'slider-group master-dock-header';
+  header.innerHTML = '<label style="grid-column:1/-1;opacity:0.85;letter-spacing:0.04em;">— MASTER —</label>';
+  sliderContainer.appendChild(header);
+
+  defs.forEach((d) => {
+    const group = document.createElement('div');
+    group.className = 'slider-group';
+    const lab = document.createElement('label');
+    lab.textContent = d.label + ':';
+    lab.title = d.title;
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = 0; slider.max = 1; slider.step = 0.01;
+    slider.value = masterControls[d.key];
+    slider.title = d.title;
+    const read = document.createElement('span');
+    read.className = 'master-readout';
+    read.style.cssText = 'font-family:monospace;font-size:9px;color:#8ff;min-width:2.4em;';
+    read.textContent = Math.round(masterControls[d.key] * 100) + '%';
+    slider.addEventListener('input', () => {
+      masterControls[d.key] = parseFloat(slider.value);
+      read.textContent = Math.round(masterControls[d.key] * 100) + '%';
+    });
+    const lock = document.createElement('button');
+    lock.className = 'lock-button';
+    lock.textContent = '<LOCK!>';
+    lock.title = 'Lock ' + d.label;
+    sliderLocks['master:' + d.key] = false;
+    lock.addEventListener('click', () => {
+      sliderLocks['master:' + d.key] = !sliderLocks['master:' + d.key];
+      lock.classList.toggle('locked', sliderLocks['master:' + d.key]);
+      lock.textContent = sliderLocks['master:' + d.key] ? '[LOCKED!]' : '<LOCK!>';
+      slider.disabled = !!sliderLocks['master:' + d.key];
+    });
+    group.appendChild(lab);
+    group.appendChild(slider);
+    group.appendChild(read);
+    group.appendChild(lock);
+    sliderContainer.appendChild(group);
+  });
+})();
+
+function triggerTimedEffect(def) {
+  const profile = blendProfiles[def.name];
+  const floorMin = profile ? profile.ambient[1] + (profile.peak[1] - profile.ambient[1]) * 0.35 : 0.2;
+  const floorMax = profile ? profile.peak[1] : 0.4;
+  const pulseFloor = clamp01(floorMin + Math.random() * Math.max(0, floorMax - floorMin));
+  const getStrength = () => Math.max(smoothedStrength[def.name] || (effectAlphas[def.name] * masterOpacity), pulseFloor);
+  activeEffects.push(def.factory(getStrength));
+}
+
+/* ------------------------------------------------------------------ *
+ *  9. Combo profile + master filters + overviews                      *
+ * ------------------------------------------------------------------ */
+let comboProfile = { hueOffset: 0, satMult: 1, glowMult: 1, contrastMult: 1 };
+let comboProfileTarget = { hueOffset: 0, satMult: 1, glowMult: 1, contrastMult: 1 };
+
+/* Ghost Protocol + V-Sync state (kept from 006). */
+const ghostModes = ['OFF', 'SPECTRUM', 'CRT', 'PLASMA'];
+let ghostModeIndex = 0;
+let ghostActive = false;
+let ghostLevel = parseFloat(ghostProtocolSlider ? ghostProtocolSlider.value : 1);
+const vsyncModes = ['OFF', 'ON', 'GHOST_OFF', 'FULL'];
+let vsyncModeIndex = 0;
+let vsyncActive = false;
+/* Per-mode V-Sync control. Each active mode owns its own constantly-running
+   strength/opacity script (same idea as the Ghost Protocol slider), so the
+   slider renames itself with the active method:
+     ON        -> scanphasing        (sweep bar + mild tear band)
+     GHOST_OFF -> virtual-vertical   (virtual vertical-hold sync, no hard tears)
+     FULL      -> tv simulator       (full vertical-hold fault machine)
+   OFF parks the slider at zero and disables it. */
+const V_SYNC_DEFS = {
+  ON:        { label: 'V-Sync Scanphasing:' },
+  GHOST_OFF: { label: 'V-Sync Virtual-Vertical Sync:' },
+  FULL:      { label: 'V-Sync TV Simulator:' }
+};
+const vsyncScripts = {};
+['ON', 'GHOST_OFF', 'FULL'].forEach((m) => {
+  vsyncScripts[m] = { level: 0.6, target: 0.6, nextAt: performance.now() + 1400 + Math.random() * 1000, lastPct: -1 };
+});
+let vsyncManualUntil = 0;
+sliderLocks.vsync = false;
+function activeVsyncLevel() {
+  const m = getVsyncMode();
+  return m === 'OFF' ? 0 : vsyncScripts[m].level;
+}
+function vsyncBand(mode) {
+  return mode === 'FULL' ? [0.3, 1] : mode === 'GHOST_OFF' ? [0.35, 0.9] : [0.25, 0.85];
+}
+const getGhostMode = () => ghostModes[ghostModeIndex] || 'OFF';
+const getVsyncMode = () => vsyncModes[vsyncModeIndex] || 'OFF';
+
+function updateComboProfile(now) {
+  const gm = getGhostMode();
+  const vm = getVsyncMode();
+  const warp = isAiWarpActive;
+  const t = now * 0.001;
+  const ghostAmount = ghostActive ? clamp01(ghostLevel) : 0;
+  const vsyncAmount = vm !== 'OFF' ? clamp01(activeVsyncLevel()) : 0;
+  const ghostAnchor = { OFF: 0, SPECTRUM: 120, CRT: 45, PLASMA: 180 }[gm] || 0;
+  const vsyncAnchor = { OFF: 0, ON: 20, GHOST_OFF: 65, FULL: 110 }[vm] || 0;
+  const warpDrift = warp ? (t * 14) % 360 : 0;
+  /* Subtle nudge toward the media's anchor hue so mode rotations stay
+     inside the artwork's colour story (final-006 confluence). */
+  const palettePull = (videoPalette.hue - PALETTE_FALLBACK.hue) * 0.22;
+  let hueOffset = ghostAnchor * ghostAmount + vsyncAnchor * vsyncAmount + warpDrift * 0.18 + palettePull;
+  hueOffset = ((hueOffset % 360) + 360) % 360;
+
+  // Finesse confluence: gentle sat/glow when Ghost + V-Sync + Warp stack.
+  const satMult = 1 + ghostAmount * 0.22 + vsyncAmount * 0.16 + (warp ? 0.10 : 0);
+  const glowMult = 1
+    + (ghostAmount * vsyncAmount) * 0.35
+    + (warp && ghostAmount > 0 ? 0.12 : 0)
+    + (warp && vsyncAmount > 0 ? 0.08 : 0)
+    + Math.min(0.12, ghostAmount * 0.08 + vsyncAmount * 0.06);
+  const contrastMult = 1
+    + ghostAmount * 0.08
+    + vsyncAmount * 0.06
+    + (warp ? 0.04 : 0)
+    + (ghostAmount * vsyncAmount) * 0.10;
+
+  comboProfileTarget = { hueOffset, satMult, glowMult, contrastMult };
+}
+
+/* Ease the live comboProfile toward its target so Ghost / V-Sync / Warp /
+   colour overlays merge without hard cuts when modes or levels change. */
+function stepComboProfile(dt) {
+  const t = comboProfileTarget;
+  const rate = 1.6; // slower, smoother merge
+  const ease = (cur, tgt) => cur + (tgt - cur) * (1 - Math.exp(-rate * Math.max(0, dt)));
+  // Hue is circular
+  let dh = t.hueOffset - comboProfile.hueOffset;
+  if (dh > 180) dh -= 360;
+  if (dh < -180) dh += 360;
+  comboProfile.hueOffset = ((comboProfile.hueOffset + dh * (1 - Math.exp(-rate * Math.max(0, dt))) + 360) % 360);
+  comboProfile.satMult = ease(comboProfile.satMult, t.satMult);
+  comboProfile.glowMult = ease(comboProfile.glowMult, t.glowMult);
+  comboProfile.contrastMult = ease(comboProfile.contrastMult, t.contrastMult);
+}
+
+
+function getComboCanvasFilter() {
+  const h = boardHarmony();
+  // Pull sat/contrast toward neutral when the board is dense so layers share space.
+  const sat = 1 + ((comboProfile.satMult || 1) - 1) * h;
+  const c = 1 + ((comboProfile.contrastMult || 1) - 1) * h;
+  const hue = (comboProfile.hueOffset || 0) * h;
+  if (hue < 0.5 && sat <= 1.01 && c <= 1.02) return 'none';
+  return 'hue-rotate(' + hue.toFixed(1) + 'deg) saturate(' +
+    sat.toFixed(2) + ') contrast(' + c.toFixed(2) + ')';
+}
+
+function applyComboPostProcess() {
+  const filterValue = getComboCanvasFilter();
+  if (filterValue === 'none') return;
+  const w = mainCanvas.width, h = mainCanvas.height;
+  if (scratch.width !== w || scratch.height !== h) { scratch.width = w; scratch.height = h; }
+  scratchCtx.clearRect(0, 0, w, h);
+  scratchCtx.drawImage(mainCanvas, 0, 0);
+  gctx.clearRect(0, 0, w, h);
+  gctx.save();
+  gctx.filter = filterValue;
+  gctx.drawImage(scratch, 0, 0);
+  gctx.restore();
+  gctx.filter = 'none';
+}
+
+let masterFilterPrimed = false;
+let lastMasterFilterApply = 0;
+function applyMasterFilters() {
+  /* The body filter re-rasterizes the whole page INCLUDING the YouTube
+     iframe. Under continual randomization the hue slider drifts every frame,
+     so an unthrottled write re-rendered the iframe ~60x/s -> skipped video
+     frames and an erratic player. Quantize + throttle to ~10Hz max. */
+  const now = performance.now();
+  if (masterFilterPrimed && now - lastMasterFilterApply < 100) return;
+  masterFilterPrimed = true;
+  const filters = [];
+  const hueStrength = (effectAlphas['Hue/Color Cycle'] || 0) * masterOpacity;
+  if (hueStrength > 0.01) filters.push('hue-rotate(' + Math.round(hueStrength * 360) + 'deg)');
+  // Graceful anti-greyout: never linger on dead grey / full invert.
+  // Soft ceiling + automatic ease-down when the slider sits in the danger zone.
+  let bw = clamp01(effectAlphas['B&W Invert'] || 0);
+  const BW_SOFT_CEILING = 0.55;   // painted invert never exceeds this feel
+  const BW_LINGER_LIMIT = 0.42;   // if held above this, ease back gracefully
+  if (bw > BW_LINGER_LIMIT && !sliderLocks['B&W Invert']) {
+    // Pull the stored alpha back so continual/auto cannot park on greyout.
+    const pull = bw - (bw - BW_LINGER_LIMIT) * 0.08;
+    effectAlphas['B&W Invert'] = pull;
+    if (sliderElements['B&W Invert'] && Math.abs(pull - (sliderWritten['B&W Invert'] || 0)) > 0.008) {
+      sliderWritten['B&W Invert'] = pull;
+      sliderElements['B&W Invert'].value = pull.toFixed(3);
+    }
+    if (randomTargets) randomTargets['B&W Invert'] = Math.min(randomTargets['B&W Invert'] || pull, BW_LINGER_LIMIT);
+    bw = pull;
+  }
+  if (bw > 0.01) {
+    // Map full slider travel into a soft, living invert (never pure grey/invert).
+    const t = Math.min(1, bw / 0.75);
+    // Ease-out curve near the top so it never hard-parks on greyout.
+    const soft = t * (1 - 0.22 * t);
+    const gray = Math.min(0.48, soft * 0.48);
+    const inv  = Math.min(0.40, soft * 0.40);
+    const contrast = (1 + soft * 0.12).toFixed(2);
+    const satKeep = (1 - soft * 0.35).toFixed(2); // residual chroma
+    filters.push(
+      'grayscale(' + gray.toFixed(2) + ') invert(' + inv.toFixed(2) +
+      ') contrast(' + contrast + ') saturate(' + satKeep + ')'
+    );
+  }
+  const value = filters.length ? filters.join(' ') : 'none';
+  if (domCache.bodyFilter !== value) {
+    domCache.bodyFilter = value;
+    document.body.style.filter = value;
+  }
+  lastMasterFilterApply = now;
+  applyYouTubeSurfaceFilters();
+}
+
+/* CSS-only V-Sync ghosting (the 006 version ran a full-screen
+   feConvolveMatrix on the iframe every frame — software rasterization). */
+function getVsyncGhostFilterParts() {
+  const mode = getVsyncMode();
+  const ghostOn = (mode === 'GHOST_OFF' || mode === 'FULL') && activeVsyncLevel() > 0.01;
+  if (!ghostOn) return null;
+  const shift = clamp01(activeVsyncLevel());
+  const isFull = mode === 'FULL';
+  // Lenient intertwining with AI Warp: the CSS ghost pass backs off
+  // (strength + saturation) while the warp script is driving the surface.
+  const sharpen = clamp01((shift - 0.55) / 0.45);
+  const softK = (isAiWarpActive ? 0.7 : 1) * (1 - sharpen * 0.45); // back off ghost as sharpen rises
+  /* Chroma shift is the media hue +/- the mode's own offset, so the CSS
+     ghost pass pushes the video toward its own palette, not a fixed shift. */
+  const hueDeg = Math.round(((isFull ? (videoPalette.hue + 95) : (videoPalette.hue - 115)) % 360) * shift * softK);
+  const sat = 1 + shift * (isFull ? 1.1 : 0.45) * (isAiWarpActive ? 0.8 : 1);
+  // Sharper surface ghosting (final-006): higher contrast + sat on FULL,
+  // still backs off under AI Warp so the two scripts interlace cleanly.
+  const parts = [
+    'hue-rotate(' + hueDeg + 'deg)',
+    'saturate(' + sat.toFixed(2) + ')',
+    'contrast(' + (1.08 + shift * (isFull ? 0.38 : 0.16)).toFixed(2) + ')',
+    'brightness(' + (1 + shift * (isFull ? 0.06 : 0.03)).toFixed(2) + ')'
+  ];
+  if (isAiWarpActive) {
+    parts.push(
+      'contrast(' + (1 + shift * 0.28).toFixed(2) + ')',
+      'saturate(' + (1 + shift * 0.42).toFixed(2) + ')'
+    );
+  }
+  return parts;
+}
+
+function applyYouTubeSurfaceFilters() {
+  // Base plate is slightly punched (final-006 analog feel) so overlays sit
+  // on a sharper picture instead of a soft one.
+  const base = 'brightness(1.02) contrast(1.12) saturate(1.06)';
+  const iframeFilters = [base];
+  const shellFilters = [base];
+  if (isAiWarpActive) {
+    iframeFilters.push('saturate(1.42)', 'contrast(1.14)', 'brightness(1.03)');
+    shellFilters.push('saturate(1.30)', 'contrast(1.10)', 'brightness(1.02)', 'sepia(0.08)');
+  }
+  // V-Sync sharpen zone: as the slider approaches 100%, the underlying
+  // YouTube/local picture resolves toward crisp & pristine (contrast +
+  // brightness + mild saturate, less blurry ghosting feel).
+  const vLevel = activeVsyncLevel();
+  if (getVsyncMode() !== 'OFF' && vLevel > 0.01) {
+    // 0 at mid, 1 at full — only the upper half of the slider is "sharpen mode"
+    const sharpen = clamp01((vLevel - 0.55) / 0.45);
+    if (sharpen > 0.02) {
+      const br = (1 + sharpen * 0.08).toFixed(3);
+      const ct = (1 + sharpen * 0.28).toFixed(3);
+      const st = (1 + sharpen * 0.12).toFixed(3);
+      // Subtle unsharp via contrast/brightness — CSS has no true unsharpMask,
+      // but this reads as a clean, pristine plate toward 100%.
+      iframeFilters.push('brightness(' + br + ')', 'contrast(' + ct + ')', 'saturate(' + st + ')');
+      shellFilters.push('brightness(' + br + ')', 'contrast(' + (1 + sharpen * 0.18).toFixed(3) + ')', 'saturate(' + st + ')');
+    }
+  }
+  const ghostParts = getVsyncGhostFilterParts();
+  if (ghostParts) { iframeFilters.push.apply(iframeFilters, ghostParts); shellFilters.push.apply(shellFilters, ghostParts); }
+
+  const localTargets = [];
+  if (video && video.style.display !== 'none') localTargets.push(video);
+  if (localArtEl && localArtEl.style.display !== 'none') localTargets.push(localArtEl);
+  const localFilter = ghostParts ? ghostParts.join(' ') : 'none';
+  for (let i = 0; i < localTargets.length; i++) {
+    applyStyleIfChanged(localTargets[i], 'filter', localFilter);
+  }
+
+  if (ytWarpShell) {
+    applyStyleIfChanged(ytWarpShell, 'filter', shellFilters.join(' '));
+    applyStyleIfChanged(ytWarpShell, 'webkitFilter', shellFilters.join(' '));
+    const op = Math.min(1, youtubeIframeVisibility * 0.94 + 0.06).toFixed(3);
+    applyStyleIfChanged(ytWarpShell, 'opacity', op);
+  }
+  const surfaces = [];
+  if (ytFrame) surfaces.push(ytFrame);
+  const liveIframe = getYouTubeIframeElement();
+  if (liveIframe) surfaces.push(liveIframe);
+  const fv = iframeFilters.join(' ');
+  for (let i = 0; i < surfaces.length; i++) {
+    applyStyleIfChanged(surfaces[i], 'filter', fv);
+    applyStyleIfChanged(surfaces[i], 'webkitFilter', fv);
+    applyStyleIfChanged(surfaces[i], 'opacity', youtubeIframeVisibility.toFixed(3));
+  }
+}
+let youtubeIframeVisibility = 1;
+let youtubeIframeVisibilityTarget = 1;
+
+/* ------------------------------------------------------------------ *
+ *  10. Ghost Protocol renderer (one snapshot + one scratch canvas)    *
+ * ------------------------------------------------------------------ */
+function renderGhostProtocol(now, baseSnapshot) {
+  const mode = getGhostMode();
+  if (mode === 'OFF' || !ghostActive || ghostLevel <= 0.01) return;
+  const w = mainCanvas.width, h = mainCanvas.height;
+  if (w === 0 || h === 0) return;
+  const t = now * 0.001;
+  const baseStrength = Math.min(1, ghostLevel * 1.2);
+  const intensity = baseStrength * masterOpacity * 0.028; // sharpened vs lite (final-006 density)
+  if (intensity <= 0) return;
+
+  const sources = { SPECTRUM: { split: 1, blur: 1, chan: 1, lines: 1, glow: 1, warp: 1, curve: 1, hueA: 120, hueB: 70, sat: 1.3, crt: 0 },
+    CRT: { split: 0.7, blur: 0.8, chan: 0.7, lines: 1.5, glow: 0.8, warp: 0.45, curve: 0.75, hueA: 55, hueB: 25, sat: 0.8, crt: 1 },
+    PLASMA: { split: 1.2, blur: 1.25, chan: 1.15, lines: 0.8, glow: 1.35, warp: 1.4, curve: 1.25, hueA: 180, hueB: 95, sat: 1.8, crt: 0 } };
+  const mp = sources[mode] || sources.SPECTRUM;
+
+  if (scratch.width !== w || scratch.height !== h) { scratch.width = w; scratch.height = h; }
+  scratchCtx.clearRect(0, 0, w, h);
+  scratchCtx.save();
+  scratchCtx.globalAlpha = 1;
+  const hueDeg = (Math.sin(t * 0.8) * mp.hueA + Math.cos(t * 0.33) * mp.hueB + videoPalette.hue + comboProfile.hueOffset * 0.3);
+  const crtGray = mp.crt ? (0.55 + baseStrength * 0.35) : (0.25 + baseStrength * 0.45);
+  if ('filter' in scratchCtx) {
+    scratchCtx.filter = 'grayscale(' + crtGray.toFixed(2) + ') hue-rotate(' + hueDeg.toFixed(2) + 'deg) saturate(' + (1.1 + baseStrength * mp.sat).toFixed(2) + ') contrast(' + (1 + baseStrength * 0.95).toFixed(2) + ') brightness(' + (1 + baseStrength * 0.35).toFixed(2) + ')';
+  }
+  scratchCtx.drawImage(baseSnapshot, 0, 0, w, h);
+  scratchCtx.restore();
+  scratchCtx.filter = 'none';
+
+  const splitOffset = (1 + intensity * 180) * mp.split;
+  const smear = (0.35 + intensity * 45) * mp.blur;
+  const channelAlpha = Math.min(0.2, (0.035 + intensity * 8.5) * mp.chan);
+  const lineAlpha = Math.min(0.12, (0.02 + intensity * 5.2) * mp.lines);
+  const glowAlpha = Math.min(0.11, (0.02 + intensity * 4.2) * mp.glow);
+  const warpAlpha = Math.min(0.12, (0.01 + intensity * 5.6) * mp.warp);
+  const curveAlpha = Math.min(0.1, (0.02 + intensity * 4.8) * mp.curve);
+
+  gctx.save();
+  gctx.globalCompositeOperation = 'screen';
+  gctx.globalAlpha = channelAlpha;
+  if ('filter' in gctx) gctx.filter = 'blur(' + smear.toFixed(1) + 'px)';
+  gctx.drawImage(scratch, -splitOffset, 0, w, h);
+  gctx.drawImage(scratch, splitOffset * 0.8, splitOffset * 0.35, w, h);
+  gctx.filter = 'none';
+
+  gctx.globalCompositeOperation = 'lighter';
+  gctx.globalAlpha = lineAlpha;
+  const lineCount = mp.crt ? 22 : 14;
+  for (let i = 0; i < lineCount; i++) {
+    const y = Math.floor(((i * 53) + now * 0.08) % h);
+    const lh = 1 + (i % 3);
+    const drift = Math.sin(now * 0.012 + i * 1.73) * splitOffset * 2.2;
+    gctx.drawImage(scratch, 0, y, w, lh, drift, y, w, lh);
+  }
+
+  gctx.globalCompositeOperation = 'color-dodge';
+  gctx.globalAlpha = warpAlpha;
+  const columns = mp.crt ? 12 : 16;
+  const colWidth = Math.ceil(w / columns);
+  const warpAmp = 1 + intensity * 130;
+  for (let c = 0; c < columns; c++) {
+    const sx = c * colWidth;
+    const sw = Math.min(colWidth, w - sx);
+    if (sw <= 0) continue;
+    const wave = Math.sin(t * 5.2 + c * 0.65) * warpAmp;
+    const wave2 = Math.cos(t * 3.6 + c * 0.43) * warpAmp * 0.55;
+    gctx.drawImage(scratch, sx, 0, sw, h, sx + wave, wave2, sw, h);
+  }
+
+  if (mp.crt) {
+    gctx.globalCompositeOperation = 'overlay';
+    gctx.globalAlpha = Math.min(0.09, 0.02 + intensity * 3.5);
+    gctx.fillStyle = 'rgba(0,0,0,0.38)';
+    for (let y = 0; y < h; y += 2) gctx.fillRect(0, y, w, 1);
+  }
+
+  gctx.globalCompositeOperation = 'soft-light';
+  gctx.globalAlpha = curveAlpha;
+  const grad = gctx.createLinearGradient(0, 0, 0, h);
+  /* The tube gradient is the media palette: dark complement -> media hue
+     -> dark accent, so the ghost IS the artwork's own light curve. */
+  grad.addColorStop(0, palHSL(180, 78, 20, 1));
+  grad.addColorStop(0.5, palHSL(0, Math.min(96, videoPalette.sat + 14), 64, 1));
+  grad.addColorStop(1, palHSL(115, 76, 24, 1));
+  gctx.fillStyle = grad;
+  gctx.fillRect(0, 0, w, h);
+
+  gctx.globalCompositeOperation = 'soft-light';
+  gctx.globalAlpha = glowAlpha;
+  gctx.fillStyle = 'hsla(' + (videoPalette.hue + Math.sin(t * 1.2) * (mp.crt ? 9 : 18) + 360) % 360.0 + ', 100%, 58%, 1)';
+  gctx.fillRect(0, 0, w, h);
+  gctx.restore();
+  gctx.filter = 'none';
+}
+
+/* ------------------------------------------------------------------ *
+ *  11. V-Sync renderers — one method per mode                         *
+ *   scanphasing (ON):        smooth sweep bar + mild tear band
+ *   virtual-vertical (OFF-): virtual vertical-hold sync — soft band,
+ *                            faint field roll, NO hard tears (CSS colour
+ *                            ghosting supplies the chroma shift)
+ *   tv simulator (FULL):     full vertical-hold fault machine (tears,
+ *                            roll + pull-down snaps, 50Hz hum)
+ *   Each method's strength + opacity is driven by its own constantly
+ *   running slider script; when AI Warp is active everything backs off
+ *   (warpSoft) and the snap gate is disabled so the two scripts interlace
+ *   instead of jittering each other.
+ * ------------------------------------------------------------------ */
+const V_SYNC_METHODS = {
+  ON:        { bar: 1.0,  tears: 0.5,  roll: 0,    hum: 0.4, snap: 0, channels: 0.5 },
+  GHOST_OFF: { bar: 0.3,  tears: 0.1,  roll: 0.16, hum: 0.2, snap: 0, channels: 1.0 },
+  FULL:      { bar: 1.15, tears: 1,    roll: 1,    hum: 1,   snap: 1, channels: 0.75 }
+};
+
+function renderVsyncScan(now, baseSnapshot) {
+  const mode = getVsyncMode();
+  if (mode === 'OFF') return;
+  const levelRaw = activeVsyncLevel();
+  if (!(levelRaw > 0.01)) return;
+  const w = mainCanvas.width, h = mainCanvas.height;
+  if (w === 0 || h === 0) return;
+  const meth = V_SYNC_METHODS[mode] || V_SYNC_METHODS.ON;
+  const warpSoft = isAiWarpActive ? 0.72 : 1; // lenient intertwine with AI Warp
+  const t = now * 0.001;
+  const level = Math.min(1, levelRaw * (mode === 'FULL' ? 1.55 : 1.3)) * (0.78 + 0.22 * warpSoft);
+  const globalFade = clamp01(0.08 + masterOpacity * 0.24);
+  if (!(level > 0.01) || !(globalFade > 0)) return;
+
+  const scanSpeedHz = (0.22 + level * 0.3) * (warpSoft < 1 ? 0.85 : 1);
+  const scanWobble = Math.sin(t * 0.23) * 0.06 + Math.cos(t * 0.11 + 1.2) * 0.04;
+  const scanPos = (t * scanSpeedHz + scanWobble) % 1;
+  const scanY = scanPos * h;
+  const scanThickness = Math.max(1, h * 0.008) * (0.7 + 0.3 * meth.bar);
+
+  // Ghost Protocol interlacing: borrow the ghost hue/glow palette when live.
+  const ghostOn = ghostActive && ghostLevel > 0.01;
+  const ghostSync = ghostOn ? clamp01(ghostLevel * 1.2) : 0;
+  const confluenceHue = comboProfile.hueOffset * 0.35;
+  /* The v-hold sweep is the media's own hue: the bar reads as the artwork
+     being held, not an arbitrary cyan/green raster. */
+  const scanGradientHue = (ghostOn
+    ? (videoPalette.hue + 10 + Math.sin(t * 1.2) * 18 + confluenceHue)
+    : (videoPalette.hue + 20 + Math.sin(t * 0.7) * 16 + confluenceHue)) % 360;
+
+  const hum14ms = Math.sin(t * 62.832);
+  const humAmp = (0.015 + level * 0.045) * meth.hum;
+  const phase = Math.sin(t * 1.35 * (0.6 + 0.4 * meth.tears)) * 0.22 + Math.cos(t * 0.53) * 0.11 + hum14ms * humAmp;
+  const rollActive = meth.roll > 0 && phase < -0.03 && Math.sin(t * 0.9 + 1.3) > -0.1;
+  const rollDir = phase >= 0 ? 1 : -1;
+  const rollSpeedHz = (0.05 + level * 0.12) * rollDir * (0.6 + 0.4 * meth.roll);
+  const rollPhase = rollActive ? ((t * rollSpeedHz) % 1) : 0;
+  // Snap gate (pull-down) only in tv-simulator mode, never while warping —
+  // hard steps are exactly what would shake the AI Warp script into loops.
+  const snapGate = (meth.snap && rollActive && !isAiWarpActive) ? Math.floor(t * 12) % 8 : 0;
+  const rollShift = rollActive ? rollPhase * h * 0.5 * snapGate * 0.125 * meth.roll * warpSoft : 0;
+
+  const tearCount = Math.max(1, Math.round((mode === 'FULL' ? 14 : mode === 'ON' ? 8 : 3) * meth.tears * (0.35 + 0.65 * level)));
+  const tearGap = Math.max(2, Math.round(h / tearCount));
+  const sliceHeight = Math.max(2, Math.round(h * 0.006));
+  const jam = level * (0.24 + 0.19 * Math.abs(Math.sin(t * 6.13 + 1.7))) * meth.tears * warpSoft;
+
+  gctx.save();
+  // sweep bar (virtual-vertical keeps a gentle "virtual" band)
+  const barGrad = gctx.createLinearGradient(0, scanY - scanThickness, 0, scanY + scanThickness);
+  barGrad.addColorStop(0, 'hsla(' + scanGradientHue.toFixed(1) + ', 90%, 70%, 0)');
+  barGrad.addColorStop(0.5, 'hsla(' + scanGradientHue.toFixed(1) + ', 90%, 68%, ' + Math.min(0.2, (0.10 + level * 0.1) * meth.bar * (0.85 + 0.15 * (1 + ghostSync))).toFixed(3) + ')');
+  barGrad.addColorStop(1, 'hsla(' + scanGradientHue.toFixed(1) + ', 90%, 70%, 0)');
+  gctx.globalCompositeOperation = 'screen';
+  gctx.globalAlpha = globalFade * warpSoft;
+  gctx.fillStyle = barGrad;
+  gctx.fillRect(0, scanY - scanThickness, w, scanThickness * 2);
+
+  // tear slices from the clean snapshot (only the ones the band swipes)
+  if (meth.tears > 0.05) {
+    gctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < tearCount; i++) {
+      const bandY = (scanY + i * tearGap) % h;
+      const above = phase >= 0;
+      const offset = (Math.sin(t * 7.1 + i * 2.4) * 0.55 + Math.sin(t * 3.7 + i * 0.9) * 0.3) * jam * (above ? 1 : 0.55);
+      const gx = offset * w * 0.5;
+      gctx.drawImage(baseSnapshot, 0, bandY, w, sliceHeight, gx, bandY, w, sliceHeight * meth.channels);
+      gctx.drawImage(baseSnapshot, 0, bandY - h, w, sliceHeight, -gx * 0.55, bandY - h, w, sliceHeight * meth.channels);
+    }
+  }
+
+  // picture roll: the whole frame slides while the v-hold hunts
+  if (rollActive) {
+    gctx.globalCompositeOperation = 'source-over';
+    gctx.globalAlpha = clamp01(0.1 + level * 0.14) * globalFade * meth.roll * warpSoft;
+    gctx.drawImage(baseSnapshot, 0, rollShift, w, h, 0, rollShift, w, h);
+  }
+  gctx.restore();
+}
+
+/* Constantly-running V-Sync script: each active mode wanders its own
+   strength/opacity on its own cadence (user drags win for a few seconds,
+   then the script resumes). Runs every frame; cheap. */
+function vsyncStepScript(now, dt) {
+  const mode = getVsyncMode();
+  if (mode === 'OFF') {
+    vsyncActive = false;
+    if (vsyncScanSlider && !vsyncScanSlider.disabled) {
+      vsyncScanSlider.disabled = true;
+      vsyncScanSlider.value = '0';
+    }
+    if (vsyncScanLabelEl) vsyncScanLabelEl.textContent = 'V-Sync: OFF (parked)';
+    if (vsyncScanBtn && vsyncScanBtn.textContent !== 'V-SYNC: OFF') vsyncScanBtn.textContent = 'V-SYNC: OFF';
+    return;
+  }
+  const s = vsyncScripts[mode];
+  const warp = isAiWarpActive;
+  const manual = now < vsyncManualUntil;
+
+  // Lock freezes level — no retarget, no auto-wander.
+  if (sliderLocks.vsync) {
+    s.target = s.level;
+    s.nextAt = now + 5000;
+  } else if (!manual && now >= s.nextAt) {
+    const band = vsyncBand(mode);
+    const dramatic = !warp && Math.random() < 0.16; // no slams while warping
+    s.target = dramatic
+      ? (Math.random() < 0.5 ? 1 : 0.05)
+      : band[0] + Math.random() * (band[1] - band[0]);
+    if (warp) s.target = Math.min(s.target, 0.8); // lenient ceiling under AI Warp
+    const base = mode === 'FULL' ? 2600 : mode === 'ON' ? 3000 : 3600;
+    s.nextAt = now + base * (0.6 + Math.random()) * (warp ? 1.7 : 1);
+  }
+
+  if (manual || sliderLocks.vsync) {
+    s.level = s.target; // user drag / lock holds exactly
+  } else {
+    const rate = (mode === 'FULL' ? 1.35 : mode === 'ON' ? 1.0 : 0.85) * (warp ? 0.5 : 1);
+    const next = easeExp(s.level, s.target, dt, rate);
+    if (Math.abs(next - s.level) > 0.0005) {
+      s.level = next;
+      if (vsyncScanSlider && (s.shown === undefined || Math.abs(next - s.shown) > 0.005)) {
+        s.shown = next;
+        vsyncScanSlider.value = s.level.toFixed(3);
+      }
+    }
+  }
+  vsyncActive = s.level > 0.01;
+
+  const pct = Math.round(s.level * 100);
+  if (pct !== s.lastPct) { s.lastPct = pct; updateVsyncUi(); }
+}
+
+/* ------------------------------------------------------------------ *
+ *  12. AI Warp (lean: CSS layers + throttled single-octave SVG)       *
+ * ------------------------------------------------------------------ */
+const feTurb = $('ai-turbulence');
+const feDisp = $('ai-displacement');
+const feHue = $('ai-color-matrix');
+const aiWarpCached = { hue: -999, freq: -999, disp: -999, lastUpdate: 0 };
+let aiWarpHue = 0;
+
+function updateAiWarp(now) {
+  if (!isAiWarpActive) return;
+  const hueStrength = (effectAlphas['Hue/Color Cycle'] || 0) * masterOpacity;
+  const rainbowStrength = (effectAlphas['HSL Rainbow'] || 0) * masterOpacity;
+  /* Ultra-slow aesthetic drift around the media's anchor hue. */
+  aiWarpHue = (videoPalette.hue + ((now * 0.018) % 360) * 0.18 + hueStrength * 70 + rainbowStrength * 24) % 360;
+
+  // SVG filter: rare updates, tiny displacement — liquid finesse, not tear.
+  if (feTurb && feDisp && now - aiWarpCached.lastUpdate > 200) {
+    aiWarpCached.lastUpdate = now;
+    const freq = Math.max(0.0004, 0.0010 + Math.sin(now / 48000) * 0.0003 + hueStrength * 0.00025);
+    if (Math.abs(freq - aiWarpCached.freq) > 0.00004 && 'setAttribute' in feTurb) {
+      feTurb.setAttribute('baseFrequency', freq.toFixed(5));
+      aiWarpCached.freq = freq;
+    }
+    const warpPulse = (Math.sin(now * 0.00009) + 1) / 2;
+    const crunchWave = (Math.sin(now * 0.00006 + 1.4) + 1) / 2;
+    const dist = Math.round(1.5 + crunchWave * 2.5 + warpPulse * 2 + hueStrength * 3 + rainbowStrength * 1.5);
+    if (dist !== aiWarpCached.disp) {
+      feDisp.setAttribute('scale', String(dist));
+      aiWarpCached.disp = dist;
+    }
+    if (feHue && Math.abs(aiWarpHue - aiWarpCached.hue) > 0.15) {
+      feHue.setAttribute('values', aiWarpHue.toFixed(1));
+      aiWarpCached.hue = aiWarpHue;
+    }
+  }
+  applyYouTubeWarpMotion(now, hueStrength);
+}
+
+/* Smoothed motion state so Warp / Bands / VHS never snap between frames. */
+const ytMotion = { x: 0, y: 0, sx: 1, sy: 1, kx: 0, ky: 0 };
+function applyYouTubeWarpMotion(currentTime, hueStrength) {
+  const iframe = getYouTubeIframeElement();
+  const surfaces = [ytWarpShell, ytFrame, iframe].filter(Boolean);
+  const t = currentTime * 0.001;
+  const harm = boardHarmony();
+  const motion = clamp01(masterControls.motionScale);
+  const bands = clamp01((effectAlphas['Data Bands'] || 0) * masterOpacity) * harm * motion;
+  const vhs = clamp01((effectAlphas['VHS Glitch'] || 0) * masterOpacity) * harm * motion;
+  const glow = motionGlow();
+  const warpOn = !!isAiWarpActive;
+
+  // Nothing driving the YouTube surface → hard reset.
+  if (!warpOn && bands < 0.01 && vhs < 0.01) {
+    const reset = 'translate3d(0,0,0) scale(1) skew(0deg,0deg)';
+    if (domCache.surfacesReset !== reset) {
+      surfaces.forEach((el) => {
+        el.style.transform = reset;
+        el.style.transformOrigin = '50% 50%';
+        el.style.willChange = 'auto';
+      });
+      domCache.shellWillChange = 'auto';
+      if (mainCanvas) {
+        mainCanvas.style.transform = reset;
+        mainCanvas.style.transformOrigin = '50% 50%';
+      }
+      domCache.surfacesReset = reset;
+      domCache.shellTransform = reset;
+      domCache.iframeTransform = reset;
+      domCache.canvasTransform = reset;
+      domCache.frameTransform = reset;
+      ytMotion.x = ytMotion.y = ytMotion.kx = ytMotion.ky = 0;
+      ytMotion.sx = ytMotion.sy = 1;
+    }
+    return;
+  }
+  domCache.surfacesReset = null;
+
+  // --- AI Warp liquid drift (same as before when warp is on) ---
+  let driftX = 0, driftY = 0, scaleX = 1, scaleY = 1, skewX = 0, skewY = 0;
+  if (warpOn) {
+    // Ultra-slow liquid drift — stable, fluent, barely perceptible tear.
+    driftX += Math.sin(t * 0.032) * 1.1 + Math.sin(t * 0.014 + 0.8) * 0.7;
+    driftY += Math.cos(t * 0.026 + 1.1) * 0.85;
+    scaleX *= 1.006 + Math.sin(t * 0.022 + 1.7) * 0.004 + (hueStrength || 0) * 0.002;
+    scaleY *= 1.006 - Math.sin(t * 0.022 + 1.7) * 0.003;
+    skewX += Math.sin(t * 0.04 + Math.cos(t * 0.018)) * 0.22;
+    skewY += Math.cos(t * 0.032 + 0.6) * 0.14;
+  }
+
+  // --- Data Bands: rolling horizontal shear (VHS tracking roll) ---
+  // Affects the actual YouTube iframe via CSS because we cannot sample it.
+  if (bands > 0.01) {
+    // Slow tracking roll — stable, fluent.
+    const roll = t * (0.35 + bands * 0.55);
+    const wobble = bands * 7 * glow;
+    driftX += Math.sin(roll) * wobble * 0.45 + Math.sin(roll * 0.3 + 1.1) * wobble * 0.25;
+    driftY += Math.cos(roll * 0.45) * bands * 1.6 * glow;
+    skewX += Math.sin(roll * 0.55) * bands * 1.4 * glow;
+    skewY += Math.cos(roll * 0.35 + 0.4) * bands * 0.55;
+    scaleX *= 1 + bands * 0.005;
+    scaleY *= 1 - bands * 0.003;
+  }
+
+  // --- VHS Glitch: hard horizontal slice jitter ---
+  if (vhs > 0.01) {
+    // Soft, slow slice sway — no hard stepwise slam.
+    const jam = vhs * 8 * glow;
+    const phase = t * (1.1 + vhs * 1.4);
+    driftX += Math.sin(phase) * jam * 0.55 + Math.sin(t * 2.4) * jam * 0.2;
+    driftY += Math.cos(phase * 0.6) * vhs * 1.8;
+    skewX += Math.sin(t * 1.6 + phase * 0.3) * vhs * 1.8 * glow;
+    skewY += Math.cos(t * 1.2) * vhs * 0.7;
+    scaleX *= 1 + vhs * 0.007;
+    scaleY *= 1 - vhs * 0.005;
+  }
+
+  // Ease motion state so all drivers (warp/bands/vhs) blend fluently.
+  const easeK = 0.08; // low-pass — stable, no jitter between systems
+  const mScale = clamp01(masterControls.motionScale);
+  driftX *= mScale; driftY *= mScale;
+  skewX *= mScale; skewY *= mScale;
+  scaleX = 1 + (scaleX - 1) * mScale;
+  scaleY = 1 + (scaleY - 1) * mScale;
+  ytMotion.x += (driftX - ytMotion.x) * easeK;
+  ytMotion.y += (driftY - ytMotion.y) * easeK;
+  ytMotion.sx += (scaleX - ytMotion.sx) * easeK;
+  ytMotion.sy += (scaleY - ytMotion.sy) * easeK;
+  ytMotion.kx += (skewX - ytMotion.kx) * easeK;
+  ytMotion.ky += (skewY - ytMotion.ky) * easeK;
+  driftX = ytMotion.x; driftY = ytMotion.y;
+  scaleX = ytMotion.sx; scaleY = ytMotion.sy;
+  skewX = ytMotion.kx; skewY = ytMotion.ky;
+
+  if (ytWarpShell) {
+    const tf = 'translate3d(' + driftX.toFixed(2) + 'px,' + driftY.toFixed(2) + 'px,0) scale(' +
+      scaleX.toFixed(4) + ',' + scaleY.toFixed(4) + ') skew(' + skewX.toFixed(2) + 'deg,' + skewY.toFixed(2) + 'deg)';
+    if (domCache.shellTransform !== tf) {
+      domCache.shellTransform = tf;
+      ytWarpShell.style.transform = tf;
+      ytWarpShell.style.transformOrigin = '50% 50%';
+      if (domCache.shellWillChange !== 'transform') {
+        ytWarpShell.style.willChange = 'transform';
+        domCache.shellWillChange = 'transform';
+      }
+    }
+    // Keep the overlay canvas locked to the warped YouTube surface.
+    if (mainCanvas && ytWarpShell.style.display !== 'none') {
+      if (domCache.canvasTransform !== tf) {
+        domCache.canvasTransform = tf;
+        mainCanvas.style.transform = tf;
+        mainCanvas.style.transformOrigin = '50% 50%';
+      }
+    }
+  }
+
+  if (ytFrame) {
+    const fx = driftX * 0.55 + (bands > 0.01 ? Math.sin(t * 0.82) * bands * 6 : 0) + (vhs > 0.01 ? Math.sin(t * 9.2) * vhs * 8 : 0);
+    const fy = driftY * 0.45 + (vhs > 0.01 ? Math.cos(t * 6.4) * vhs * 3 : 0);
+    const fskx = skewX * 0.7 + vhs * Math.sin(t * 4.1) * 2.5;
+    const fsky = skewY * 0.7;
+    const tf = 'translate3d(' + fx.toFixed(2) + 'px,' + fy.toFixed(2) + 'px,0) scale(' +
+      (1 + bands * 0.008 + vhs * 0.012).toFixed(4) + ',' + (1 - bands * 0.006 - vhs * 0.01).toFixed(4) +
+      ') skew(' + fskx.toFixed(2) + 'deg,' + fsky.toFixed(2) + 'deg)';
+    if (domCache.frameTransform !== tf) {
+      domCache.frameTransform = tf;
+      ytFrame.style.transform = tf;
+      ytFrame.style.transformOrigin = '50% 50%';
+    }
+  }
+
+  if (iframe) {
+    // Inner iframe gets the strongest VHS slice motion so the picture itself tears.
+    const ix = driftX * 0.85
+      + (bands > 0.01 ? Math.sin(t * 0.4 + 0.3) * bands * 5 * glow : 0)
+      + (vhs > 0.01 ? Math.sin(t * 2.2) * vhs * 5 * glow + Math.sin(t * 1.4) * vhs * 2.5 : 0);
+    const iy = driftY * 0.7
+      + (vhs > 0.01 ? Math.cos(t * 8.9) * vhs * 6 : 0);
+    const iskx = skewX * 0.9 + (vhs > 0.01 ? Math.sin(t * 1.5) * vhs * 1.6 * glow : 0)
+      + (bands > 0.01 ? Math.sin(t * 0.35) * bands * 1.2 : 0);
+    const isky = skewY * 0.85 + (bands > 0.01 ? Math.cos(t * 0.7) * bands * 1.4 : 0);
+    const isx = 1.01 + (hueStrength || 0) * 0.012 + bands * 0.015 + vhs * 0.022;
+    const isy = 1.01 - (hueStrength || 0) * 0.007 - bands * 0.01 - vhs * 0.016;
+    const tf = 'translate3d(' + ix.toFixed(2) + 'px,' + iy.toFixed(2) + 'px,0) scale(' +
+      isx.toFixed(4) + ',' + isy.toFixed(4) + ') skew(' + iskx.toFixed(2) + 'deg,' + isky.toFixed(2) + 'deg)';
+    if (domCache.iframeTransform !== tf) {
+      domCache.iframeTransform = tf;
+      iframe.style.transform = tf;
+      iframe.style.transformOrigin = '50% 50%';
+    }
+  }
+}
+
+/* Colour-shift overlay (folded into the main loop, no third rAF). */
+const shiftOverlay = document.createElement('div');
+shiftOverlay.id = 'color-shift-overlay';
+Object.assign(shiftOverlay.style, {
+  position: 'fixed', inset: '0', pointerEvents: 'none',
+  mixBlendMode: 'color-dodge', zIndex: '10000', opacity: '0', transition: 'opacity 0.8s ease'
+});
+let shiftOverlayMounted = false;
+let shiftGradient = '', shiftGradientTime = 0, lastShiftOpacity = '';
+
+function updateShiftOverlay(now) {
+  const active = isAiWarpActive || (comboProfile.hueOffset > 4 && comboProfile.satMult > 1.02);
+  if (!active) {
+    if (shiftOverlayMounted) { shiftOverlay.style.opacity = '0'; shiftOverlayMounted = false; }
+    return;
+  }
+  if (!shiftOverlayMounted) {
+    document.body.appendChild(shiftOverlay);
+    shiftOverlayMounted = true;
+  }
+  if (now - shiftGradientTime > 8000 || !shiftGradient) {
+    shiftGradientTime = now;
+    const base = aiWarpHue % 360;
+    const angle = 100 + Math.random() * 160;
+    /* Tighter spread around the media anchor: the overlay reads as the
+       artwork's palette breathing, not a random carnival wash. */
+    shiftGradient = 'linear-gradient(' + angle.toFixed(0) + 'deg,' +
+      'hsl(' + ((base - 30 + Math.random() * 60) % 360).toFixed(0) + ',100%,62%),' +
+      'hsl(' + ((base + 80 + Math.random() * 70) % 360).toFixed(0) + ',100%,60%),' +
+      'hsl(' + ((base + 190 + Math.random() * 70) % 360).toFixed(0) + ',100%,58%))';
+    shiftOverlay.style.background = shiftGradient;
+  }
+  const hueStrength = (effectAlphas['Hue/Color Cycle'] || 0) * masterOpacity;
+  const rainbowStrength = (effectAlphas['HSL Rainbow'] || 0) * masterOpacity;
+  const pulse = (Math.sin(now / 12000 * Math.PI * 2) + 1) / 2;
+  const intensity = (0.14 + pulse * 0.22 + hueStrength * 0.12 + rainbowStrength * 0.09).toFixed(3);
+  if (lastShiftOpacity !== intensity) {
+    lastShiftOpacity = intensity;
+    shiftOverlay.style.opacity = intensity;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  13. Canvas sizing (resize-driven only — no per-frame layout)       *
+ * ------------------------------------------------------------------ */
+let lastCssW = 0, lastCssH = 0, lastDpr = 0;
+function resizeGlitchCanvas(force) {
+  const cssW = window.innerWidth, cssH = window.innerHeight;
+  const dpr = Math.min(window.devicePixelRatio || 1, renderBudget.pixelCap);
+  if (!force && cssW === lastCssW && cssH === lastCssH && dpr === lastDpr) return;
+  lastCssW = cssW; lastCssH = cssH; lastDpr = dpr;
+  const w = Math.max(1, Math.floor(cssW * renderBudget.scale * dpr));
+  const h = Math.max(1, Math.floor(cssH * renderBudget.scale * dpr));
+  if (mainCanvas.width !== w) mainCanvas.width = w;
+  if (mainCanvas.height !== h) mainCanvas.height = h;
+  mainCanvas.style.width = cssW + 'px';
+  mainCanvas.style.height = cssH + 'px';
+  gctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+window.addEventListener('resize', () => resizeGlitchCanvas(false));
+
+/* ------------------------------------------------------------------ *
+ *  14. Continual randomization — timing modes + friendly blend        *
+ *  Modes cycle while Continual is ON:
+ *    smooth   — soft exponential ease toward targets
+ *    snap     — fast settle (almost stepped)
+ *    flipflop — mirrors / swaps high↔low levels between peaks
+ *    burst    — short aggressive ramps toward extremes
+ *    linger   — holds the current board, only micro-drifts
+ *  Timing interpolation feeds smoothedStrength + comboProfile so every
+ *  visual effect (colour, overlays, ASCII, VHS, Ghost, V-Sync) merges
+ *  on the same musical clock instead of fighting each other.
+ * ------------------------------------------------------------------ */
+let activePeakEffects = new Set();
+const TIMING_MODES = ['smooth', 'snap', 'flipflop', 'burst', 'linger'];
+let randBehavior = 'smooth';
+let nextBehaviorChange = performance.now() + 2800 + Math.random() * 2200;
+let nextRetargetAt = performance.now() + 2600;
+let burstUntil = 0;
+let lingerUntil = 0;
+let burstDir = {};
+let flipFlopPhase = 0;
+let ghostRandomTarget = ghostLevel;
+/* Per-effect ease rates modulated by the active timing mode so colour
+   washes, overlay alphas and geometry effects all share one tempo. */
+const timingRateScale = {
+  smooth:  1.0,
+  snap:    4.2,
+  flipflop:2.4,
+  burst:   5.5,
+  linger:  0.28
+};
+const sliderWritten = {};
+const PARKED_EPSILON = 0.02;
+
+function randRange(r) { return r[0] + Math.random() * (r[1] - r[0]); }
+
+function pickPeakEffects(count) {
+  const pool = peakPool.slice();
+  const out = new Set();
+  while (out.size < count && pool.length) {
+    out.add(pool.splice((Math.random() * pool.length) | 0, 1)[0]);
+  }
+  return out;
+}
+
+function pickTimingMode(now) {
+  // Weighted: smooth is most common, linger and burst rarer so the board
+  // breathes instead of constantly slamming.
+  const roll = Math.random();
+  if (roll < 0.34) return 'smooth';
+  if (roll < 0.52) return 'snap';
+  if (roll < 0.68) return 'flipflop';
+  if (roll < 0.84) return 'burst';
+  return 'linger';
+}
+
+function retargetRandomization(now) {
+  activePeakEffects = pickPeakEffects(3 + ((Math.random() * 2) | 0));
+  const mode = randBehavior;
+  /* Coordination with Auto Glitch: suppress mass slam events when both run. */
+  const allowWild = !isAutoGlitching;
+  const mirror = allowWild && (mode === 'flipflop' || Math.random() < 0.18);
+  const burst = allowWild && (mode === 'burst' || Math.random() < 0.12);
+  if (burst) {
+    burstUntil = now + 1600 + Math.random() * 1800;
+    burstDir = {};
+  }
+  if (mode === 'linger') {
+    lingerUntil = now + 2200 + Math.random() * 2800;
+  }
+  if (mode === 'flipflop') flipFlopPhase = (flipFlopPhase + 1) & 1;
+
+  for (let i = 0; i < profileNames.length; i++) {
+    const name = profileNames[i];
+    if (sliderLocks[name]) continue;
+    const profile = blendProfiles[name];
+    const cur = effectAlphas[name] || 0;
+    let target;
+
+    if (mode === 'linger') {
+      // Micro-drift around the current seed — hold the look.
+      target = clamp(cur + (Math.random() - 0.5) * 0.06, 0, MAX_EFFECT_CAP);
+    } else if (mirror || mode === 'flipflop') {
+      // Flip-flop: invert relative to mid, bias peaks opposite each other.
+      const inv = clamp((1 - cur) * 0.78 + cur * 0.22, 0, MAX_EFFECT_CAP);
+      if (mode === 'flipflop' && activePeakEffects.has(name)) {
+        target = flipFlopPhase ? Math.max(inv, profile.peak[0]) : Math.min(cur * 0.35, profile.ambient[1]);
+      } else {
+        target = inv;
+      }
+    } else if (mode === 'burst') {
+      const isPeak = activePeakEffects.has(name);
+      target = isPeak
+        ? randRange([Math.max(profile.peak[0], 0.45), Math.min(1, profile.peak[1] + 0.15)])
+        : randRange([0, profile.ambient[1] * 0.7]);
+      if (Math.random() < 0.2) target = Math.random() < 0.5 ? 0 : Math.min(1, MAX_EFFECT_CAP);
+    } else if (mode === 'snap') {
+      const isPeak = activePeakEffects.has(name);
+      const range = isPeak ? profile.peak : profile.ambient;
+      // Quantize to a few stepped levels for a hard digital feel.
+      const steps = [0, 0.15, 0.35, 0.55, 0.75, MAX_EFFECT_CAP];
+      target = steps[(Math.random() * steps.length) | 0];
+      if (isPeak) target = Math.max(target, range[0]);
+    } else {
+      // smooth
+      const isPeak = activePeakEffects.has(name);
+      const range = isPeak ? profile.peak : profile.ambient;
+      target = randRange(range);
+      if (allowWild && Math.random() < 0.1) target = 1;
+    }
+
+    if (target < PARKED_EPSILON && mode !== 'linger' && mode !== 'burst') {
+      target = PARKED_EPSILON + Math.random() * 0.05;
+    }
+    randomTargets[name] = Math.min(target, MAX_EFFECT_CAP);
+    if (burst) burstDir[name] = (randomTargets[name] || 0) >= cur ? 1 : -1;
+  }
+
+  if (!sliderLocks.global) {
+    if (mode === 'linger') {
+      randomTargets.global = clamp(masterOpacity + (Math.random() - 0.5) * 0.04, 0.4, 1);
+    } else if (mode === 'snap') {
+      randomTargets.global = [0.55, 0.7, 0.85, 1][(Math.random() * 4) | 0];
+    } else if (mode === 'burst') {
+      randomTargets.global = Math.random() < 0.35 ? 1 : randRange([0.5, 0.95]);
+    } else {
+      randomTargets.global = Math.random() < 0.12 ? 1 : randRange([0.55, 0.92]);
+    }
+    if (burst) burstDir.global = randomTargets.global >= masterOpacity ? 1 : -1;
+  } else {
+    randomTargets.global = masterOpacity;
+  }
+
+  if (getGhostMode() !== 'OFF') {
+    if (mode === 'linger') ghostRandomTarget = clamp(ghostLevel + (Math.random() - 0.5) * 0.05, 0.2, 1);
+    else if (mode === 'burst') ghostRandomTarget = Math.random() < 0.3 ? 1 : randRange([0.4, 1]);
+    else ghostRandomTarget = Math.random() < 0.2 ? 1 : randRange([0.3, 1]);
+  }
+
+  // Cadence depends on mode: linger holds longer, burst retargets sooner.
+  const cadence = {
+    smooth:  [2800, 3600],
+    snap:    [1600, 2400],
+    flipflop:[2000, 2800],
+    burst:   [1200, 2000],
+    linger:  [3200, 4800]
+  }[mode] || [2600, 3400];
+  nextRetargetAt = now + (cadence[0] + Math.random() * (cadence[1] - cadence[0])) * (isAutoGlitching ? 1.45 : 1);
+}
+
+function stepContinualRandomization(now, dt) {
+  if (now >= nextBehaviorChange) {
+    randBehavior = pickTimingMode(now);
+    // Linger and burst self-extend via their until clocks; others switch on a beat.
+    const hold = {
+      smooth:  [3200, 5000],
+      snap:    [1800, 3200],
+      flipflop:[2200, 3800],
+      burst:   [1400, 2600],
+      linger:  [2800, 5200]
+    }[randBehavior] || [2400, 4000];
+    nextBehaviorChange = now + hold[0] + Math.random() * (hold[1] - hold[0]);
+    // Entering burst/linger also schedules their short windows.
+    if (randBehavior === 'burst') {
+      burstUntil = now + 1400 + Math.random() * 1600;
+      burstDir = {};
+    }
+    if (randBehavior === 'linger') {
+      lingerUntil = now + 2000 + Math.random() * 2600;
+    }
+  }
+  if (now >= nextRetargetAt) retargetRandomization(now);
+
+  const burstOn = now < burstUntil;
+  const lingerOn = now < lingerUntil || randBehavior === 'linger';
+  const modeScale = timingRateScale[randBehavior] || 1;
+
+  for (let i = 0; i < profileNames.length; i++) {
+    const name = profileNames[i];
+    if (sliderLocks[name]) continue;
+    const target = randomTargets[name];
+    if (target === undefined) continue;
+    const cur = effectAlphas[name] || 0;
+    let rate = (blendProfiles[name].rate || 0.2) * 1.35 * modeScale * (0.75 + 0.25 * boardHarmony()) * (0.4 + 1.4 * clamp01(masterControls.continualSpeed));
+    if (burstOn) rate *= (burstDir[name] > 0 ? 1.8 : 1.35);
+    if (lingerOn && randBehavior === 'linger') rate *= 0.55;
+    // Snap: almost step — high rate with a small deadzone jump.
+    let next;
+    if (randBehavior === 'snap' && Math.abs(target - cur) > 0.04 && Math.random() < 0.35) {
+      next = cur + (target - cur) * 0.55; // partial hard step
+    } else {
+      next = easeExp(cur, target, dt, rate);
+    }
+    if (Math.abs(next - cur) > 0.0004) {
+      effectAlphas[name] = next;
+      const el = sliderElements[name];
+      if (el && (sliderWritten[name] === undefined || Math.abs(next - sliderWritten[name]) > 0.006)) {
+        sliderWritten[name] = next;
+        el.value = next.toFixed(3);
+      }
+    }
+  }
+
+  if (!sliderLocks.global && randomTargets.global !== undefined) {
+    let rate = 1.5 * modeScale;
+    if (burstOn) rate *= (burstDir.global || 1) > 0 ? 1.7 : 1.3;
+    const next = easeExp(masterOpacity, randomTargets.global, dt, rate);
+    if (Math.abs(next - masterOpacity) > 0.0004) {
+      masterOpacity = next;
+      if (globalSliderEl && (sliderWritten.global === undefined || Math.abs(next - sliderWritten.global) > 0.006)) {
+        sliderWritten.global = next;
+        globalSliderEl.value = next.toFixed(3);
+      }
+    }
+  }
+  if (getGhostMode() !== 'OFF' && !(ghostProtocolSlider && document.activeElement === ghostProtocolSlider)) {
+    const next = easeExp(ghostLevel, ghostRandomTarget, dt, 1.6 * Math.min(2.2, modeScale));
+    if (Math.abs(next - ghostLevel) > 0.0004) {
+      ghostLevel = next;
+      if (ghostProtocolSlider) ghostProtocolSlider.value = next.toFixed(3);
+      updateGhostUi();
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  15. Auto glitch (eased layer + occasional sparks)                  *
+ * ------------------------------------------------------------------ */
+let autoGlitchLevel = 0;
+const AUTO_GLITCH_EASE_RATE = 0.32;
+const autoGlitchInstances = [];
+let nextSparkAt = 0;
+/* Parked sliders are woken one at a time at random intervals while auto
+   glitch runs; these three are zeroed again the moment it is toggled off. */
+let nextUnparkAt = 0;
+const AUTO_GLITCH_SHUTDOWN_EFFECTS = ['Tech Artist', 'B&W Invert', 'ASCII'];
+
+function autoGlitchUnpark(now) {
+  /* Single-writer rule: while Continual Randomization is live it owns the
+     effect sliders. Auto Glitch does not touch parked sliders or kick
+     sparks then — it only layers its additive envelope on top. That removes
+     the tug-of-war where both systems rewrote the same sliders mid-ease. */
+  if (isContinuallyRandomizing || !isAutoGlitching || now < nextUnparkAt) return;
+  nextUnparkAt = now + 2000 + Math.random() * 4500;
+  const parked = profileNames.filter((n) =>
+    !sliderLocks[n] && (effectAlphas[n] || 0) < PARKED_EPSILON);
+  if (!parked.length) return;
+  const name = parked[(Math.random() * parked.length) | 0];
+  const profile = blendProfiles[name];
+  const value = profile ? randRange(profile.ambient) : 0.05 + Math.random() * 0.1;
+  effectAlphas[name] = value;
+  randomTargets[name] = value; // keep continual randomization from fighting the wake
+  if (sliderElements[name]) sliderElements[name].value = value.toFixed(3);
+  updateContinuousEffectsCache(name);
+}
+
+function autoGlitchPulse(now) {
+  return clamp01(0.55 + 0.45 * Math.sin(now * 0.0004) * Math.sin(now * 0.0007 + 1.3));
+}
+function autoGlitchStep(now, dt) {
+  const target = isAutoGlitching ? 1 : 0;
+  autoGlitchLevel = easeExp(autoGlitchLevel, target, dt, AUTO_GLITCH_EASE_RATE);
+  if (Math.abs(autoGlitchLevel - target) < 0.002) autoGlitchLevel = target;
+  autoGlitchUnpark(now);
+
+  if (isAutoGlitching && autoGlitchInstances.length === 0) {
+    timedEffectsDefs.forEach((def) => {
+      const profile = blendProfiles[def.name];
+      const ceiling = profile ? profile.peak[1] : 0.2;
+      const getStrength = () => {
+        if (autoGlitchLevel <= 0) return 0;
+        const base = smoothedStrength[def.name] || ((effectAlphas[def.name] || 0) * masterOpacity);
+        const headroom = 1 - clamp01(base) * 0.55; // more headroom = extra glitchyness
+        // Extra glitch factor while Auto Glitch is ON (final board energy).
+        const extra = 1.08 + 0.12 * autoGlitchPulse(performance.now());
+        return Math.min(0.85, autoGlitchLevel * ceiling * autoGlitchPulse(performance.now()) * headroom * extra * clamp01(masterControls.autoGlitchPower));
+      };
+      const fn = def.factory(getStrength, true);
+      autoGlitchInstances.push(fn);
+      activeEffects.push(fn);
+    });
+  } else if (!isAutoGlitching && autoGlitchLevel <= 0 && autoGlitchInstances.length > 0) {
+    autoGlitchInstances.forEach((fn) => {
+      const i = activeEffects.indexOf(fn);
+      if (i > -1) activeEffects.splice(i, 1);
+    });
+    autoGlitchInstances.length = 0;
+  }
+
+  if (isAutoGlitching && !isContinuallyRandomizing && now >= nextSparkAt) {
+    // Extra glitchyness: more frequent, hotter sparks while Auto Glitch is ON.
+    // Cap transient overlays so the list cannot grow under long sessions.
+    if (activeEffects.length < 48) {
+      nextSparkAt = now + 2200 + Math.random() * 2800;
+      const def = timedEffectsDefs[(Math.random() * timedEffectsDefs.length) | 0];
+      if (def) {
+        const p = blendProfiles[def.name];
+        const floor = p ? p.peak[1] * 0.85 : 0.35;
+        activeEffects.push(def.factory(() => Math.min(1.1, floor * (0.75 + Math.random() * 0.55))));
+      }
+    } else {
+      nextSparkAt = now + 4000;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  16. One-shot controls: randomize + seeded script                   *
+ * ------------------------------------------------------------------ */
+function randomizeBoard() {
+  activePeakEffects = pickPeakEffects(3 + ((Math.random() * 2) | 0));
+  for (let i = 0; i < profileNames.length; i++) {
+    const name = profileNames[i];
+    if (!sliderLocks[name]) {
+      const profile = blendProfiles[name];
+      const parked = (effectAlphas[name] || 0) < PARKED_EPSILON && Math.random() < 0.6;
+      const value = parked ? 0 : randRange(activePeakEffects.has(name) ? profile.peak : profile.ambient);
+      effectAlphas[name] = value;
+      if (sliderElements[name]) sliderElements[name].value = value.toFixed(3);
+      randomTargets[name] = value;
+    }
+  }
+  if (!sliderLocks.global) {
+    masterOpacity = randRange([0.55, 0.92]);
+    if (globalSliderEl) globalSliderEl.value = masterOpacity.toFixed(3);
+    randomTargets.global = masterOpacity;
+  }
+  updateContinuousEffectsCache();
+}
+/* Applies a seed the same way the Random Seed slider does: re-scripts the
+   timeline, the global opacity and every unlocked effect. Shared by the
+   slider and by the Auto Glitch engage (which rolls a fresh random seed). */
+function applyRandomSeed(seed) {
+  const rng = (function (s) { return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; })(seed);
+  customTime = rng() * 86400000;
+  if (!sliderLocks.global) {
+    masterOpacity = rng();
+    if (globalSliderEl) globalSliderEl.value = masterOpacity.toFixed(3);
+    randomTargets.global = masterOpacity;
+    sliderWritten.global = masterOpacity;
+  }
+  for (let i = 0; i < profileNames.length; i++) {
+    const name = profileNames[i];
+    if (!sliderLocks[name]) {
+      const v = rng();
+      effectAlphas[name] = v;
+      if (sliderElements[name]) sliderElements[name].value = v.toFixed(3);
+      randomTargets[name] = v;
+      sliderWritten[name] = v;
+    }
+  }
+  if (isContinuallyRandomizing) retargetRandomization(performance.now());
+  updateContinuousEffectsCache();
+}
+if (randomSeedSlider) {
+  randomSeedSlider.addEventListener('input', () => {
+    applyRandomSeed(parseFloat(randomSeedSlider.value));
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ *  17. Ghost / V-Sync / AI Warp button logic                          *
+ * ------------------------------------------------------------------ */
+function updateGhostUi() {
+  const mode = getGhostMode();
+  ghostActive = mode !== 'OFF';
+  document.body.classList.toggle('ghost-protocol-active', ghostActive);
+  if (ghostProtocolBtn) {
+    ghostProtocolBtn.classList.toggle('active', ghostActive);
+    ghostProtocolBtn.textContent = ghostActive
+      ? 'GHOST PROTOCOL: ' + mode + ' (' + Math.round(ghostLevel * 100) + '%)'
+      : 'GHOST PROTOCOL: OFF';
+  }
+  updateVsyncUi();
+}
+function toggleGhost() {
+  ghostModeIndex = (ghostModeIndex + 1) % ghostModes.length;
+  updateGhostUi();
+}
+if (ghostProtocolSlider) ghostProtocolSlider.addEventListener('input', (e) => { ghostLevel = parseFloat(e.target.value); updateGhostUi(); });
+if (ghostProtocolBtn) ghostProtocolBtn.addEventListener('click', toggleGhost);
+
+function updateVsyncUi() {
+  const mode = getVsyncMode();
+  const level = activeVsyncLevel();
+  vsyncActive = mode !== 'OFF' && level > 0.01;
+  // The slider renames itself with the active method and self-labels.
+  if (vsyncScanSlider) {
+    vsyncScanSlider.disabled = mode === 'OFF';
+    vsyncScanSlider.value = mode === 'OFF' ? '0' : level.toFixed(3);
+  }
+  if (vsyncLockBtn) {
+    vsyncLockBtn.disabled = mode === 'OFF';
+    vsyncLockBtn.classList.toggle('locked', !!sliderLocks.vsync);
+    vsyncLockBtn.textContent = sliderLocks.vsync ? '[LOCKED!]' : '<LOCK!>';
+  }
+  if (vsyncScanLabelEl) {
+    const base = mode === 'OFF'
+      ? 'V-Sync: OFF (parked)'
+      : (V_SYNC_DEFS[mode] ? V_SYNC_DEFS[mode].label : 'V-Sync:');
+    // Sharpen zone cue near the top of the slider
+    const sharpenCue = (mode !== 'OFF' && level >= 0.72)
+      ? ' · sharpen ' + Math.round(Math.min(1, (level - 0.55) / 0.45) * 100) + '%'
+      : '';
+    vsyncScanLabelEl.textContent = base + sharpenCue + (sliderLocks.vsync && mode !== 'OFF' ? ' [LOCKED]' : '');
+  }
+  applyYouTubeSurfaceFilters();
+  if (vsyncScanBtn) {
+    vsyncScanBtn.classList.toggle('active', mode !== 'OFF');
+    vsyncScanBtn.classList.toggle('mode-ghost-off', mode === 'GHOST_OFF');
+    vsyncScanBtn.classList.toggle('mode-full', mode === 'FULL');
+    vsyncScanBtn.classList.toggle('ghost-synced', vsyncActive && ghostActive);
+    const pct = Math.round(level * 100);
+    const labels = {
+      OFF: 'V-SYNC: OFF',
+      ON: 'V-SYNC SCANPHASING: ON (' + pct + '%)',
+      GHOST_OFF: 'V-SYNC VIRTUAL-VERTICAL SYNC: ON (' + pct + '%)',
+      FULL: 'V-SYNC TV SIMULATOR: FULL ON (' + pct + '%)'
+    };
+    vsyncScanBtn.textContent = labels[mode] || labels.OFF;
+  }
+}
+function cycleVsyncMode() {
+  vsyncModeIndex = (vsyncModeIndex + 1) % vsyncModes.length;
+  const mode = getVsyncMode();
+  if (mode !== 'OFF') {
+    const s = vsyncScripts[mode];
+    s.level = Math.max(0.4, s.level); // entering a mode always shows something
+    s.target = Math.max(s.target, 0.4);
+    s.nextAt = performance.now() + 1200 + Math.random() * 1400;
+    vsyncManualUntil = 0;
+  }
+  updateVsyncUi();
+}
+if (vsyncScanSlider) {
+  vsyncScanSlider.addEventListener('input', (e) => {
+    const mode = getVsyncMode();
+    if (mode === 'OFF' || !vsyncScripts[mode]) return;
+    const v = parseFloat(e.target.value);
+    vsyncScripts[mode].level = v;
+    vsyncScripts[mode].target = v;
+    vsyncManualUntil = performance.now() + 4000; // user wins for a few seconds
+    updateVsyncUi();
+  });
+}
+if (vsyncLockBtn) {
+  vsyncLockBtn.addEventListener('click', () => {
+    sliderLocks.vsync = !sliderLocks.vsync;
+    vsyncLockBtn.classList.toggle('locked', sliderLocks.vsync);
+    vsyncLockBtn.textContent = sliderLocks.vsync ? '[LOCKED!]' : '<LOCK!>';
+    // Lock freezes the current level as the target so the script cannot wander.
+    const mode = getVsyncMode();
+    if (mode !== 'OFF' && vsyncScripts[mode]) {
+      vsyncScripts[mode].target = vsyncScripts[mode].level;
+      if (sliderLocks.vsync) vsyncManualUntil = performance.now() + 1e12; // hold while locked
+      else vsyncManualUntil = performance.now() + 500;
+    }
+  });
+}
+if (vsyncScanBtn) vsyncScanBtn.addEventListener('click', cycleVsyncMode);
+updateVsyncUi();
+
+/* AI Warp toggle */
+if ($('aiWarpBtn')) {
+  $('aiWarpBtn').addEventListener('click', () => {
+    isAiWarpActive = !isAiWarpActive;
+    $('aiWarpBtn').textContent = 'AI Video Warp: ' + (isAiWarpActive ? 'ON' : 'OFF');
+    if (!isAiWarpActive && ytWarpShell) ytWarpShell.style.filter = '';
+  });
+}
+/* Auto Glitch / Continual / Randomize */
+if ($('autoGlitchBtn')) {
+  $('autoGlitchBtn').addEventListener('click', () => {
+    isAutoGlitching = !isAutoGlitching;
+    $('autoGlitchBtn').textContent = 'Auto Glitch: ' + (isAutoGlitching ? 'ON' : 'OFF');
+    if (isAutoGlitching) {
+      nextUnparkAt = performance.now() + 1200 + Math.random() * 2200; // first wake lands soon
+      // Engage also rolls a fresh random seed: it re-scripts the timeline,
+      // global opacity and every unlocked effect (same as the Random Seed
+      // slider), so each Auto Glitch session starts from a new board.
+      const seed = Math.random();
+      if (randomSeedSlider) randomSeedSlider.value = seed.toFixed(3);
+      applyRandomSeed(seed);
+    } else {
+      nextUnparkAt = 0;
+      // Auto Glitch OFF: return to normal energy, park ASCII + Tech Artist
+      // (and B&W Invert) at 0%, and stop their continuous effect instances.
+      AUTO_GLITCH_SHUTDOWN_EFFECTS.forEach((name) => {
+        effectAlphas[name] = 0;
+        randomTargets[name] = 0;
+        sliderWritten[name] = 0;
+        if (sliderElements[name]) {
+          sliderElements[name].value = '0.000';
+          // Visual park cue
+          const lock = sliderElements[name].parentElement &&
+            sliderElements[name].parentElement.querySelector('.lock-button');
+          // do not auto-lock; just zero so continual can wake them later if desired
+        }
+        if (smoothedStrength) smoothedStrength[name] = 0;
+      });
+      updateContinuousEffectsCache();
+    }
+    autoGlitchStep(performance.now(), 0);
+  });
+}
+if ($('continualRandomizeBtn')) {
+  $('continualRandomizeBtn').addEventListener('click', () => {
+    isContinuallyRandomizing = !isContinuallyRandomizing;
+    $('continualRandomizeBtn').textContent = 'Continual Randomization: ' + (isContinuallyRandomizing ? 'ON' : 'OFF');
+    if (isContinuallyRandomizing) {
+      // ON: unpark unlocked sliders only (locked / user-parked stay put).
+      for (let i = 0; i < profileNames.length; i++) {
+        const name = profileNames[i];
+        if (sliderLocks[name]) continue;
+        if ((effectAlphas[name] || 0) < PARKED_EPSILON) {
+          const profile = blendProfiles[name];
+          const v = profile ? randRange(profile.ambient) : 0.05 + Math.random() * 0.1;
+          effectAlphas[name] = v;
+          if (sliderElements[name]) sliderElements[name].value = v.toFixed(3);
+        }
+      }
+      if (!sliderLocks.global && masterOpacity < PARKED_EPSILON) {
+        masterOpacity = 0.55 + Math.random() * 0.35;
+        if (globalSliderEl) globalSliderEl.value = masterOpacity.toFixed(3);
+      }
+      retargetRandomization(performance.now());
+      updateContinuousEffectsCache();
+    } else {
+      // OFF: freeze every slider at its current seed.
+      // Parked at 0% (e.g. ASCII / Tech Artist) stay fully off until you move them or turn Continual back on (unlocked).
+      for (let i = 0; i < profileNames.length; i++) {
+        const name = profileNames[i];
+        randomTargets[name] = effectAlphas[name] || 0;
+      }
+      randomTargets.global = masterOpacity;
+      updateContinuousEffectsCache();
+    }
+  });
+}
+if ($('randomizeBtn')) {
+  $('randomizeBtn').addEventListener('click', randomizeBoard);
+}
+
+/* ------------------------------------------------------------------ *
+ *  18. Playback UI + init screen                                      *
+ * ------------------------------------------------------------------ */
+function activatePlaybackUi(mode) {
+  document.body.classList.add('playback-on');
+  document.body.classList.remove('local-audio', 'local-video');
+  if (mode === 'local-audio') document.body.classList.add('local-audio');
+  if (mode === 'local-video') document.body.classList.add('local-video');
+  if (mode === 'youtube') {
+    if (ytWarpShell) ytWarpShell.style.display = 'block';
+    if (ytFrame) ytFrame.style.display = 'block';
+    video.style.display = 'none';
+  }
+  hidePlaybackPrompts();
+  if (openFileWrap) openFileWrap.style.display = 'none';
+  if (openFileBtn) openFileBtn.style.display = 'none';
+  if (fileInput) fileInput.style.display = 'none';
+  applyMasterFilters();
+}
+function hidePlaybackPrompts() {
+  ['ytInput', 'startBtn', 'suggestedVideo', 'suggestedVideo3', 'suggestedVideo2', 'suggestedYoutube', 'suggestedPlaylist', 'suggestedMoonlight', 'suggestedFractals', 'suggestedNightCity', 'testCanvas', 'Defcon1Video'].forEach((id) => {
+    const el = $(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+if (startBtn) {
+  startBtn.addEventListener('click', () => startPlayback(ytInput ? ytInput.value : ''));
+  if (ytInput) ytInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startPlayback(ytInput.value); });
+}
+const SUGGESTED = [
+  ['suggestedVideo', 'https://www.youtube.com/watch?v=gopYmb38DgM'],
+  ['suggestedVideo3', 'https://www.youtube.com/watch?v=uvSXL6ypLlw'],
+  ['suggestedVideo2', 'https://www.youtube.com/watch?v=8o6bdTOhIyE'],
+  ['suggestedYoutube', 'https://www.youtube.com/watch?v=QsUmvGkXhnk'],
+  ['suggestedPlaylist', 'https://www.youtube.com/watch?v=RgFaK6ZQifE&list=RDEMWUbu7UjvrEYUSE4m8ATOcw&start_radio=1'],
+  ['suggestedFractals', 'https://www.youtube.com/watch?v=u4TPBkN0vIc'],
+  ['suggestedNightCity', 'https://www.youtube.com/watch?v=KlcsGjI6Jms'],
+  ['Defcon1Video', 'https://www.youtube.com/watch?v=jmEAP7aGo0o'],
+  ['testCanvas', 'https://www.youtube.com/watch?v=kCP2xZvhJk0'],
+  ['suggestedMoonlight', 'https://www.youtube.com/watch?v=B1CL4PqHh9k&list=RDB1CL4PqHh9k&start_radio=1']
+];
+function bindSuggestedStart(el, url, loop) {
+  if (!el) return;
+  el.style.pointerEvents = 'auto';
+  el.style.cursor = 'pointer';
+  el.setAttribute('role', 'button');
+  el.tabIndex = 0;
+  const go = (e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    try { if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url); } catch (err) {}
+    startPlayback(url, !!loop);
+  };
+  el.addEventListener('click', go, true);
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') go(e);
+  });
+}
+SUGGESTED.forEach(([id, url]) => {
+  bindSuggestedStart($(id), url, id === 'suggestedPlaylist' || id === 'suggestedMoonlight' || id === 'testCanvas');
+});
+
+/* ------------------------------------------------------------------ *
+ *  19. Presets (localStorage, condensed)                              *
+ * ------------------------------------------------------------------ */
+const PRESET_KEY = 'glitch-canvas-lite-presets-v1';
+let presets = {};
+(function loadPresets() {
+  try { presets = JSON.parse(localStorage.getItem(PRESET_KEY)) || {}; } catch (e) { presets = {}; }
+})();
+function persistPresets() {
+  try { localStorage.setItem(PRESET_KEY, JSON.stringify(presets)); } catch (e) {}
+}
+function captureSettings() {
+  const s = {
+    alphas: {}, masterOpacity, ghostLevel, ghostMode: getGhostMode(),
+    vsyncMode: getVsyncMode(), aiWarp: isAiWarpActive,
+    vsyncLevels: {}
+  };
+  ['ON', 'GHOST_OFF', 'FULL'].forEach((m) => { s.vsyncLevels[m] = vsyncScripts[m].level; });
+  for (let i = 0; i < profileNames.length; i++) s.alphas[profileNames[i]] = effectAlphas[profileNames[i]] || 0;
+  return s;
+}
+function applySettings(s) {
+  if (!s) return;
+  masterOpacity = s.masterOpacity !== undefined ? s.masterOpacity : masterOpacity;
+  for (let i = 0; i < profileNames.length; i++) {
+    const name = profileNames[i];
+    const v = s.alphas && s.alphas[name] !== undefined ? s.alphas[name] : 0;
+    effectAlphas[name] = v;
+    if (sliderElements[name]) sliderElements[name].value = v.toFixed(3);
+  }
+  if (globalSliderEl) globalSliderEl.value = masterOpacity.toFixed(3);
+  ghostLevel = s.ghostLevel !== undefined ? s.ghostLevel : ghostLevel;
+  if (s.vsyncMode) vsyncModeIndex = Math.max(0, vsyncModes.indexOf(s.vsyncMode));
+  if (s.vsyncLevels) {
+    ['ON', 'GHOST_OFF', 'FULL'].forEach((m) => {
+      if (s.vsyncLevels[m] !== undefined) {
+        vsyncScripts[m].level = s.vsyncLevels[m];
+        vsyncScripts[m].target = s.vsyncLevels[m];
+      }
+    });
+  }
+  if (s.ghostMode) { ghostModeIndex = Math.max(0, ghostModes.indexOf(s.ghostMode)); }
+  isAiWarpActive = !!s.aiWarp;
+  if ($('aiWarpBtn')) $('aiWarpBtn').textContent = 'AI Video Warp: ' + (isAiWarpActive ? 'ON' : 'OFF');
+  if (ghostProtocolSlider) ghostProtocolSlider.value = ghostLevel;
+  updateGhostUi();
+  updateVsyncUi();
+  updateContinuousEffectsCache();
+}
+/* preset bar wiring */
+const presetSelect = $('presetSelect');
+const presetNameInput = $('presetNameInput');
+const presetSaveBtn = $('presetSaveBtn');
+const presetDeleteBtn = $('presetDeleteBtn');
+const presetDeleteAllBtn = $('presetDeleteAllBtn');
+const presetPrevBtn = $('presetPrevBtn');
+const presetNextBtn = $('presetNextBtn');
+const currentPresetDisplay = $('current-preset-display');
+let presetOrder = [];
+
+function refreshPresetList() {
+  presetOrder = Object.keys(presets);
+  if (presetSelect) {
+    presetSelect.innerHTML = '';
+    presetOrder.forEach((name) => {
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      presetSelect.appendChild(opt);
+    });
+  }
+}
+function setCurrentPresetDisplay(text) {
+  if (currentPresetDisplay) currentPresetDisplay.textContent = text;
+}
+if (presetToggleBtn) {
+  presetToggleBtn.addEventListener('click', () => {
+    const open = presetDropdown.classList.toggle('open');
+    presetToggleBtn.textContent = open ? 'Hide Presets' : 'Show Presets';
+    if (open) refreshPresetList();
+  });
+}
+if (presetSaveBtn) {
+  presetSaveBtn.addEventListener('click', () => {
+    const name = (presetNameInput && presetNameInput.value.trim()) || 'preset-' + (presetOrder.length + 1);
+    presets[name] = captureSettings();
+    persistPresets();
+    refreshPresetList();
+    setCurrentPresetDisplay('SAVED: ' + name);
+    if (presetNameInput) presetNameInput.value = '';
+  });
+}
+function applyPresetByName(name) {
+  if (presets[name]) {
+    applySettings(presets[name]);
+    setCurrentPresetDisplay('LOADED: ' + name);
+  }
+}
+if (presetSelect) presetSelect.addEventListener('change', () => applyPresetByName(presetSelect.value));
+if (presetDeleteBtn) {
+  presetDeleteBtn.addEventListener('click', () => {
+    const name = presetSelect ? presetSelect.value : '';
+    if (name && presets[name]) {
+      delete presets[name];
+      persistPresets();
+      refreshPresetList();
+      setCurrentPresetDisplay('DELETED: ' + name);
+    }
+  });
+}
+if (presetDeleteAllBtn) {
+  presetDeleteAllBtn.addEventListener('click', () => {
+    presets = {};
+    persistPresets();
+    refreshPresetList();
+    setCurrentPresetDisplay('ALL PRESETS DELETED');
+  });
+}
+if (presetPrevBtn) {
+  presetPrevBtn.addEventListener('click', () => {
+    if (!presetOrder.length) return;
+    const cur = presetSelect ? presetOrder.indexOf(presetSelect.value) : -1;
+    const idx = (cur - 1 + presetOrder.length) % presetOrder.length;
+    if (presetSelect) presetSelect.value = presetOrder[idx];
+    applyPresetByName(presetOrder[idx]);
+  });
+}
+if (presetNextBtn) {
+  presetNextBtn.addEventListener('click', () => {
+    if (!presetOrder.length) return;
+    const cur = presetSelect ? presetOrder.indexOf(presetSelect.value) : -1;
+    const idx = (cur + 1) % presetOrder.length;
+    if (presetSelect) presetSelect.value = presetOrder[idx];
+    applyPresetByName(presetOrder[idx]);
+  });
+}
+refreshPresetList();
+
+/* ------------------------------------------------------------------ *
+ *  20. Notification helper                                            *
+ * ------------------------------------------------------------------ */
+function showNotificationMessage(message, duration) {
+  duration = duration || 3600;
+  let el = document.querySelector('.notification');
+  if (!el) { el = document.createElement('div'); el.className = 'notification'; document.body.appendChild(el); }
+  el.textContent = message;
+  el.style.display = 'block';
+  el.style.opacity = '1';
+  clearTimeout(showNotificationMessage._t);
+  showNotificationMessage._t = setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => { el.style.display = 'none'; }, 500);
+  }, duration);
+}
+
+/* ------------------------------------------------------------------ *
+ *  21. UI toggle tab + hover dim (kept from 006, condensed)           *
+ * ------------------------------------------------------------------ */
+let isUIHidden = false;
+let tabHideTimer = null;
+let uiHoverDepth = 0;
+function hideTab() {
+  if (!uiToggleTab) return;
+  const tabWidth = uiToggleTab.offsetWidth || 160;
+  uiToggleTab.style.setProperty('--ui-tab-collapsed-right', Math.min(0, 40 - tabWidth) + 'px');
+  uiToggleTab.classList.add('is-collapsed');
+}
+function showTabBriefly(duration) {
+  clearTimeout(tabHideTimer);
+  if (!uiToggleTab) return;
+  uiToggleTab.classList.remove('is-collapsed');
+  tabHideTimer = setTimeout(hideTab, duration || 1200);
+}
+if (toggleUiBtn) {
+  toggleUiBtn.addEventListener('click', () => {
+    isUIHidden = !isUIHidden;
+    showTabBriefly(1200);
+    document.body.classList.toggle('ui-hidden', isUIHidden);
+    toggleUiBtn.textContent = isUIHidden ? 'SHOW CONTROL U.I.' : 'HIDE CONTROL U.I.';
+    uiHoverDepth = 0;
+    document.body.classList.remove('ui-controls-hover');
+  });
+  if (uiToggleTab) {
+    uiToggleTab.addEventListener('touchstart', () => showTabBriefly(3000));
+    uiToggleTab.addEventListener('touchend', () => showTabBriefly(3000));
+  }
+}
+const hoverTargets = [ytInput, startBtn, openFileBtn, openFileWrap, rightRack, sliderContainer, ghostBtnRack, wiredBtn, presetToggleBtn, presetDropdown, uiToggleTab, toggleUiBtn].filter(Boolean);
+hoverTargets.forEach((el) => {
+  el.addEventListener('mouseenter', () => { uiHoverDepth += 1; document.body.classList.add('ui-controls-hover'); });
+  el.addEventListener('mouseleave', () => { uiHoverDepth = Math.max(0, uiHoverDepth - 1); if (!uiHoverDepth) document.body.classList.remove('ui-controls-hover'); });
+  el.addEventListener('focusin', () => { uiHoverDepth += 1; document.body.classList.add('ui-controls-hover'); });
+  el.addEventListener('focusout', () => { uiHoverDepth = Math.max(0, uiHoverDepth - 1); if (!uiHoverDepth) document.body.classList.remove('ui-controls-hover'); });
+});
+
+/* ------------------------------------------------------------------ *
+ *  22. Main loop: one rAF, controller + renderer                      *
+ * ------------------------------------------------------------------ */
+function draw(now) {
+  resizeGlitchCanvas(false);
+  gctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+  // comboProfile is eased in frame() — do not recompute hard here (confluence).
+
+  for (let i = 0; i < activeEffects.length; i++) {
+    try { activeEffects[i](); } catch (e) {}
+  }
+
+  applyComboPostProcess();
+
+  const needSnap = (ghostActive && ghostLevel > 0.01) || (getVsyncMode() !== 'OFF' && activeVsyncLevel() > 0.01);
+  if (needSnap) {
+    const w = mainCanvas.width, h = mainCanvas.height;
+    if (snap.width !== w || snap.height !== h) { snap.width = w; snap.height = h; }
+    snapCtx.setTransform(1, 0, 0, 1, 0, 0);
+    snapCtx.clearRect(0, 0, w, h);
+    snapCtx.drawImage(mainCanvas, 0, 0, w, h);
+    renderVsyncScan(now, snap);
+    renderGhostProtocol(now, snap);
+  }
+  updateShiftOverlay(now);
+}
+
+/* Adaptive frame governor: if the loop cannot hold ~37fps for a sustained
+   window, step the quality tier down (smaller canvas, fewer ASCII cells,
+   every-2nd-frame rendering); recover upward only after a long calm stretch.
+   This is what keeps the video/YouTube compositor fed under the heaviest
+   boards — the loop starves itself before it can starve the video. */
+const QUALITY_TIERS = [
+  { drawEveryN: 1, asciiCells: 42000, scale: 1,   cap: 1.25 },
+  { drawEveryN: 1, asciiCells: 21000, scale: 0.9, cap: 1.1 },
+  { drawEveryN: 2, asciiCells: 10500, scale: 0.8, cap: 1 }
+];
+let qualityTier = renderBudget.lowPower ? 2 : 0;
+let emaFrameMs = 16.7, governorSlow = 0, governorFast = 0;
+function applyQualityTier() {
+  const t = QUALITY_TIERS[qualityTier];
+  renderBudget.drawEveryN = t.drawEveryN;
+  renderBudget.asciiCells = t.asciiCells;
+  renderBudget.scale = t.scale;
+  renderBudget.pixelCap = t.cap;
+  resizeGlitchCanvas(true);
+}
+function governorStep(dtMs) {
+  emaFrameMs = emaFrameMs * 0.92 + dtMs * 0.08;
+  // Proactive pressure from a heavy board (continual + auto + many lit effects)
+  // so the YouTube compositor stays fed on typical web connections / laptops.
+  let lit = 0;
+  for (let i = 0; i < profileNames.length; i++) {
+    if ((effectAlphas[profileNames[i]] || 0) > 0.05) lit++;
+  }
+  const heavy = (isContinuallyRandomizing ? 1 : 0) + (isAutoGlitching ? 1 : 0) + (lit > 6 ? 1 : 0) + (isAiWarpActive ? 1 : 0);
+  const slowThresh = heavy >= 2 ? 24 : 27;
+  const slowNeed = heavy >= 2 ? 50 : 80;
+  if (emaFrameMs > slowThresh) { governorSlow++; governorFast = 0; }
+  else if (emaFrameMs < 14 && qualityTier > (renderBudget.lowPower ? 2 : 0)) { governorFast++; governorSlow = 0; }
+  else { governorSlow = 0; governorFast = 0; }
+  if (governorSlow > slowNeed && qualityTier < 2) {
+    qualityTier++; applyQualityTier();
+    governorSlow = 0; governorFast = 0;
+  } else if (governorFast > 400 && qualityTier > 0 && heavy < 3) {
+    qualityTier--; applyQualityTier();
+    governorSlow = 0; governorFast = 0;
+  }
+}
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (document.hidden) { lastFrameTime = now; return; }
+  const dtMs = now - lastFrameTime;
+  const dt = Math.min(0.05, dtMs * 0.001);
+  lastFrameTime = now;
+  customTime += dt * 1000;
+  frameCount++;
+
+  /* controller: pure math, runs every frame for responsive sliders */
+  updateSmoothedStrengths(dt);
+  updateComboProfile(performance.now());
+  stepComboProfile(dt);
+  stepPalette(now, dt);   // media palette eases every frame; samples ~2.4Hz
+  autoGlitchStep(now, dt);
+  vsyncStepScript(now, dt);
+  if (isContinuallyRandomizing) stepContinualRandomization(now, dt);
+  if (isAiWarpActive) {
+    updateAiWarp(now);
+  } else {
+    // Still drive YouTube surface from Data Bands / VHS Glitch when warp is off.
+    const hueStrength = (effectAlphas['Hue/Color Cycle'] || 0) * masterOpacity;
+    applyYouTubeWarpMotion(now, hueStrength);
+  }
+  /* board energy for the beat-driven jitter */
+  let energy = 0, count = 0;
+  for (let i = 0; i < profileNames.length; i++) {
+    const a = effectAlphas[profileNames[i]] || 0;
+    if (a > 0.01) { energy += a; count++; }
+  }
+  energy = count ? energy / count : 0;
+  beat += (energy * masterOpacity * boardHarmony() * (0.35 + 1.3 * clamp01(masterControls.boardEnergy)) - beat) * Math.min(1, dt * 1.4);
+  applyMasterFilters();
+
+  /* Effect instances reconcile at ~10Hz, never per frame: while continual
+     randomization runs the board never "settles", so a per-frame reconcile
+     churned create/remove on every frame and spiked the main thread —
+     exactly the jank that made the video buffer skip. */
+  if (frameCount % 6 === 0) updateContinuousEffectsCache();
+
+  governorStep(dtMs);
+
+  /* renderer: full rate normally, every Nth frame on low-power devices */
+  if ((frameCount % renderBudget.drawEveryN) === 0) draw(now);
+}
+
+/* ------------------------------------------------------------------ *
+ *  22b. Connection / device fluency                                    *
+ *  Prefer a safer quality tier on slow networks or Save-Data so the    *
+ *  page stays fluent on typical web connections without starving YT.   *
+ * ------------------------------------------------------------------ */
+(function adaptToConnection() {
+  try {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const save = !!(c && c.saveData);
+    const slow = c && (c.effectiveType === '2g' || c.effectiveType === 'slow-2g' || c.effectiveType === '3g');
+    if (save || renderBudget.lowPower) {
+      qualityTier = 2;
+      applyQualityTier();
+    } else if (slow) {
+      qualityTier = Math.max(qualityTier, 1);
+      applyQualityTier();
+    }
+  } catch (e) {}
+})();
+
+
+/* ------------------------------------------------------------------ *
+ *  Easter egg (from final-006): idle ~1s → flash DATA.. / ! and seed  *
+ *  a hidden YouTube URL into the input + clipboard.                   *
+ * ------------------------------------------------------------------ */
+(function installEasterEgg() {
+  const hiddenUrl = 'https://www.youtube.com/watch?v=DmStNF35o1w';
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  let idleTimer = null;
+  let easterEggHasRun = false;
+
+  const flashText = async (msg, color, shadowColor, duration) => {
+    const warnings = [];
+    for (let i = 0; i < 10; i++) {
+      const warning = document.createElement('div');
+      warning.textContent = msg;
+      warning.style.cssText = 'position:fixed;top:' + (Math.random() * 90) + 'vh;left:' +
+        (Math.random() * 90) + 'vw;font-size:' + (Math.random() * 10 + 5) +
+        'vw;color:' + color + ';z-index:9999;text-shadow:0 0 20px ' + shadowColor +
+        ';pointer-events:none;transition:opacity 0.1s ease-in-out;opacity:1;';
+      document.body.appendChild(warning);
+      warnings.push(warning);
+    }
+    const fonts = ['Courier New', 'monospace', 'Arial Black', 'Impact', 'Georgia', 'Times New Roman', 'Verdana'];
+    let elapsed = 0;
+    const fontInterval = setInterval(() => {
+      warnings.forEach((w) => { w.style.fontFamily = fonts[(Math.random() * fonts.length) | 0]; });
+      elapsed += 50;
+      if (elapsed >= duration) clearInterval(fontInterval);
+    }, 50);
+    await sleep(duration);
+    warnings.forEach((w) => { w.style.opacity = '0'; });
+    await sleep(100);
+    warnings.forEach((w) => { if (w.parentNode) w.parentNode.removeChild(w); });
+  };
+
+  const writeHiddenUrlToClipboard = async () => {
+    if (navigator.clipboard && window.isSecureContext) {
+      try { await navigator.clipboard.writeText(hiddenUrl); return true; } catch (e) {}
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = hiddenUrl;
+      ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none;';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return !!ok;
+    } catch (e) { return false; }
+  };
+
+  const runEasterEgg = async () => {
+    if (easterEggHasRun) return;
+    easterEggHasRun = true;
+    window.removeEventListener('mousemove', resetIdleTimer);
+    window.removeEventListener('keydown', resetIdleTimer);
+    window.removeEventListener('scroll', resetIdleTimer);
+    window.removeEventListener('click', resetIdleTimer);
+    clearTimeout(idleTimer);
+    try {
+      if (ytInput && !document.body.classList.contains('playback-on')) {
+        ytInput.value = hiddenUrl;
+        try { ytInput.focus(); ytInput.select(); } catch (e) {}
+      }
+      const clipboardSuccess = await writeHiddenUrlToClipboard();
+      if (!clipboardSuccess) {
+        const fallback = document.createElement('div');
+        fallback.textContent = hiddenUrl;
+        fallback.style.cssText = 'position:fixed;bottom:10px;left:10px;z-index:9999;color:#fff;background:rgba(0,0,0,0.8);padding:8px 10px;border:1px solid lime;font-family:monospace;';
+        document.body.appendChild(fallback);
+        setTimeout(() => { if (fallback.parentNode) fallback.parentNode.removeChild(fallback); }, 8000);
+      }
+      await flashText('DATA..', 'crimson', 'red', 400);
+      const bang = document.createElement('div');
+      bang.textContent = '!';
+      bang.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:30vw;color:lime;z-index:9999;text-shadow:0 0 20px green;pointer-events:none;transition:opacity 0.5s ease-in-out;opacity:1;';
+      document.body.appendChild(bang);
+      await sleep(1500);
+      await flashText('DATA..', 'crimson', 'red', 400);
+      bang.style.opacity = '0';
+      await sleep(500);
+      if (bang.parentNode) bang.parentNode.removeChild(bang);
+    } catch (err) {
+      if (err && err.name === 'NotAllowedError') return;
+      console.error('Easter egg failed:', err);
+    }
+  };
+
+  const resetIdleTimer = () => {
+    if (easterEggHasRun) return;
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(runEasterEgg, 1000);
+  };
+
+  window.addEventListener('mousemove', resetIdleTimer);
+  window.addEventListener('keydown', resetIdleTimer);
+  window.addEventListener('scroll', resetIdleTimer);
+  window.addEventListener('click', resetIdleTimer);
+  resetIdleTimer();
+  setTimeout(() => { if (!easterEggHasRun) runEasterEgg(); }, 1200);
+})();
+
+/* ------------------------------------------------------------------ *
+ *  23. Init                                                            *
+ * ------------------------------------------------------------------ */
+resizeGlitchCanvas(true);
+requestAnimationFrame(frame);
+requestAnimationFrame(() => hideTab());
+if (!isHttpOrigin()) {
+  showNotificationMessage('YouTube playback needs http://localhost or another web origin. Local MP3/MP4 still works from file://.', 5600);
+}
+})();
+
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3a75bc218b7669c',t:'MTc4OTMwNDY3Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

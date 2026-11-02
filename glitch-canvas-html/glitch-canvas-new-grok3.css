@@ -1,0 +1,744 @@
+/* ==========================================================================
+   GLITCH CANVAS — NEW (lite architecture + 006 / (3) logic)
+   Base: glitch-canvas-lite (clean, small, no !important wars)
+   Enriched with: Night City entry, improved V-Sync mode states,
+   DEFCON 1 glow, better rest-opacity for Ghost/V-Sync, hard-off cues
+   from final-006 and glitch-canvas (3).
+   ========================================================================== */
+
+/* ---------- base ---------- */
+html, body {
+  margin: 0; padding: 0;
+  height: 100%; width: 100%;
+  overflow: hidden;
+  background: #000;
+  cursor: crosshair;
+}
+body {
+  font-family: 'Courier New', Courier, monospace;
+  color: #fff;
+}
+
+canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+#glitchCanvas {
+  z-index: 3;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ---------- media surfaces ---------- */
+#effects-wrapper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+#ytWarpShell {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+}
+#ytFrame {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+}
+#ytPlayerMount iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+  display: block;
+  transform-origin: 50% 50%;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+}
+#video {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100vw; height: 100vh;
+  object-fit: cover;
+  pointer-events: none;
+  display: none;
+}
+body.local-video #video { display: block; }
+
+#localArt {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #000;
+  z-index: 1;
+  pointer-events: none;
+}
+body.local-audio #localArt { display: block; }
+#localAudio {
+  position: absolute;
+  width: 0; height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- shared control styling ---------- */
+.wired-button {
+  font-family: 'Courier New', Courier, monospace;
+  text-decoration: none;
+  color: #00ffff;
+  background: rgba(0, 20, 20, 0.5);
+  border: 2px solid #00ffff;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0,255,255,.5), 0 0 20px rgba(0,255,255,.3), inset 0 0 15px rgba(0,255,255,.2);
+  text-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff;
+  animation: crt-flicker .2s infinite;
+  transition: all .2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wired-button:hover {
+  background: rgba(0, 40, 40, 0.7);
+  box-shadow: 0 0 15px rgba(0,255,255,.8), 0 0 30px rgba(0,255,255,.5), inset 0 0 20px rgba(0,255,255,.3);
+}
+.wired-button:active {
+  transform: scale(0.95) rotate(-1deg);
+  background: rgba(255, 0, 255, 0.3);
+}
+.wired-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,.15) 50%, rgba(0,0,0,.3) 50%);
+  background-size: 100% var(--scanline-thickness, 4px);
+  opacity: .6;
+  animation: scanline-move var(--scanline-speed, 4s) linear infinite;
+  pointer-events: none;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: .9; }
+  50% { opacity: 1; }
+}
+@keyframes scanline-move {
+  from { background-position: 0 0; }
+  to { background-position: 0 -8px; }
+}
+
+/* ---------- init screen ---------- */
+#ytInput, #startBtn, .suggested, #openFileWrap {
+  position: absolute;
+  font-family: 'Courier New', Courier, monospace;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #fff;
+  z-index: 2000;
+  pointer-events: auto;
+}
+#ytInput {
+  top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px; max-width: 86vw;
+  font-size: 11px;
+  padding: 4px 8px;
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+#startBtn {
+  top: 46%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+#startBtn:hover { background: rgba(0, 180, 180, 0.35); }
+
+.suggested {
+  margin: 0;
+  font-weight: normal;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  font-family: Impact, 'Arial Black', sans-serif;
+  font-size: 0.9em;
+  letter-spacing: 0.05em;
+  background: none;
+  border: none;
+  text-shadow: 0 0 8px rgba(0,255,255,.6);
+  opacity: 0.2;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: opacity .2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.suggested:hover, .suggested:focus { opacity: 1 !important; text-shadow: 0 0 12px #00ffff, 0 0 24px #00ffff; }
+#suggestedVideo   { top: 0%; }
+#suggestedVideo3  { top: 5%; }
+#suggestedVideo2  { top: 10%; }
+#suggestedYoutube { top: 15%; }
+#suggestedPlaylist{ top: 20%; }
+#suggestedMoonlight { top: 25%; }
+#suggestedFractals{ top: 56%; }
+#testCanvas       { top: 50%; }
+
+/* --- Night City Walk: silver-shining white + crimson shine entry --- */
+#suggestedNightCity {
+  top: 65%;
+  font-size: 1.15em;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  color: #f5f6fa; /* fallback if background-clip: text is unsupported */
+  opacity: 0.7;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  background: linear-gradient(100deg,
+    #9aa0ad 0%,
+    #ffffff 20%,
+    #dfe3ee 34%,
+    #dc143c 50%,
+    #ff5570 58%,
+    #ffffff 76%,
+    #9aa0ad 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: nightCityShine 4.5s linear infinite;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,.35))
+          drop-shadow(0 0 10px rgba(220,20,60,.35));
+  transition: opacity .2s ease-in-out, filter .25s ease;
+}
+@keyframes nightCityShine {
+  from { background-position: 0% center; }
+  to   { background-position: 200% center; }
+}
+#suggestedNightCity:hover,
+#suggestedNightCity:focus {
+  opacity: 1 !important;
+  animation-duration: 2.2s;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,.7))
+          drop-shadow(0 0 18px rgba(255,60,90,.8));
+}
+@media (prefers-reduced-motion: reduce) {
+  #suggestedNightCity { animation: none; background-position: 50% center; }
+}
+
+/* --- DEFCON 1: big CRT-courier cyan-glow entry --- */
+#Defcon1Video {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 74%;
+  bottom: auto;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(1.4em, 4.4vw, 3.2em);
+  color: #fff;
+  cursor: pointer;
+  z-index: 2000;
+  width: 100%;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-shadow: 0 0 8px #00ffff, 0 0 16px #00ffff;
+  transition: opacity .2s, color .2s, text-shadow .2s;
+}
+#Defcon1Video:hover {
+  color: #00ffff;
+  text-shadow: 0 0 16px #fff, 0 0 32px #00ffff;
+}
+
+#openFileWrap {
+  bottom: 20px; right: 20px;
+  width: 280px; height: 44px;
+  display: block;
+  z-index: 9999;
+  box-sizing: border-box;
+  background: none;
+  border: none;
+}
+#openFileBtn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-weight: bold;
+  color: #00ffff;
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid #00ffff;
+  border-radius: 6px;
+  z-index: 1;
+  box-sizing: border-box;
+  pointer-events: none;
+  box-shadow: 0 0 12px rgba(0,255,255,.5), inset 0 0 14px rgba(0,255,255,.15);
+  text-shadow: 0 0 4px #00ffff;
+}
+#fileInput {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  margin: 0; padding: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  font-size: 18px;
+}
+.file-input-hidden { display: none; }
+
+.visually-hidden {
+  position: absolute;
+  left: -9999px;
+  width: 1px; height: 1px;
+  overflow: hidden;
+}
+
+/* ---------- post-init control racks ---------- */
+#wired-btn {
+  position: absolute;
+  top: 12px; left: 12px;
+  padding: 8px 12px;
+  font-size: clamp(11px, 1.4vw, 18px);
+  z-index: 3000;
+  display: none;
+}
+#rightRack {
+  position: absolute;
+  top: 12px; right: 12px;
+  z-index: 3000;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(240px, 42vw);
+}
+#rightRack .wired-button {
+  font-size: clamp(8px, 1vw, 10px);
+  padding: 4px 8px;
+  white-space: normal;
+  margin: 0;
+}
+#ghostBtnRack {
+  position: absolute;
+  bottom: 12px; left: 12px;
+  z-index: 3100;
+  display: none;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: calc(100vw - 24px);
+}
+#ghostBtnRack .wired-button {
+  margin: 0;
+  font-size: clamp(8px, 1vw, 10px);
+  padding: 4px 8px;
+  white-space: nowrap;
+  min-width: 120px;
+}
+body.playback-on #wired-btn,
+body.playback-on #rightRack,
+body.playback-on #ghostBtnRack { display: flex; }
+body.playback-on #wired-btn { display: block; }
+
+/* Ghost / V-Sync shared rack styling */
+#ghostProtocolBtn.active {
+  background: rgba(0,255,255,.18);
+  box-shadow: 0 0 22px rgba(102,252,241,.35);
+}
+#vsyncScanBtn.ghost-synced {
+  border-color: rgba(186,140,255,.9);
+  color: #d9b3ff;
+  box-shadow: 0 0 18px rgba(186,140,255,.3), inset 0 0 12px rgba(186,140,255,.15);
+  text-shadow: 0 0 4px #b06cff, 0 0 8px #b06cff;
+}
+#vsyncScanBtn.active.ghost-synced {
+  background: rgba(120,80,220,.22);
+  animation: crt-flicker .2s infinite, vsync-sync-pulse 1.6s ease-in-out infinite;
+}
+/* GHOST_OFF: tear/scan-bar hard-disabled, only the loose hue-ghost shift remains. */
+#vsyncScanBtn.mode-ghost-off {
+  border-color: rgba(255,120,120,0.8);
+  color: #ff9a9a;
+  background: rgba(60,0,0,0.4);
+  box-shadow: 0 0 16px rgba(255,90,90,0.28);
+}
+/* FULL: everything blended (tear + color ghosting + sharpen) at max heat. */
+#vsyncScanBtn.mode-full {
+  border-color: rgba(255,214,102,0.95);
+  color: #ffe28a;
+  background: rgba(90,60,0,0.35);
+  box-shadow: 0 0 24px rgba(255,200,80,0.4);
+  animation: crt-flicker 0.2s infinite;
+}
+/* Hard-off latch visual (from 006 / (3) lineage) */
+#vsyncScanBtn.hard-off {
+  border-color: rgba(255,96,96,0.85);
+  color: #ff8f8f;
+  box-shadow: 0 0 12px rgba(255,96,96,0.25), inset 0 0 8px rgba(120,0,0,0.3);
+  text-shadow: 0 0 4px rgba(255,110,110,0.7);
+  opacity: 0.92;
+}
+#vsyncScanBtn.hard-off:hover {
+  background: rgba(120,0,0,0.25);
+  box-shadow: 0 0 16px rgba(255,96,96,0.4), inset 0 0 10px rgba(120,0,0,0.35);
+}
+#vsyncScanBtn.hard-off.ghost-color {
+  border-color: rgba(216,160,255,0.92);
+  color: #f0ccff;
+  box-shadow: 0 0 18px rgba(190,120,255,0.45), inset 0 0 12px rgba(120,40,180,0.35);
+  text-shadow: 0 0 6px rgba(216,160,255,0.9);
+  animation: vsyncGhostColorPulse 2.2s ease-in-out infinite;
+  opacity: 1;
+}
+@keyframes vsync-sync-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(160,120,255,.4), inset 0 0 10px rgba(160,120,255,.2); }
+  50%      { box-shadow: 0 0 26px rgba(120,200,255,.6), inset 0 0 16px rgba(120,200,255,.3); }
+}
+@keyframes vsyncGhostColorPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(190,120,255,0.32), inset 0 0 8px rgba(120,40,180,0.26); }
+  50%      { box-shadow: 0 0 24px rgba(205,155,255,0.6),  inset 0 0 14px rgba(150,80,220,0.38); }
+}
+
+/* ---------- slider panel ---------- */
+#sliderContainer {
+  position: absolute;
+  top: 72px; left: 12px;
+  z-index: 2000;
+  display: none;
+  width: min(42vw, 520px);
+  min-width: min(320px, calc(100vw - 24px));
+  max-width: min(520px, calc(100vw - 24px));
+  max-height: calc(100dvh - 136px);
+  overflow-x: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  background: rgba(0,0,0,.85);
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 10px;
+  box-shadow: 0 0 14px rgba(0,255,255,.18);
+  opacity: 0.95;
+  backdrop-filter: blur(10px);
+  font-size: 0.82em;
+}
+body.playback-on #sliderContainer { display: block; }
+
+.slider-group {
+  display: grid;
+  grid-template-columns: max-content minmax(36px, 1fr) auto auto;
+  align-items: center;
+  gap: 3px 6px;
+  margin-bottom: 2px;
+  min-width: 0;
+}
+.slider-group label {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(8px, 1.05vw, 11px);
+  line-height: 1.15;
+  color: #fff;
+  white-space: nowrap;
+  min-width: max-content;
+}
+.slider-group input[type="range"] {
+  width: 100%;
+  min-width: 36px;
+  height: clamp(14px, 2.1vh, 20px);
+  margin: 0;
+  accent-color: #4de1ff;
+}
+.slider-group input[type="range"]:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+.slider-group button,
+.lock-button,
+.trigger-button {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(7px, 0.95vw, 9px);
+  color: #fff;
+  background: #000;
+  border: 1px solid #fff;
+  cursor: pointer;
+  padding: 2px 4px;
+  white-space: nowrap;
+  margin: 0;
+}
+.lock-button.locked, .trigger-button.locked {
+  color: #000;
+  background: #fff;
+}
+
+/* ---------- notification ---------- */
+.notification {
+  position: fixed;
+  top: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 255, 13, 0.8);
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 100;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity .5s ease-in-out;
+  pointer-events: none;
+  max-width: 90vw;
+  text-align: center;
+}
+
+/* ---------- preset bar ---------- */
+#preset-toggle-btn {
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  z-index: 10010;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 0 0 8px 8px;
+  cursor: pointer;
+  display: none;
+  opacity: 0.5;
+  color: #00ffff;
+  background: rgba(0, 20, 20, 0.5);
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 10px rgba(0,255,255,.5), 0 0 20px rgba(0,255,255,.3), inset 0 0 15px rgba(0,255,255,.2);
+  text-shadow: 0 0 4px #00ffff;
+  animation: crt-flicker .2s infinite;
+  transition: all .2s ease;
+}
+body.playback-on #preset-toggle-btn { display: block; }
+#preset-toggle-btn:hover {
+  background: #39ffff;
+  box-shadow: 0 2px 15px rgba(0,255,247,.8);
+}
+
+#preset-dropdown-container {
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 600px;
+  height: 0;
+  overflow: hidden;
+  background: rgba(10, 26, 35, 0.5);
+  border-bottom: 2px solid #00fff7;
+  box-shadow: 0 0 10px rgba(0,255,255,.5), 0 0 20px rgba(0,255,255,.3), inset 0 0 15px rgba(0,255,255,.2);
+  z-index: 10000;
+  transition: height .4s ease-in-out, opacity .4s ease-in-out;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 30px;
+  box-sizing: border-box;
+  opacity: 0;
+}
+#preset-dropdown-container.open { display: flex; height: auto; padding-bottom: 10px; }
+
+.preset-bar {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+.preset-bar select,
+.preset-bar input,
+.preset-bar button {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  border: 2px solid #00fff7;
+  border-radius: 4px;
+  margin: 2px;
+  padding: 4px 8px;
+  color: #00fff7;
+  background: rgba(16, 28, 34, 0.5);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0,255,247,.6);
+}
+.preset-bar button:hover { background: #00fff7; color: #101c22; }
+#presetDeleteBtn { background: rgba(34,16,16,.5); color: #ff2a2a; border-color: #ff2a2a; }
+#presetDeleteBtn:hover { background: #ff2a2a; color: #fff; }
+#presetDeleteAllBtn { background: rgba(255,0,255,.5); color: #fff; border-color: #ff00ff; }
+#presetDeleteAllBtn:hover { background: #ff00ff; color: #000; }
+#presetPrevBtn, #presetNextBtn {
+  width: 28px; height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+.current-preset-display {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  color: crimson;
+  text-shadow: 0 0 5px rgb(127,255,246);
+  pointer-events: none;
+  font-size: 1.05rem;
+  text-align: center;
+  padding: 2px 0;
+}
+
+/* ---------- UI hide tab ---------- */
+#ui-toggle-tab {
+  position: fixed;
+  right: 0; top: 50%;
+  transform: translateY(-50%);
+  z-index: 4000;
+  transition: right .3s ease-in-out, opacity .2s ease-in-out;
+  opacity: 0.95;
+  cursor: pointer;
+}
+#ui-toggle-tab.is-collapsed { right: var(--ui-tab-collapsed-right, -110px); }
+#ui-toggle-tab:hover { right: 0; opacity: 1; }
+#toggle-ui-btn {
+  font-family: 'Courier New', monospace;
+  color: #00ffff;
+  background: rgba(0, 20, 20, 0.7);
+  border: 2px solid #00ffff;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 0 8px rgba(0,255,255,.5), 0 0 16px rgba(0,255,255,.3), inset 0 0 10px rgba(0,255,255,.2);
+  text-shadow: 0 0 4px #00ffff;
+  animation: crt-flicker .2s infinite;
+  padding: 6px 10px;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* ---------- dim-by-default + hidden states ---------- */
+body:not(.playback-on) #rightRack,
+body:not(.playback-on) #sliderContainer,
+body:not(.playback-on) #preset-toggle-btn { display: none !important; }
+
+/* Keep Ghost Protocol / V-Sync more legible at rest (from final-006). */
+body:not(.ui-controls-hover) #preset-toggle-btn,
+body:not(.ui-controls-hover) #rightRack,
+body:not(.ui-controls-hover) #sliderContainer,
+body:not(.ui-controls-hover) #wired-btn,
+body:not(.ui-controls-hover) #ytInput,
+body:not(.ui-controls-hover) #startBtn,
+body:not(.ui-controls-hover) #openFileWrap {
+  opacity: 0.2 !important;
+}
+body:not(.ui-controls-hover) #ghostBtnRack,
+body:not(.ui-controls-hover) #ghostProtocolBtn,
+body:not(.ui-controls-hover) #vsyncScanBtn {
+  opacity: 0.6 !important;
+}
+body.ui-controls-hover #preset-toggle-btn,
+body.ui-controls-hover #rightRack,
+body.ui-controls-hover #sliderContainer,
+body.ui-controls-hover #ghostBtnRack,
+body.ui-controls-hover #wired-btn,
+body.ui-controls-hover #ytInput,
+body.ui-controls-hover #startBtn,
+body.ui-controls-hover #openFileWrap,
+body.ui-controls-hover #ghostProtocolBtn,
+body.ui-controls-hover #vsyncScanBtn {
+  opacity: 1 !important;
+}
+
+body.ui-hidden .suggested,
+body.ui-hidden #ytInput,
+body.ui-hidden #startBtn,
+body.ui-hidden #openFileWrap,
+body.ui-hidden #rightRack,
+body.ui-hidden #sliderContainer,
+body.ui-hidden #ghostBtnRack,
+body.ui-hidden #wired-btn,
+body.ui-hidden #preset-toggle-btn,
+body.ui-hidden #preset-dropdown-container {
+  display: none !important;
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 768px) {
+  #ytInput { width: 80vw; font-size: 12px; }
+  #startBtn { font-size: 12px; padding: 8px 12px; }
+  #rightRack { max-width: 108px; }
+  #rightRack .wired-button { font-size: 8px; padding: 3px 5px; }
+  #sliderContainer {
+    top: 52px; left: 8px;
+    width: calc(100vw - 118px);
+    min-width: 0;
+    max-width: calc(100vw - 118px);
+    max-height: calc(100dvh - 108px);
+  }
+  .slider-group { grid-template-columns: max-content minmax(28px, 1fr) auto auto; }
+  .slider-group label { font-size: clamp(7px, 2.6vw, 10px); }
+  #wired-btn { left: 8px; top: 8px; padding: 6px 8px; font-size: 12px; }
+  .suggested { font-size: 0.65em; }
+  #suggestedNightCity { font-size: 0.85em; }
+  #Defcon1Video { font-size: 1.5em; }
+  #openFileWrap { width: 200px; height: 38px; }
+  #openFileBtn { font-size: 11px; }
+  #preset-dropdown-container { width: 98%; padding-top: 35px; }
+  #ui-toggle-tab { transform: translateY(-50%); }
+  #toggle-ui-btn { font-size: 12px; padding: 8px 12px; }
+}
+@media (max-height: 760px) {
+  #sliderContainer { top: 58px; max-height: calc(100dvh - 110px); padding: 4px 6px; }
+  .slider-group { margin-bottom: 1px; gap: 2px 4px; }
+  .slider-group input[type="range"] { height: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wired-button, #preset-toggle-btn, #toggle-ui-btn { animation: none; }
+  .wired-button::before { animation: none; }
+}
+
+
+/* suggested link hit-targets — always clickable on the init screen */
+.suggested,
+#Defcon1Video,
+#testCanvas,
+#ytInput,
+#startBtn,
+#openFileWrap {
+  pointer-events: auto !important;
+  z-index: 2000;
+}
+#Defcon1Video {
+  pointer-events: auto !important;
+  z-index: 2000;
+}
+body:not(.playback-on) .suggested:hover,
+body:not(.playback-on) #Defcon1Video:hover,
+body:not(.playback-on) #testCanvas:hover {
+  opacity: 1 !important;
+}

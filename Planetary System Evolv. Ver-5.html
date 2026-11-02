@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CELERON // SIMULATION MATRIX</title>
+<style>
+:root {
+  --text-main: #a49cb3;
+  --bg-dark: #050208;
+  --panel-bg: rgba(8, 4, 16, 0.94);
+  --panel-border: rgba(164, 156, 179, 0.28);
+  --accent: #a49cb3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: var(--bg-dark);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  color: #fff;
+}
+#canvas-master-container {
+  position: absolute; inset: 0; z-index: 1;
+  background: #050208;
+}
+#cosmic-svg-layer {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  display: block;
+}
+#webgl-engine-layer {
+  position: absolute; inset: 0; z-index: 2;
+  width: 100%; height: 100%;
+}
+#webgl-engine-layer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.ui-terminal-wrapper {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 40px; pointer-events: none;
+}
+.ui-header { opacity: 0.65; }
+.celeron-title {
+  font-size: 1.2rem; letter-spacing: 4px;
+  color: var(--text-main); margin-bottom: 6px;
+  transition: color 0.8s ease;
+}
+.status-text {
+  font-size: 0.65rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--text-main);
+  transition: color 0.8s ease;
+}
+.hud-telemetry {
+  display: flex; justify-content: space-between; width: 100%;
+  font-size: 0.65rem; letter-spacing: 2px; opacity: 0.5;
+}
+.hud-column { display: flex; flex-direction: column; gap: 4px; }
+.hud-column.right { text-align: right; }
+.val { font-weight: bold; transition: color 0.8s ease; }
+
+#ctrl-toggle {
+  position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+  z-index: 200; width: 28px; height: 72px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border); border-right: none;
+  border-radius: 8px 0 0 8px;
+  color: var(--accent); font-size: 11px; letter-spacing: 1px;
+  writing-mode: vertical-rl; text-orientation: mixed;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  pointer-events: auto; user-select: none;
+}
+#ctrl-toggle:hover { background: rgba(20,12,36,0.95); color: #fff; }
+#ctrl-toggle.hidden { display: none; }
+
+#ctrl-panel {
+  position: fixed; top: 0; right: 0;
+  width: 340px; height: 100%; z-index: 199;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--panel-border);
+  backdrop-filter: blur(14px);
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none;
+  display: flex; flex-direction: column;
+  font-size: 11px; color: #c8c0d4;
+}
+#ctrl-panel.open { transform: translateX(0); pointer-events: auto; }
+#ctrl-panel.floating {
+  top: 60px; right: auto; left: 80px;
+  width: 360px; height: auto; max-height: 82vh;
+  border: 1px solid var(--panel-border); border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  transform: none; transition: none; pointer-events: auto;
+}
+#ctrl-panel.floating.hidden-float { display: none; }
+
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px; border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0; user-select: none;
+}
+#ctrl-panel.floating .panel-header { cursor: grab; }
+.panel-header h2 { font-size: 12px; letter-spacing: 3px; color: var(--accent); margin: 0; }
+.header-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.hdr-btn {
+  font-size: 9px; letter-spacing: 1px; padding: 4px 8px;
+  background: rgba(164,156,179,0.12); border: 1px solid var(--panel-border);
+  color: #c8c0d4; border-radius: 4px; cursor: pointer; font-family: inherit; text-transform: uppercase;
+}
+.hdr-btn:hover { background: rgba(164,156,179,0.3); color: #fff; }
+.panel-body { padding: 16px 18px 40px; overflow-y: auto; flex: 1; }
+
+.ctrl-section { margin-bottom: 20px; }
+.ctrl-section h3 {
+  font-size: 10px; letter-spacing: 2px; color: #887e9a;
+  margin-bottom: 10px; text-transform: uppercase;
+}
+.ctrl-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 11px; }
+.ctrl-row label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 10px; letter-spacing: 0.5px;
+}
+.ctrl-row label .val { color: #e0d8ec; min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+  background: rgba(164,156,179,0.2); border-radius: 2px; outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); cursor: pointer; border: none;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%; background: var(--accent); cursor: pointer; border: none;
+}
+.color-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.color-row label { font-size: 10px; flex: 1; }
+input[type="color"] {
+  -webkit-appearance: none; width: 36px; height: 24px;
+  border: 1px solid var(--panel-border); border-radius: 4px;
+  background: transparent; cursor: pointer; padding: 0;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+input[type="color"]::-webkit-color-swatch { border: none; border-radius: 2px; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.toggle-row label { font-size: 10px; }
+.toggle-btn {
+  width: 40px; height: 20px; background: rgba(164,156,179,0.2);
+  border-radius: 10px; position: relative; cursor: pointer; border: none;
+}
+.toggle-btn.on { background: rgba(164,156,179,0.55); }
+.toggle-btn::after {
+  content: ''; position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px; border-radius: 50%; background: #c8c0d4; transition: transform 0.2s;
+}
+.toggle-btn.on::after { transform: translateX(20px); background: #fff; }
+.btn-row { display: flex; gap: 8px; margin-top: 8px; }
+.ctrl-btn {
+  flex: 1; padding: 7px 0; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  background: rgba(164,156,179,0.12); border: 1px solid var(--panel-border);
+  color: #c8c0d4; border-radius: 4px; cursor: pointer; font-family: inherit;
+}
+.ctrl-btn:hover { background: rgba(164,156,179,0.28); color: #fff; }
+.ctrl-btn.active { background: rgba(100,220,140,0.25); border-color: rgba(100,220,140,0.5); color: #9eecc0; }
+.audio-status {
+  font-size: 9px; color: #776e8a; margin-bottom: 8px; padding: 6px 8px;
+  background: rgba(0,0,0,0.25); border-radius: 4px; border: 1px solid rgba(164,156,179,0.12);
+}
+.audio-status.live { color: #9eecc0; border-color: rgba(100,220,140,0.3); }
+.audio-status.err { color: #f0a0a0; border-color: rgba(220,100,100,0.3); }
+.audio-meter { height: 6px; background: rgba(164,156,179,0.15); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.audio-meter-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #5a4a7a, #a49cb3, #e0d8ec); border-radius: 3px;
+}
+.meter-label { font-size: 9px; color: #776e8a; margin-top: 2px; display: flex; justify-content: space-between; }
+.panel-body::-webkit-scrollbar { width: 5px; }
+.panel-body::-webkit-scrollbar-thumb { background: rgba(164,156,179,0.3); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="canvas-master-container">
+  <svg id="cosmic-svg-layer" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <radialGradient id="magnetic-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#221a30" stop-opacity="0.35" id="grad-stop-0"/>
+        <stop offset="100%" stop-color="#050208" stop-opacity="0" id="grad-stop-1"/>
+      </radialGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#magnetic-glow)"/>
+    <g id="svg-stars-back"></g>
+    <g id="svg-magnetic-back"></g>
+    <g id="svg-magnetic-aberr-r"></g>
+    <g id="svg-magnetic-aberr-b"></g>
+    <g id="svg-belt-back"></g>
+    <g id="svg-belt-aberr-r"></g>
+    <g id="svg-belt-aberr-b"></g>
+    <g id="svg-stars-front"></g>
+    <g id="svg-magnetic-front"></g>
+    <g id="svg-belt-front"></g>
+  </svg>
+  <div id="webgl-engine-layer"></div>
+</div>
+
+<div class="ui-terminal-wrapper">
+  <header class="ui-header">
+    <h1 class="celeron-title" id="main-title">CELERON — NOMINAL BASELINE</h1>
+    <div class="status-text" id="status-text">Topology: Pure Nominal // Environmental State: Neutral</div>
+  </header>
+  <footer class="hud-telemetry">
+    <div class="hud-column">
+      <div>CORE LENS: <span class="val" id="lensing-val">PURE_NOMINAL</span></div>
+      <div>MASS CONFIG: <span class="val" id="hud-mass">4.2M SOL</span></div>
+    </div>
+    <div class="hud-column right">
+      <div>RELATIVISTIC VELOCITY: <span class="val" id="vel-val">0.10c</span></div>
+      <div>RADIATION THRESHOLD: <span class="val" id="hud-rad">NATURAL FLUX</span></div>
+    </div>
+  </footer>
+</div>
+
+<button id="ctrl-toggle" type="button">CTRL</button>
+<aside id="ctrl-panel">
+  <div class="panel-header" id="panel-drag-handle">
+    <h2>MATRIX CONTROLS</h2>
+    <div class="header-btns">
+      <button class="hdr-btn" id="btn-popout" type="button">POP OUT</button>
+      <button class="hdr-btn" id="btn-dock" type="button" style="display:none">DOCK</button>
+      <button class="hdr-btn" id="btn-hide" type="button">HIDE</button>
+    </div>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</aside>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+    "gsap": "https://unpkg.com/gsap@3.12.5/index.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import gsap from 'gsap';
+
+const CONTROLS_HTML = `
+<div class="ctrl-section"><h3>Density</h3>
+  <div class="ctrl-row"><label>Starfield Density <span class="val" data-val="stars">280</span></label>
+    <input type="range" data-key="starCount" data-id="stars" min="40" max="700" step="10" value="280"></div>
+  <div class="ctrl-row"><label>Asteroid Belt Density <span class="val" data-val="asteroids">220</span></label>
+    <input type="range" data-key="asteroidCount" data-id="asteroids" min="30" max="500" step="10" value="220"></div>
+  <div class="ctrl-row"><label>Magnetic Fields Density <span class="val" data-val="fields">14</span></label>
+    <input type="range" data-key="fieldLines" data-id="fields" min="4" max="36" step="1" value="14"></div>
+</div>
+<div class="ctrl-section"><h3>Orbital / Deformation FX</h3>
+  <div class="ctrl-row"><label>Morph <span class="val" data-val="morph">0.00</span></label>
+    <input type="range" data-key="morph" data-id="morph" data-dec="2" min="0" max="3" step="0.05" value="0"></div>
+  <div class="ctrl-row"><label>Compression <span class="val" data-val="compress">1.00</span></label>
+    <input type="range" data-key="compress" data-id="compress" data-dec="2" min="0.05" max="1.8" step="0.05" value="1"></div>
+  <div class="ctrl-row"><label>Intensity <span class="val" data-val="intensity">0.80</span></label>
+    <input type="range" data-key="intensity" data-id="intensity" data-dec="2" min="0.2" max="6" step="0.1" value="0.8"></div>
+  <div class="ctrl-row"><label>Rotate Speed <span class="val" data-val="rotate">0.10</span></label>
+    <input type="range" data-key="rotate" data-id="rotate" data-dec="2" min="0" max="10" step="0.1" value="0.1"></div>
+  <div class="ctrl-row"><label>Belt Speed <span class="val" data-val="astSpeed">0.35</span></label>
+    <input type="range" data-key="astSpeed" data-id="astSpeed" data-dec="2" min="0" max="8" step="0.1" value="0.35"></div>
+  <div class="ctrl-row"><label>Belt Fluctuation <span class="val" data-val="astChaos">0.25</span></label>
+    <input type="range" data-key="astChaos" data-id="astChaos" data-dec="2" min="0" max="2" step="0.05" value="0.25"></div>
+  <div class="ctrl-row"><label>Field Pulse <span class="val" data-val="fieldPulse">1.00</span></label>
+    <input type="range" data-key="fieldPulse" data-id="fieldPulse" data-dec="2" min="0.2" max="12" step="0.1" value="1"></div>
+  <div class="ctrl-row"><label>Shell Orbit Speed <span class="val" data-val="shellSpeed">0.15</span></label>
+    <input type="range" data-key="shellSpeed" data-id="shellSpeed" data-dec="2" min="0" max="2" step="0.05" value="0.15"></div>
+  <div class="ctrl-row"><label>Cam Distance (wheel zoom) <span class="val" data-val="camDist">42</span></label>
+    <input type="range" data-key="camDist" data-id="camDist" min="18" max="80" step="1" value="42"></div>
+  <div class="ctrl-row"><label>Cam Y <span class="val" data-val="camY">10</span></label>
+    <input type="range" data-key="camY" data-id="camY" min="-25" max="35" step="1" value="10"></div>
+</div>
+<div class="ctrl-section"><h3>Colors</h3>
+  <div class="color-row"><label>Main / Vector (Center)</label><input type="color" data-key="color" data-id="color" value="#a49cb3"></div>
+  <div class="color-row"><label>Aura / Magnetic</label><input type="color" data-key="glowColor" data-id="glow" value="#221a30"></div>
+  <div class="color-row"><label>Stars / Belt</label><input type="color" data-key="starColor" data-id="starcolor" value="#ffffff"></div>
+</div>
+<div class="ctrl-section"><h3>Chromatic / Hue Params</h3>
+  <div class="ctrl-row"><label>Hue Speed <span class="val" data-val="hueSpeed">0.40</span></label>
+    <input type="range" data-key="hueSpeed" data-id="hueSpeed" data-dec="2" min="0.05" max="4" step="0.05" value="0.4"></div>
+  <div class="ctrl-row"><label>Audio Hue Boost <span class="val" data-val="hueBoost">1.50</span></label>
+    <input type="range" data-key="hueBoost" data-id="hueBoost" data-dec="2" min="0" max="6" step="0.1" value="1.5"></div>
+  <div class="ctrl-row"><label>Chromatic Strength <span class="val" data-val="chromaStr">1.00</span></label>
+    <input type="range" data-key="chromaStr" data-id="chromaStr" data-dec="2" min="0" max="3" step="0.05" value="1"></div>
+  <div class="ctrl-row"><label>HSL Invert Mix <span class="val" data-val="invertMix">0.65</span></label>
+    <input type="range" data-key="invertMix" data-id="invertMix" data-dec="2" min="0" max="1" step="0.05" value="0.65"></div>
+  <div class="ctrl-row"><label>Disco Burst Density <span class="val" data-val="discoDensity">1.00</span></label>
+    <input type="range" data-key="discoDensity" data-id="discoDensity" data-dec="2" min="0.2" max="3" step="0.05" value="1"></div>
+</div>
+<div class="ctrl-section"><h3>Audio Response</h3>
+  <div class="audio-status" data-audio-status>Audio: idle — click Start Capture</div>
+  <div class="btn-row" style="margin-bottom:10px">
+    <button class="ctrl-btn" data-action="start-audio" type="button">Start Capture</button>
+    <button class="ctrl-btn" data-action="stop-audio" type="button">Stop</button>
+  </div>
+  <div class="toggle-row"><label>Enable Audio Reactivity</label><button class="toggle-btn" data-toggle="audioEnabled" type="button"></button></div>
+  <div class="ctrl-row"><label>Sensitivity <span class="val" data-val="audioSens">1.20</span></label>
+    <input type="range" data-key="audioSens" data-id="audioSens" data-dec="2" min="0.2" max="4" step="0.1" value="1.2"></div>
+  <div class="ctrl-row"><label>Bass → Morph/Intensity <span class="val" data-val="bassInf">1.00</span></label>
+    <input type="range" data-key="bassInf" data-id="bassInf" data-dec="2" min="0" max="3" step="0.1" value="1"></div>
+  <div class="ctrl-row"><label>Mid → Chaos/Pulse <span class="val" data-val="midInf">1.00</span></label>
+    <input type="range" data-key="midInf" data-id="midInf" data-dec="2" min="0" max="3" step="0.1" value="1"></div>
+  <div class="ctrl-row"><label>High → Rotate/Speed <span class="val" data-val="highInf">0.70</span></label>
+    <input type="range" data-key="highInf" data-id="highInf" data-dec="2" min="0" max="3" step="0.1" value="0.7"></div>
+  <div class="ctrl-row"><label>Beat Punch <span class="val" data-val="beatPunch">1.40</span></label>
+    <input type="range" data-key="beatPunch" data-id="beatPunch" data-dec="2" min="0" max="4" step="0.1" value="1.4"></div>
+  <div style="margin-top:8px">
+    <div class="meter-label"><span>BASS</span><span data-meter-val="bass">0%</span></div>
+    <div class="audio-meter"><div class="audio-meter-fill" data-meter="bass"></div></div>
+    <div class="meter-label"><span>MID</span><span data-meter-val="mid">0%</span></div>
+    <div class="audio-meter"><div class="audio-meter-fill" data-meter="mid"></div></div>
+    <div class="meter-label"><span>HIGH</span><span data-meter-val="high">0%</span></div>
+    <div class="audio-meter"><div class="audio-meter-fill" data-meter="high"></div></div>
+    <div class="meter-label"><span>ENERGY</span><span data-meter-val="energy">0%</span></div>
+    <div class="audio-meter"><div class="audio-meter-fill" data-meter="energy"></div></div>
+  </div>
+</div>
+<div class="ctrl-section"><h3>System</h3>
+  <div class="toggle-row"><label>Rainbow Hue Shift</label><button class="toggle-btn" data-toggle="rainbow" type="button"></button></div>
+  <div class="toggle-row"><label>Auto Cycle States</label><button class="toggle-btn on" data-toggle="autoCycle" type="button"></button></div>
+  <div class="btn-row">
+    <button class="ctrl-btn" data-action="next" type="button">Next State</button>
+    <button class="ctrl-btn" data-action="reset" type="button">Reset Defaults</button>
+  </div>
+</div>`;
+
+document.getElementById('panel-body').innerHTML = CONTROLS_HTML;
+
+const POPUP_CSS = `:root{--accent:#a49cb3;--panel-bg:#0a0612;--panel-border:rgba(164,156,179,.28)}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;background:var(--panel-bg);font-family:monospace;color:#c8c0d4;font-size:11px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--panel-border);background:rgba(0,0,0,.25)}
+.panel-header h2{font-size:12px;letter-spacing:3px;color:var(--accent);margin:0}.header-btns{display:flex;gap:6px}
+.hdr-btn{font-size:9px;letter-spacing:1px;padding:4px 8px;background:rgba(164,156,179,.12);border:1px solid var(--panel-border);color:#c8c0d4;border-radius:4px;cursor:pointer;font-family:inherit;text-transform:uppercase}
+.hdr-btn:hover{background:rgba(164,156,179,.3);color:#fff}.panel-body{padding:14px 16px 30px;overflow-y:auto;height:calc(100% - 48px)}
+.ctrl-section{margin-bottom:18px}.ctrl-section h3{font-size:10px;letter-spacing:2px;color:#887e9a;margin-bottom:10px;text-transform:uppercase}
+.ctrl-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}.ctrl-row label{display:flex;justify-content:space-between;font-size:10px}
+.ctrl-row label .val{color:#e0d8ec;min-width:42px;text-align:right}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:rgba(164,156,179,.2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);border:none}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--accent);border:none}
+.color-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.color-row label{font-size:10px;flex:1}
+input[type=color]{-webkit-appearance:none;width:36px;height:24px;border:1px solid var(--panel-border);border-radius:4px;background:transparent;cursor:pointer;padding:0}
+input[type=color]::-webkit-color-swatch-wrapper{padding:2px}input[type=color]::-webkit-color-swatch{border:none;border-radius:2px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.toggle-row label{font-size:10px}
+.toggle-btn{width:40px;height:20px;background:rgba(164,156,179,.2);border-radius:10px;position:relative;cursor:pointer;border:none}
+.toggle-btn.on{background:rgba(164,156,179,.55)}.toggle-btn::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#c8c0d4;transition:transform .2s}
+.toggle-btn.on::after{transform:translateX(20px);background:#fff}
+.btn-row{display:flex;gap:8px;margin-top:8px}.ctrl-btn{flex:1;padding:7px 0;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(164,156,179,.12);border:1px solid var(--panel-border);color:#c8c0d4;border-radius:4px;cursor:pointer;font-family:inherit}
+.ctrl-btn:hover{background:rgba(164,156,179,.28);color:#fff}.ctrl-btn.active{background:rgba(100,220,140,.25);border-color:rgba(100,220,140,.5);color:#9eecc0}
+.audio-status{font-size:9px;color:#776e8a;margin-bottom:8px;padding:6px 8px;background:rgba(0,0,0,.25);border-radius:4px;border:1px solid rgba(164,156,179,.12)}
+.audio-status.live{color:#9eecc0;border-color:rgba(100,220,140,.3)}.audio-status.err{color:#f0a0a0;border-color:rgba(220,100,100,.3)}
+.audio-meter{height:6px;background:rgba(164,156,179,.15);border-radius:3px;overflow:hidden;margin-top:4px}
+.audio-meter-fill{height:100%;width:0%;background:linear-gradient(90deg,#5a4a7a,#a49cb3,#e0d8ec);border-radius:3px}
+.meter-label{font-size:9px;color:#776e8a;margin-top:2px;display:flex;justify-content:space-between}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(164,156,179,.3);border-radius:3px}`;
+
+/* Full state presets — every slider key included so auto-cycle updates densities / FX / colors */
+const config = [
+  { title:"CELERON — NOMINAL BASELINE", status:"Topology: Pure Nominal // Environmental State: Neutral",
+    starCount:220, asteroidCount:160, fieldLines:10,
+    morph:0, compress:1, intensity:0.8, rotate:0.1, camY:10, camDist:42,
+    color:"#a49cb3", glowColor:"#221a30", starColor:"#e8e4f0",
+    astSpeed:0.35, astChaos:0.2, fieldPulse:1, shellSpeed:0.12,
+    hueSpeed:0.35, hueBoost:1.2, chromaStr:0.8, invertMix:0.55, discoDensity:0.8,
+    vel:"0.10c", license:"PURE_NOMINAL", rad:"NATURAL FLUX" },
+  { title:"CELERON — TURBULENT BASELINE", status:"Topology: Pure Turbulent // Environmental State: Neutral",
+    starCount:380, asteroidCount:280, fieldLines:18,
+    morph:1.2, compress:1, intensity:1.1, rotate:0.8, camY:20, camDist:48,
+    color:"#88ffcc", glowColor:"#053322", starColor:"#b8ffe8",
+    astSpeed:0.7, astChaos:0.55, fieldPulse:2.5, shellSpeed:0.28,
+    hueSpeed:0.55, hueBoost:1.6, chromaStr:1.2, invertMix:0.65, discoDensity:1.1,
+    vel:"0.55c", license:"PURE_TURB", rad:"STABLE BASELINE" },
+  { title:"CELERON — CRITICAL BASELINE", status:"Topology: Pure Critical // Environmental State: Neutral",
+    starCount:450, asteroidCount:320, fieldLines:22,
+    morph:0.3, compress:0.35, intensity:1.5, rotate:1.5, camY:5, camDist:35,
+    color:"#ff6666", glowColor:"#401010", starColor:"#ffbbbb",
+    astSpeed:1.5, astChaos:0.4, fieldPulse:4, shellSpeed:0.4,
+    hueSpeed:0.7, hueBoost:2.0, chromaStr:1.5, invertMix:0.7, discoDensity:1.4,
+    vel:"0.90c", license:"PURE_CRIT", rad:"THERMAL DRIFT" },
+  { title:"CELERON — NOMINAL SOLAR STRAIN", status:"Topology: Nominal // Solar Radiation: Active",
+    starCount:300, asteroidCount:200, fieldLines:14,
+    morph:0.08, compress:0.95, intensity:1.2, rotate:0.3, camY:15, camDist:45,
+    color:"#ff884b", glowColor:"#b300ff", starColor:"#ffe0c0",
+    astSpeed:0.5, astChaos:0.3, fieldPulse:1.8, shellSpeed:0.18,
+    hueSpeed:0.45, hueBoost:1.8, chromaStr:1.1, invertMix:0.6, discoDensity:1.0,
+    vel:"0.42c", license:"SOLAR_TELEM", rad:"HIGH ION MASS" },
+  { title:"CELERON — TURBULENT RAIN INTERCEPT", status:"Topology: Turbulent // Precipitation Vector: Dense",
+    starCount:520, asteroidCount:360, fieldLines:26,
+    morph:1.6, compress:1.4, intensity:2, rotate:2.2, camY:25, camDist:52,
+    color:"#00d5ff", glowColor:"#ff0077", starColor:"#a0f0ff",
+    astSpeed:1.0, astChaos:0.85, fieldPulse:3.2, shellSpeed:0.5,
+    hueSpeed:0.9, hueBoost:2.2, chromaStr:1.8, invertMix:0.75, discoDensity:1.6,
+    vel:"0.81c", license:"RAIN_MESH", rad:"ATTENUATED" },
+  { title:"CELERON — CRITICAL STORM SINGULARITY", status:"Topology: Critical // Storm Vector: Maximum Burst",
+    starCount:600, asteroidCount:420, fieldLines:30,
+    morph:0.45, compress:0.15, intensity:4, rotate:6, camY:2, camDist:30,
+    color:"#ff003c", glowColor:"#4400aa", starColor:"#ff90c0",
+    astSpeed:3.5, astChaos:1.15, fieldPulse:8, shellSpeed:0.85,
+    hueSpeed:1.4, hueBoost:3.0, chromaStr:2.4, invertMix:0.85, discoDensity:2.2,
+    vel:"0.99c", license:"STORM_CORE", rad:"CRITICAL EMISSION" },
+  { title:"CELERON — NOMINAL PRECIPITATION CURVE", status:"Topology: Nominal // Precipitation Vector: Rain",
+    starCount:260, asteroidCount:180, fieldLines:12,
+    morph:0.04, compress:1.2, intensity:0.9, rotate:0.2, camY:12, camDist:44,
+    color:"#3ba2ff", glowColor:"#1d2440", starColor:"#c8e0ff",
+    astSpeed:0.4, astChaos:0.15, fieldPulse:1.2, shellSpeed:0.14,
+    hueSpeed:0.3, hueBoost:1.1, chromaStr:0.7, invertMix:0.5, discoDensity:0.7,
+    vel:"0.38c", license:"STREAM_SYS", rad:"DAMPENED SCATTER" },
+  { title:"CELERON — TURBULENT RADIATION FLARE", status:"Topology: Turbulent // Solar Radiation: Eruptive",
+    starCount:480, asteroidCount:340, fieldLines:24,
+    morph:2.2, compress:0.7, intensity:2.8, rotate:3.5, camY:-15, camDist:50,
+    color:"#ffbb00", glowColor:"#ff4b00", starColor:"#ffe8a0",
+    astSpeed:2.2, astChaos:0.75, fieldPulse:5.5, shellSpeed:0.6,
+    hueSpeed:1.1, hueBoost:2.5, chromaStr:2.0, invertMix:0.8, discoDensity:1.9,
+    vel:"0.89c", license:"FLARE_WARN", rad:"MAX CORONAL INDUCT" },
+  { title:"CELERON — CRITICAL VORTEX DISPLACEMENT", status:"Topology: Critical // Storm Vector: Rain & Shield Collapse",
+    starCount:650, asteroidCount:450, fieldLines:34,
+    morph:0.9, compress:0.05, intensity:5, rotate:8, camY:0, camDist:28,
+    color:"#e600ff", glowColor:"#1a0033", starColor:"#f0b0ff",
+    astSpeed:5, astChaos:1.4, fieldPulse:10, shellSpeed:1.1,
+    hueSpeed:1.8, hueBoost:3.5, chromaStr:2.8, invertMix:0.9, discoDensity:2.6,
+    vel:"0.998c", license:"VOID_MATRIX", rad:"EXTREME QUANTUM BURST" }
+];
+
+const base = {
+  starCount:280, asteroidCount:220, fieldLines:14,
+  morph:0, compress:1, intensity:0.8, rotate:0.1, camY:10, camDist:42,
+  color:"#a49cb3", glowColor:"#221a30", starColor:"#ffffff",
+  astSpeed:0.35, astChaos:0.25, fieldPulse:1, shellSpeed:0.15,
+  autoCycle:true, rainbow:false, hueSpeed:0.4, hueBoost:1.5,
+  chromaStr:1.0, invertMix:0.65, discoDensity:1.0,
+  audioEnabled:false, audioSens:1.2, bassInf:1, midInf:1, highInf:0.7, beatPunch:1.4
+};
+const live = { ...base };
+
+let stateIdx = 0;
+let currentAstSpeed = base.astSpeed, currentAstChaos = base.astChaos, currentFieldPulse = base.fieldPulse;
+let svgColorStr = base.color, starColorStr = base.starColor;
+let cycleTimer = null, rainbowHue = 0;
+let uiCamDistSync = true; // allow wheel to update slider without feedback loop
+
+const chroma = { amount:0, oxR:0, oyR:0, oxB:0, oyB:0, colR:'#ff0044', colG:'#00ff88', colB:'#4488ff' };
+const audioState = {
+  bass:0, mid:0, high:0, energy:0,
+  smoothBass:0, smoothMid:0, smoothHigh:0, smoothEnergy:0,
+  beat:0, lastBeatTime:0
+};
+
+const panel = document.getElementById('ctrl-panel');
+const toggleBtn = document.getElementById('ctrl-toggle');
+const btnPopout = document.getElementById('btn-popout');
+const btnDock = document.getElementById('btn-dock');
+const btnHide = document.getElementById('btn-hide');
+const dragHandle = document.getElementById('panel-drag-handle');
+const mainTitle = document.getElementById('main-title');
+const statusText = document.getElementById('status-text');
+const licenseVal = document.getElementById('lensing-val');
+const velVal = document.getElementById('vel-val');
+const hudRad = document.getElementById('hud-rad');
+const gradStop0 = document.getElementById('grad-stop-0');
+const gStarsBack = document.getElementById('svg-stars-back');
+const gStarsFront = document.getElementById('svg-stars-front');
+const gMagBack = document.getElementById('svg-magnetic-back');
+const gMagFront = document.getElementById('svg-magnetic-front');
+const gMagAberrR = document.getElementById('svg-magnetic-aberr-r');
+const gMagAberrB = document.getElementById('svg-magnetic-aberr-b');
+const gBeltBack = document.getElementById('svg-belt-back');
+const gBeltFront = document.getElementById('svg-belt-front');
+const gBeltAberrR = document.getElementById('svg-belt-aberr-r');
+const gBeltAberrB = document.getElementById('svg-belt-aberr-b');
+const container = document.getElementById('webgl-engine-layer');
+const svgRoot = document.getElementById('cosmic-svg-layer');
+
+let width = window.innerWidth, height = window.innerHeight;
+
+/* panel chrome */
+let popupWin = null, usingExternalPopup = false, isInternalFloat = false;
+let isDragging = false, dragOffX = 0, dragOffY = 0;
+
+function openDocked() {
+  closeExternalPopup();
+  panel.classList.remove('floating', 'hidden-float'); panel.classList.add('open');
+  btnPopout.style.display = ''; btnDock.style.display = 'none';
+  toggleBtn.classList.remove('hidden'); toggleBtn.textContent = 'CLOSE';
+  isInternalFloat = false; panel.style.left = ''; panel.style.top = '';
+}
+function closeDocked() { panel.classList.remove('open'); toggleBtn.textContent = 'CTRL'; }
+function openInternalFloat() {
+  panel.classList.add('open', 'floating'); panel.classList.remove('hidden-float');
+  btnPopout.style.display = 'none'; btnDock.style.display = '';
+  toggleBtn.classList.add('hidden'); isInternalFloat = true;
+  if (!panel.style.left) { panel.style.left = '80px'; panel.style.top = '60px'; }
+}
+function openExternalPopup() {
+  if (popupWin && !popupWin.closed) { popupWin.focus(); return; }
+  popupWin = window.open('about:blank', 'CeleronMatrixControls',
+    'width=380,height=780,left=120,top=60,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');
+  if (!popupWin || popupWin.closed) { openInternalFloat(); return; }
+  usingExternalPopup = true;
+  const doc = popupWin.document;
+  doc.open();
+  doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CELERON CONTROLS</title><style>${POPUP_CSS}</style></head><body>
+    <div class="panel-header"><h2>MATRIX CONTROLS</h2><div class="header-btns">
+      <button class="hdr-btn" id="popup-dock">DOCK</button>
+      <button class="hdr-btn" id="popup-close">CLOSE</button>
+    </div></div><div class="panel-body">${CONTROLS_HTML}</div></body></html>`);
+  doc.close();
+  bindRoot(doc); syncRoot(doc);
+  doc.getElementById('popup-dock').onclick = () => { closeExternalPopup(); openDocked(); };
+  doc.getElementById('popup-close').onclick = () => closeExternalPopup();
+  const poll = setInterval(() => {
+    if (!popupWin || popupWin.closed) {
+      clearInterval(poll); usingExternalPopup = false; popupWin = null;
+      toggleBtn.classList.remove('hidden'); toggleBtn.textContent = 'CTRL';
+    }
+  }, 400);
+  panel.classList.remove('open', 'floating'); toggleBtn.classList.add('hidden');
+}
+function closeExternalPopup() {
+  if (popupWin && !popupWin.closed) popupWin.close();
+  popupWin = null; usingExternalPopup = false;
+  toggleBtn.classList.remove('hidden'); toggleBtn.textContent = 'CTRL';
+}
+toggleBtn.addEventListener('click', () => {
+  if (usingExternalPopup) { if (popupWin && !popupWin.closed) popupWin.focus(); else openExternalPopup(); return; }
+  if (isInternalFloat) {
+    if (panel.classList.contains('hidden-float')) { panel.classList.remove('hidden-float'); toggleBtn.classList.add('hidden'); }
+    else { panel.classList.add('hidden-float'); toggleBtn.classList.remove('hidden'); toggleBtn.textContent = 'CTRL'; }
+    return;
+  }
+  if (panel.classList.contains('open')) closeDocked(); else openDocked();
+});
+btnPopout.addEventListener('click', () => openExternalPopup());
+btnDock.addEventListener('click', () => openDocked());
+btnHide.addEventListener('click', () => {
+  if (usingExternalPopup) closeExternalPopup();
+  else if (isInternalFloat) { panel.classList.add('hidden-float'); toggleBtn.classList.remove('hidden'); toggleBtn.textContent = 'CTRL'; }
+  else closeDocked();
+});
+dragHandle.addEventListener('pointerdown', (e) => {
+  if (!panel.classList.contains('floating')) return;
+  isDragging = true;
+  const r = panel.getBoundingClientRect();
+  dragOffX = e.clientX - r.left; dragOffY = e.clientY - r.top;
+  panel.setPointerCapture(e.pointerId);
+});
+window.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  panel.style.left = Math.max(0, Math.min(window.innerWidth - 80, e.clientX - dragOffX)) + 'px';
+  panel.style.top = Math.max(0, Math.min(window.innerHeight - 60, e.clientY - dragOffY)) + 'px';
+});
+window.addEventListener('pointerup', () => { isDragging = false; });
+panel.addEventListener('pointerdown', e => e.stopPropagation());
+panel.addEventListener('wheel', e => e.stopPropagation());
+
+const DENSITY_KEYS = new Set(['starCount', 'asteroidCount', 'fieldLines']);
+
+function pushValToUI(id, value, dec) {
+  const text = dec != null ? Number(value).toFixed(dec) : String(value);
+  document.querySelectorAll(`[data-val="${id}"]`).forEach(el => { el.textContent = text; });
+  if (popupWin && !popupWin.closed) {
+    popupWin.document.querySelectorAll(`[data-val="${id}"]`).forEach(el => { el.textContent = text; });
+  }
+}
+function pushInputToUI(key, value) {
+  const sel = `[data-key="${key}"]`;
+  document.querySelectorAll(sel).forEach(el => { if (String(el.value) !== String(value)) el.value = value; });
+  if (popupWin && !popupWin.closed) {
+    popupWin.document.querySelectorAll(sel).forEach(el => { if (String(el.value) !== String(value)) el.value = value; });
+  }
+}
+
+function onParamChange(key, value, id, dec) {
+  base[key] = value;
+  if (id) pushValToUI(id, value, dec);
+  if (DENSITY_KEYS.has(key)) initializePlanetarySystem();
+  if (key === 'camY') camera.position.y = value;
+  if (key === 'camDist') setCameraDistance(value);
+  if (key === 'color' && !base.rainbow && !base.audioEnabled) {
+    live.color = base.color; vectorMaterial.uniforms.uColor.value.set(live.color);
+    svgColorStr = live.color;
+    [mainTitle, statusText, licenseVal, velVal, hudRad].forEach(el => el.style.color = live.color);
+  }
+  if (key === 'glowColor' && !base.rainbow && !base.audioEnabled) {
+    live.glowColor = base.glowColor; auraMat.uniforms.uColor.value.set(live.glowColor);
+    gradStop0.setAttribute('stop-color', live.glowColor);
+  }
+  if (key === 'starColor' && !base.rainbow && !base.audioEnabled) {
+    live.starColor = base.starColor; starColorStr = live.starColor;
+  }
+  pushInputToUI(key, value);
+}
+
+function bindRoot(root) {
+  root.querySelectorAll('input[data-key]').forEach(el => {
+    el.addEventListener('input', () => {
+      const key = el.getAttribute('data-key');
+      const id = el.getAttribute('data-id');
+      const dec = el.hasAttribute('data-dec') ? parseInt(el.getAttribute('data-dec'), 10) : null;
+      let val = el.type === 'color' ? el.value : parseFloat(el.value);
+      if (DENSITY_KEYS.has(key)) val = parseInt(el.value, 10);
+      onParamChange(key, val, id, dec);
+    });
+  });
+  root.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.getAttribute('data-toggle');
+      base[key] = !base[key];
+      setToggle(key, base[key]);
+      if (key === 'autoCycle') startCycleTimer();
+      if (key === 'rainbow') discoMat.uniforms.uActive.value = base.rainbow ? 1 : 0;
+    });
+  });
+  root.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const act = btn.getAttribute('data-action');
+      if (act === 'start-audio') startWebAudio();
+      if (act === 'stop-audio') stopWebAudio();
+      if (act === 'next') { triggerState(); startCycleTimer(); }
+      if (act === 'reset') doReset();
+    });
+  });
+}
+function setToggle(key, on) {
+  document.querySelectorAll(`[data-toggle="${key}"]`).forEach(b => b.classList.toggle('on', on));
+  if (popupWin && !popupWin.closed) {
+    popupWin.document.querySelectorAll(`[data-toggle="${key}"]`).forEach(b => b.classList.toggle('on', on));
+  }
+}
+function syncRoot(root) {
+  root.querySelectorAll('input[data-key]').forEach(el => {
+    const key = el.getAttribute('data-key');
+    const id = el.getAttribute('data-id');
+    const dec = el.hasAttribute('data-dec') ? parseInt(el.getAttribute('data-dec'), 10) : null;
+    const val = base[key];
+    el.value = val;
+    if (el.type !== 'color' && id) {
+      const lab = root.querySelector(`[data-val="${id}"]`);
+      if (lab) lab.textContent = dec != null ? Number(val).toFixed(dec) : val;
+    }
+  });
+  setToggle('rainbow', base.rainbow);
+  setToggle('audioEnabled', base.audioEnabled);
+  setToggle('autoCycle', base.autoCycle);
+}
+function syncAll() {
+  syncRoot(document);
+  if (popupWin && !popupWin.closed) syncRoot(popupWin.document);
+}
+bindRoot(document);
+
+/* audio */
+let audioCtx = null, analyser = null, mediaStream = null, freqData = null, webAudioOn = false;
+function processAudio(arr) {
+  if (!arr || arr.length < 16) return;
+  const len = arr.length, use = len >= 128 ? Math.floor(len / 2) : len;
+  let bSum = 0, mSum = 0, hSum = 0;
+  const bEnd = Math.max(1, Math.floor(use * 0.12));
+  const mEnd = Math.max(bEnd + 1, Math.floor(use * 0.45));
+  for (let i = 0; i < use; i++) {
+    let v = arr[i]; if (v > 1.5) v /= 255; v = Math.abs(v);
+    if (i < bEnd) bSum += v; else if (i < mEnd) mSum += v; else hSum += v;
+  }
+  audioState.bass = Math.min(1, (bSum / bEnd) * base.audioSens * 2.4);
+  audioState.mid  = Math.min(1, (mSum / (mEnd - bEnd)) * base.audioSens * 1.9);
+  audioState.high = Math.min(1, (hSum / (use - mEnd || 1)) * base.audioSens * 1.7);
+  audioState.energy = Math.min(1, audioState.bass * 0.5 + audioState.mid * 0.3 + audioState.high * 0.2);
+  const now = performance.now();
+  if (audioState.bass > 0.55 && audioState.bass > audioState.smoothBass * 1.35 && now - audioState.lastBeatTime > 200) {
+    audioState.beat = 1; audioState.lastBeatTime = now;
+  }
+}
+async function startWebAudio() {
+  if (webAudioOn) return;
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation:false, noiseSuppression:false, autoGainControl:false, channelCount:2 }, video: false
+    });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = audioCtx.createMediaStreamSource(mediaStream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256; analyser.smoothingTimeConstant = 0.35;
+    src.connect(analyser);
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+    webAudioOn = true;
+    if (!base.audioEnabled) { base.audioEnabled = true; setToggle('audioEnabled', true); }
+    setAudioStatus('Audio: LIVE (default recording device)', 'live'); markStartBtn(true);
+  } catch (e) { setAudioStatus('Audio error: ' + (e.message || 'denied'), 'err'); markStartBtn(false); }
+}
+function stopWebAudio() {
+  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+  mediaStream = null;
+  if (audioCtx) audioCtx.close().catch(() => {});
+  audioCtx = null; analyser = null; freqData = null; webAudioOn = false;
+  setAudioStatus('Audio: stopped', ''); markStartBtn(false);
+}
+function setAudioStatus(msg, type) {
+  document.querySelectorAll('[data-audio-status]').forEach(el => {
+    el.textContent = msg; el.className = 'audio-status' + (type ? ' ' + type : '');
+  });
+  if (popupWin && !popupWin.closed) {
+    popupWin.document.querySelectorAll('[data-audio-status]').forEach(el => {
+      el.textContent = msg; el.className = 'audio-status' + (type ? ' ' + type : '');
+    });
+  }
+}
+function markStartBtn(on) {
+  document.querySelectorAll('[data-action="start-audio"]').forEach(b => b.classList.toggle('active', on));
+  if (popupWin && !popupWin.closed) {
+    popupWin.document.querySelectorAll('[data-action="start-audio"]').forEach(b => b.classList.toggle('active', on));
+  }
+}
+if (window.wallpaperRegisterAudioListener) {
+  window.wallpaperRegisterAudioListener(arr => {
+    processAudio(arr);
+    if (!webAudioOn) setAudioStatus('Audio: LIVE (Wallpaper Engine)', 'live');
+  });
+  setAudioStatus('Wallpaper Engine detected — audio ready', 'live');
+}
+
+/* WEBGL */
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+camera.position.set(35, 12, 35);
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance', premultipliedAlpha:false });
+renderer.setSize(width, height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x000000, 0);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.5;
+container.appendChild(renderer.domElement);
+
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.dampingFactor = 0.05;
+orbit.enableZoom = true;          // mouse-wheel zoom
+orbit.zoomSpeed = 1.0;
+orbit.minDistance = 18;
+orbit.maxDistance = 80;
+orbit.autoRotate = true;
+orbit.autoRotateSpeed = base.rotate;
+orbit.target.set(0, 0, 0);
+
+function setCameraDistance(d) {
+  d = THREE.MathUtils.clamp(d, orbit.minDistance, orbit.maxDistance);
+  const dir = new THREE.Vector3().subVectors(camera.position, orbit.target).normalize();
+  if (dir.lengthSq() < 1e-6) dir.set(0, 0.2, 1).normalize();
+  camera.position.copy(orbit.target).addScaledVector(dir, d);
+  camControl.distance = d;
+  base.camDist = Math.round(d);
+}
+
+// Sync slider when user zooms with wheel
+orbit.addEventListener('change', () => {
+  if (!uiCamDistSync) return;
+  const d = camera.position.distanceTo(orbit.target);
+  if (Math.abs(d - camControl.distance) < 0.05) return;
+  camControl.distance = d;
+  base.camDist = Math.round(d);
+  pushValToUI('camDist', base.camDist, null);
+  pushInputToUI('camDist', base.camDist);
+});
+
+const discoMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime:{value:0}, uActive:{value:0}, uDensity:{value:1},
+    uEnergy:{value:0}, uBeat:{value:0}, uBass:{value:0}, uMid:{value:0}, uHigh:{value:0},
+    uChroma:{value:0}, uResolution:{value:new THREE.Vector2(width,height)}
+  },
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`,
+  fragmentShader: `
+    precision highp float;
+    uniform float uTime,uActive,uDensity,uEnergy,uBeat,uBass,uMid,uHigh,uChroma;
+    uniform vec2 uResolution; varying vec2 vUv;
+    float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+    vec3 hsl2rgb(float h,float s,float l){
+      float c=(1.-abs(2.*l-1.))*s; float x=c*(1.-abs(mod(h*6.,2.)-1.)); float m=l-c*.5; vec3 rgb;
+      if(h<1./6.)rgb=vec3(c,x,0.); else if(h<2./6.)rgb=vec3(x,c,0.); else if(h<3./6.)rgb=vec3(0.,c,x);
+      else if(h<4./6.)rgb=vec3(0.,x,c); else if(h<5./6.)rgb=vec3(x,0.,c); else rgb=vec3(c,0.,x);
+      return rgb+m;
+    }
+    void main(){
+      if(uActive<0.01){ gl_FragColor=vec4(0.); return; }
+      vec2 uv=vUv; vec2 px=uv*uResolution;
+      float cell=mix(12.,3.5,clamp(uDensity*.5+uEnergy*.4,0.,1.));
+      vec2 gid=floor(px/cell); vec2 guv=fract(px/cell);
+      float n1=hash(gid+floor(uTime*(8.+uHigh*20.)));
+      float n2=hash(gid*1.7+floor(uTime*(5.+uMid*14.)+3.1));
+      float n3=hash(gid*2.3+floor(uTime*(3.+uBass*10.)+7.7));
+      float hue=fract(n1+uTime*.15+uBeat*.25);
+      float sat=mix(.55,1.,n2); float lit=mix(.12,.72,n3)*(.35+uEnergy*.65+uBeat*.5);
+      float spark=step(.55-uDensity*.15-uBeat*.2,n1*n2);
+      float glow=smoothstep(.8,.2,length(guv-.5))*spark;
+      vec3 col=hsl2rgb(hue,sat,lit)*glow;
+      float cell2=cell*.45; vec2 gid2=floor(px/cell2);
+      float m=hash(gid2+floor(uTime*14.));
+      float spark2=step(.72-uDensity*.1,m)*(.5+uHigh*.5);
+      col+=hsl2rgb(fract(m*3.7+uTime*.4),1.,.55)*spark2*.85;
+      float aberr=uChroma*(6.+uBeat*18.+uHigh*10.);
+      vec2 dir=normalize(uv-.5+1e-5);
+      vec2 offR=dir*aberr/uResolution; vec2 offB=-dir*aberr*1.15/uResolution;
+      vec2 gidR=floor((px+offR*uResolution)/cell); vec2 gidB=floor((px+offB*uResolution)/cell);
+      float nR=hash(gidR+floor(uTime*8.)); float nB=hash(gidB+floor(uTime*8.));
+      col.r=max(col.r,hsl2rgb(fract(nR+uTime*.15),1.,.55).r*step(.5,nR)*glow);
+      col.b=max(col.b,hsl2rgb(fract(nB+uTime*.15+.5),1.,.55).b*step(.5,nB)*glow);
+      float vig=smoothstep(.15,.75,length(uv-.5));
+      col*=mix(.25,1.,vig);
+      gl_FragColor=vec4(col,clamp(length(col)*1.2,0.,.85)*uActive);
+    }`,
+  transparent:true, depthWrite:false, depthTest:false, blending:THREE.AdditiveBlending
+});
+const discoGeo = new THREE.BufferGeometry();
+discoGeo.setAttribute('position', new THREE.Float32BufferAttribute([-1,-1,0, 3,-1,0, -1,3,0], 3));
+discoGeo.setAttribute('uv', new THREE.Float32BufferAttribute([0,0, 2,0, 0,2], 2));
+const discoMesh = new THREE.Mesh(discoGeo, discoMat);
+discoMesh.frustumCulled = false; discoMesh.renderOrder = -10;
+scene.add(discoMesh);
+
+const noiseChunk = `
+vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
+vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
+vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-.85373472095314*r;}
+float snoise(vec3 v){
+  const vec2 C=vec2(1./6.,1./3.); const vec4 D=vec4(0.,.5,1.,2.);
+  vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.-g;
+  vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy;
+  i=mod289(i);
+  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));
+  float n_=.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.*floor(p*ns.z*ns.z);
+  vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.*x_);
+  vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy;
+  vec4 h=1.-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.+1.; vec4 s1=floor(b1)*2.+1.;
+  vec4 sh=-step(h,vec4(0.));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y);
+  vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.); m=m*m;
+  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}`;
+
+const coreGroup = new THREE.Group(); scene.add(coreGroup);
+coreGroup.add(new THREE.Mesh(new THREE.SphereGeometry(9.8, 64, 64), new THREE.MeshBasicMaterial({ color: 0x030105 })));
+
+const auraMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime:{value:0}, uIntensity:{value:0.8}, uColor:{value:new THREE.Color('#221a30')},
+    uChroma:{value:0}, uChromaR:{value:new THREE.Color('#ff2040')}, uChromaB:{value:new THREE.Color('#2060ff')}
+  },
+  vertexShader: `varying vec3 vNormal; varying vec3 vView;
+    void main(){ vNormal=normalize(normalMatrix*normal); vView=normalize(-(modelViewMatrix*vec4(position,1.)).xyz);
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+  fragmentShader: `uniform float uIntensity,uChroma; uniform vec3 uColor,uChromaR,uChromaB;
+    varying vec3 vNormal,vView;
+    void main(){ float rim=pow(1.-max(dot(vNormal,vView),0.),4.);
+      float fringe=rim*uChroma;
+      vec3 col=uColor+(uChromaR-uColor)*fringe*.85+(uChromaB-uColor)*(1.-rim)*fringe*.55;
+      gl_FragColor=vec4(col*rim*uIntensity*5.,rim*.4); }`,
+  side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+});
+coreGroup.add(new THREE.Mesh(new THREE.SphereGeometry(10.3, 64, 64), auraMat));
+
+const RADIUS = 10, RING_COUNT = 12, ringSegments = 128;
+const vectorMaterial = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime:{value:0}, uMorph:{value:0}, uCompression:{value:1},
+    uIntensity:{value:0.8}, uColor:{value:new THREE.Color('#a49cb3')},
+    uChroma:{value:0}, uChromaR:{value:new THREE.Color('#ff3060')}, uChromaB:{value:new THREE.Color('#3080ff')}
+  },
+  vertexShader: `${noiseChunk}
+    uniform float uTime,uMorph,uCompression; varying float vOpacity,vFres;
+    void main(){ vec3 pos=position; vec3 nrm=normalize(position);
+      float noise=snoise(vec3(pos.x*.12,pos.y*.12,uTime*.35));
+      pos+=nrm*noise*uMorph*3.2; pos.y*=uCompression;
+      vec3 viewDir=normalize(cameraPosition-pos);
+      float fresnel=pow(1.-max(dot(nrm,viewDir),0.),2.5);
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.);
+      vOpacity=.3+fresnel*.7; vFres=fresnel; }`,
+  fragmentShader: `uniform vec3 uColor,uChromaR,uChromaB; uniform float uIntensity,uTime,uChroma;
+    varying float vOpacity,vFres;
+    void main(){ float wave=.75+.25*sin(uTime*2.5);
+      vec3 col=mix(uColor,uChromaR,vFres*uChroma*.7);
+      col=mix(col,uChromaB,(1.-vFres)*uChroma*.5);
+      gl_FragColor=vec4(col*uIntensity*wave,vOpacity*.7); }`,
+  transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+});
+
+function buildVectorGrid() {
+  for (let i = 1; i < 9; i++) {
+    const phi = (i * Math.PI) / 9;
+    const rY = RADIUS * Math.cos(phi), rX = RADIUS * Math.sin(phi);
+    const points = [];
+    for (let j = 0; j <= ringSegments; j++) {
+      const th = (j * Math.PI * 2) / ringSegments;
+      points.push(new THREE.Vector3(Math.cos(th)*rX, rY, Math.sin(th)*rX));
+    }
+    coreGroup.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points), vectorMaterial));
+  }
+  for (let i = 0; i < RING_COUNT; i++) {
+    const ang = (i * Math.PI) / RING_COUNT;
+    const points = [];
+    for (let j = 0; j <= ringSegments; j++) {
+      const la = (j * Math.PI * 2) / ringSegments;
+      points.push(new THREE.Vector3(
+        RADIUS * Math.sin(la) * Math.cos(ang),
+        RADIUS * Math.cos(la),
+        RADIUS * Math.sin(la) * Math.sin(ang)
+      ));
+    }
+    coreGroup.add(new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points), vectorMaterial));
+  }
+}
+buildVectorGrid();
+const camControl = { distance: 42 };
+
+/* PLANETARY SVG */
+const GLOBE_R = 10, FIELD_R0 = 12, FIELD_R1 = 22, BELT_R0 = 24, BELT_R1 = 34, SHELL_R0 = 38, SHELL_R1 = 55;
+const _proj = new THREE.Vector3();
+function project3D(x, y, z) {
+  _proj.set(x, y, z);
+  _proj.project(camera);
+  return {
+    sx: (_proj.x * 0.5 + 0.5) * width,
+    sy: (-_proj.y * 0.5 + 0.5) * height,
+    depth: _proj.z,
+    behind: _proj.z > 1
+  };
+}
+
+let stars3d = [], fields3d = [], belt3d = [];
+function clearGroup(g) { while (g.firstChild) g.removeChild(g.firstChild); }
+
+function initializePlanetarySystem() {
+  svgRoot.setAttribute('width', width);
+  svgRoot.setAttribute('height', height);
+  svgRoot.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  [gStarsBack, gStarsFront, gMagBack, gMagFront, gMagAberrR, gMagAberrB,
+   gBeltBack, gBeltFront, gBeltAberrR, gBeltAberrB].forEach(clearGroup);
+  stars3d = []; fields3d = []; belt3d = [];
+
+  for (let i = 0; i < base.starCount; i++) {
+    const u = Math.random(), v = Math.random();
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+    const r = SHELL_R0 + Math.random() * (SHELL_R1 - SHELL_R0);
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    el.setAttribute('r', (Math.random() * 1.4 + 0.35).toFixed(2));
+    el.setAttribute('fill', starColorStr);
+    gStarsBack.appendChild(el);
+    stars3d.push({
+      el, r, theta, phi,
+      spin: (Math.random() * 0.15 + 0.05) * (Math.random() > 0.5 ? 1 : -1),
+      phase: Math.random() * Math.PI * 2,
+      twinkle: Math.random() * 0.02 + 0.005
+    });
+  }
+
+  for (let i = 0; i < base.fieldLines; i++) {
+    const lon = (i / base.fieldLines) * Math.PI * 2;
+    const L = FIELD_R0 + (i % 5) * ((FIELD_R1 - FIELD_R0) / 5);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-width', '1.15');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('stroke-linecap', 'round');
+    gMagBack.appendChild(path);
+    const pathR = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    pathR.setAttribute('fill', 'none'); pathR.setAttribute('stroke-width', '1.0');
+    gMagAberrR.appendChild(pathR);
+    const pathB = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    pathB.setAttribute('fill', 'none'); pathB.setAttribute('stroke-width', '1.0');
+    gMagAberrB.appendChild(pathB);
+    fields3d.push({ path, pathR, pathB, lon, L, phase: Math.random() * Math.PI * 2 });
+  }
+
+  for (let i = 0; i < base.asteroidCount; i++) {
+    const r = BELT_R0 + Math.random() * (BELT_R1 - BELT_R0);
+    const incl = (Math.random() - 0.5) * 0.55;
+    const node = Math.random() * Math.PI * 2;
+    const angle = Math.random() * Math.PI * 2;
+    const size = Math.random() * 2.0 + 0.45;
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    el.setAttribute('r', size.toFixed(2));
+    gBeltBack.appendChild(el);
+    const elR = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    elR.setAttribute('r', (size * 0.85).toFixed(2));
+    gBeltAberrR.appendChild(elR);
+    const elB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    elB.setAttribute('r', (size * 0.85).toFixed(2));
+    gBeltAberrB.appendChild(elB);
+    belt3d.push({
+      el, elR, elB, r, incl, node, angle,
+      speed: (0.08 + Math.random() * 0.12) * (Math.random() > 0.45 ? 1 : -1),
+      wobble: Math.random() * Math.PI * 2,
+      wobbleRate: Math.random() * 0.8 + 0.3
+    });
+  }
+}
+
+function sampleFieldLine(lon, L, t, pulse, chaos) {
+  const theta = t * Math.PI;
+  const sinT = Math.sin(theta);
+  let r = L * sinT * sinT;
+  r = Math.max(r, GLOBE_R * 1.05);
+  r += Math.sin(theta * 4 + pulse) * chaos * 1.8;
+  r *= (0.92 + 0.08 * Math.sin(pulse * 0.7 + lon));
+  return {
+    x: r * sinT * Math.cos(lon),
+    y: r * Math.cos(theta) * live.compress,
+    z: r * sinT * Math.sin(lon)
+  };
+}
+
+function animatePlanetary(time) {
+  const pulse = time * currentFieldPulse;
+  const chaos = currentAstChaos;
+  const shellSpd = base.shellSpeed * (0.6 + currentFieldPulse * 0.15);
+
+  for (let i = 0; i < stars3d.length; i++) {
+    const s = stars3d[i];
+    s.theta += s.spin * shellSpd * 0.01;
+    s.phase += s.twinkle * currentFieldPulse;
+    const sp = Math.sin(s.phi), cp = Math.cos(s.phi);
+    const st = Math.sin(s.theta), ct = Math.cos(s.theta);
+    const p = project3D(s.r * sp * ct, s.r * cp * live.compress * 0.85, s.r * sp * st);
+    if (p.behind || p.sx < -40 || p.sx > width + 40 || p.sy < -40 || p.sy > height + 40) {
+      s.el.setAttribute('opacity', '0'); continue;
+    }
+    const depthFade = THREE.MathUtils.clamp(1.15 - p.depth * 0.55, 0.12, 1);
+    const tw = 0.2 + (Math.sin(s.phase) * 0.5 + 0.5) * 0.75;
+    s.el.setAttribute('cx', p.sx.toFixed(1));
+    s.el.setAttribute('cy', p.sy.toFixed(1));
+    s.el.setAttribute('opacity', (tw * depthFade).toFixed(3));
+    if (base.rainbow) {
+      s.el.setAttribute('fill', hslToHex((rainbowHue + i * 17.3 + time * 40) % 360, 90, 55 + (i % 20)));
+    } else s.el.setAttribute('fill', starColorStr);
+    const parent = p.depth < 0.15 ? gStarsFront : gStarsBack;
+    if (s.el.parentNode !== parent) parent.appendChild(s.el);
+  }
+
+  const SEG = 48;
+  for (let i = 0; i < fields3d.length; i++) {
+    const f = fields3d[i];
+    const lon = f.lon + time * 0.04 * shellSpd + Math.sin(time * 0.2 + f.phase) * chaos * 0.15;
+    let d = '', avgDepth = 0, visiblePts = 0, first = true;
+    for (let s = 0; s <= SEG; s++) {
+      const pt = sampleFieldLine(lon, f.L, s / SEG, pulse + f.phase, chaos);
+      const p = project3D(pt.x, pt.y, pt.z);
+      if (p.behind) { first = true; continue; }
+      avgDepth += p.depth; visiblePts++;
+      d += (first ? `M ${p.sx.toFixed(1)} ${p.sy.toFixed(1)}` : ` L ${p.sx.toFixed(1)} ${p.sy.toFixed(1)}`);
+      first = false;
+    }
+    const op = Math.min(0.55, 0.12 + (Math.sin(pulse + f.phase) * 0.5 + 0.5) * 0.18 * Math.min(currentFieldPulse, 3));
+    const strokeCol = base.rainbow ? hslToHex((rainbowHue + i * 23) % 360, 95, 55) : svgColorStr;
+    f.path.setAttribute('d', d || 'M0 0');
+    f.path.setAttribute('stroke', strokeCol);
+    f.path.setAttribute('opacity', String(op));
+    const showCh = chroma.amount > 0.02 || base.rainbow;
+    const mult = base.rainbow ? 1.8 : 1;
+    f.pathR.setAttribute('d', d || 'M0 0');
+    f.pathR.setAttribute('stroke', chroma.colR);
+    f.pathR.setAttribute('opacity', showCh ? String(op * 0.6 * Math.max(chroma.amount, base.rainbow ? 0.75 : 0)) : '0');
+    f.pathR.setAttribute('transform', `translate(${(chroma.oxR * mult).toFixed(2)},${(chroma.oyR * mult).toFixed(2)})`);
+    f.pathB.setAttribute('d', d || 'M0 0');
+    f.pathB.setAttribute('stroke', chroma.colB);
+    f.pathB.setAttribute('opacity', showCh ? String(op * 0.6 * Math.max(chroma.amount, base.rainbow ? 0.75 : 0)) : '0');
+    f.pathB.setAttribute('transform', `translate(${(chroma.oxB * mult).toFixed(2)},${(chroma.oyB * mult).toFixed(2)})`);
+    if (visiblePts > 0) {
+      avgDepth /= visiblePts;
+      const parent = avgDepth < 0.15 ? gMagFront : gMagBack;
+      if (f.path.parentNode !== parent) parent.appendChild(f.path);
+    }
+  }
+
+  for (let i = 0; i < belt3d.length; i++) {
+    const a = belt3d[i];
+    a.angle += a.speed * currentAstSpeed * 0.02;
+    a.wobble += a.wobbleRate * 0.015 * currentFieldPulse;
+    const fluc = 1 + Math.sin(a.wobble) * chaos * 0.12;
+    const r = a.r * fluc;
+    const cosA = Math.cos(a.angle), sinA = Math.sin(a.angle);
+    const cosN = Math.cos(a.node), sinN = Math.sin(a.node);
+    const cosI = Math.cos(a.incl * (1 + chaos * 0.4)), sinI = Math.sin(a.incl * (1 + chaos * 0.4));
+    let x = r * cosA, y = 0, z = r * sinA;
+    const y2 = y * cosI - z * sinI, z2 = y * sinI + z * cosI;
+    const x3 = x * cosN - z2 * sinN, z3 = x * sinN + z2 * cosN, y3 = y2 * live.compress;
+    const fx = Math.sin(time * 1.3 + a.wobble) * chaos * 1.4;
+    const fy = Math.cos(time * 0.9 + a.wobble) * chaos * 1.1;
+    const fz = Math.sin(time * 1.1 + a.angle) * chaos * 1.2;
+    const p = project3D(x3 + fx, y3 + fy, z3 + fz);
+    if (p.behind || p.sx < -50 || p.sx > width + 50 || p.sy < -50 || p.sy > height + 50) {
+      a.el.setAttribute('opacity', '0'); a.elR.setAttribute('opacity', '0'); a.elB.setAttribute('opacity', '0');
+      continue;
+    }
+    const depthFade = THREE.MathUtils.clamp(1.2 - p.depth * 0.5, 0.15, 1);
+    const op = (0.28 + (Math.sin(a.angle * 2 + time) * 0.25 + 0.25)) * depthFade;
+    const col = base.rainbow ? hslToHex((rainbowHue + i * 11 + time * 30) % 360, 90, 55) : svgColorStr;
+    a.el.setAttribute('cx', p.sx.toFixed(1)); a.el.setAttribute('cy', p.sy.toFixed(1));
+    a.el.setAttribute('fill', col); a.el.setAttribute('opacity', op.toFixed(3));
+    const showCh = chroma.amount > 0.02 || base.rainbow;
+    const m = base.rainbow ? 2.2 : 1;
+    a.elR.setAttribute('cx', (p.sx + chroma.oxR * m).toFixed(1));
+    a.elR.setAttribute('cy', (p.sy + chroma.oyR * m).toFixed(1));
+    a.elR.setAttribute('fill', chroma.colR);
+    a.elR.setAttribute('opacity', showCh ? (op * 0.5 * Math.max(chroma.amount, base.rainbow ? 0.85 : 0)).toFixed(3) : '0');
+    a.elB.setAttribute('cx', (p.sx + chroma.oxB * m).toFixed(1));
+    a.elB.setAttribute('cy', (p.sy + chroma.oyB * m).toFixed(1));
+    a.elB.setAttribute('fill', chroma.colB);
+    a.elB.setAttribute('opacity', showCh ? (op * 0.5 * Math.max(chroma.amount, base.rainbow ? 0.85 : 0)).toFixed(3) : '0');
+    const parent = p.depth < 0.15 ? gBeltFront : gBeltBack;
+    if (a.el.parentNode !== parent) parent.appendChild(a.el);
+  }
+}
+
+/* HSL */
+function hexToHsl(hex) {
+  let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h, s, l = (max+min)/2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){ case r: h=(g-b)/d+(g<b?6:0); break; case g: h=(b-r)/d+2; break; default: h=(r-g)/d+4; }
+    h /= 6;
+  }
+  return { h: h*360, s: s*100, l: l*100 };
+}
+function hslToHex(h, s, l) {
+  h = ((h%360)+360)%360; s = Math.max(0, Math.min(100, s)); l = Math.max(0, Math.min(100, l));
+  s/=100; l/=100;
+  const a = s * Math.min(l, 1-l);
+  const f = n => {
+    const k = (n + h/30) % 12;
+    const c = l - a * Math.max(Math.min(k-3, 9-k, 1), -1);
+    return Math.round(255*c).toString(16).padStart(2,'0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+function lerp(a, b, t) { return a + (b - a) * t; }
+function lerpHue(a, b, t) { let d = ((b - a + 540) % 360) - 180; return (a + d * t + 360) % 360; }
+function invertHue(h) { return (h + 180) % 360; }
+function invertLightness(l) { return 100 - l; }
+
+function updateColorSystem(dt) {
+  const mainBase = hexToHsl(base.color);
+  const auraBase = hexToHsl(base.glowColor);
+  const starBase = hexToHsl(base.starColor);
+  const bass = audioState.smoothBass, mid = audioState.smoothMid, high = audioState.smoothHigh;
+  const energy = audioState.smoothEnergy, beat = audioState.beat;
+  const audioOn = base.audioEnabled, rainbowOn = base.rainbow;
+
+  let speed = base.hueSpeed * 40 * dt;
+  if (audioOn) speed *= (1 + energy * base.hueBoost + beat * 0.8);
+  if (rainbowOn) speed *= 2.5;
+  if (rainbowOn || audioOn) rainbowHue = (rainbowHue + speed) % 360;
+
+  const cStr = base.chromaStr * (rainbowOn ? 2.4 : 1);
+  chroma.amount = 0;
+  if (audioOn || rainbowOn) {
+    chroma.amount = Math.min(2.5, (bass * 0.45 + mid * 0.35 + high * 0.55 + beat * 0.8 + (rainbowOn ? 0.6 : 0)) * cStr);
+    const punch = 1 + beat * 2.2 + (rainbowOn ? 1.5 : 0);
+    chroma.oxR = (bass * 6 + high * 3 + (rainbowOn ? 8 : 0)) * cStr * punch;
+    chroma.oyR = (high * 5 + mid * 2 + (rainbowOn ? 6 : 0)) * cStr * punch * 0.7;
+    chroma.oxB = -chroma.oxR * 0.9;
+    chroma.oyB = -chroma.oyR * 1.1;
+  }
+
+  discoMat.uniforms.uActive.value = rainbowOn ? 1 : 0;
+  discoMat.uniforms.uDensity.value = base.discoDensity;
+  discoMat.uniforms.uEnergy.value = energy;
+  discoMat.uniforms.uBeat.value = beat;
+  discoMat.uniforms.uBass.value = bass;
+  discoMat.uniforms.uMid.value = mid;
+  discoMat.uniforms.uHigh.value = high;
+  discoMat.uniforms.uChroma.value = chroma.amount;
+  discoMat.uniforms.uResolution.value.set(width, height);
+
+  if (!rainbowOn && !audioOn) {
+    live.color = base.color; live.glowColor = base.glowColor; live.starColor = base.starColor;
+    starColorStr = live.starColor; svgColorStr = live.color;
+    chroma.amount = 0;
+    vectorMaterial.uniforms.uChroma.value = 0;
+    auraMat.uniforms.uChroma.value = 0;
+    return;
+  }
+
+  const mainHueTarget = (rainbowHue + bass * 50 + beat * 30) % 360;
+  const mainHue = lerpHue(mainBase.h, mainHueTarget, rainbowOn ? 1 : Math.min(1, energy * 1.2 + 0.25));
+  const mainS = lerp(mainBase.s, Math.min(100, mainBase.s + energy * 25 + beat * 15), 0.7);
+  const mainL = lerp(mainBase.l, Math.min(70, Math.max(35, mainBase.l + beat * 12 - bass * 5)), 0.6);
+  const auraHueInv = invertHue(mainHue);
+  const auraHueShift = (mainHue + 120 + mid * 80) % 360;
+  const invMix = base.invertMix;
+  const auraHue = lerpHue(auraHueShift, auraHueInv, invMix * (0.55 + mid * 0.45));
+  const auraS = lerp(auraBase.s, Math.min(100, 55 + mid * 40), 0.75);
+  const auraLInv = invertLightness(mainL);
+  const auraL = lerp(lerp(auraBase.l, auraLInv, invMix * 0.7), Math.min(48, 18 + bass * 25), 0.5);
+  const starHueInv = invertHue(auraHue);
+  const starHueTri = (mainHue + 240 + high * 90) % 360;
+  const starHue = lerpHue(starHueTri, starHueInv, invMix * (0.4 + high * 0.5));
+  const starS = lerp(starBase.s, Math.min(100, 60 + high * 40 + beat * 20), 0.8);
+  const starLInv = invertLightness(auraL);
+  const starL = lerp(Math.max(55, starBase.l), Math.min(95, starLInv * 0.5 + 55 + high * 25), 0.65);
+
+  live.color = hslToHex(mainHue, mainS, mainL);
+  live.glowColor = hslToHex(auraHue, auraS, auraL);
+  live.starColor = hslToHex(starHue, starS, starL);
+  svgColorStr = live.color; starColorStr = live.starColor;
+  chroma.colR = hslToHex((mainHue + 10) % 360, 95, 55);
+  chroma.colG = hslToHex((mainHue + 120) % 360, 90, 50);
+  chroma.colB = hslToHex((mainHue + 200) % 360, 95, 55);
+  const ch = Math.min(1.5, chroma.amount);
+  vectorMaterial.uniforms.uChroma.value = ch;
+  vectorMaterial.uniforms.uChromaR.value.set(chroma.colR);
+  vectorMaterial.uniforms.uChromaB.value.set(chroma.colB);
+  auraMat.uniforms.uChroma.value = ch;
+  auraMat.uniforms.uChromaR.value.set(chroma.colR);
+  auraMat.uniforms.uChromaB.value.set(chroma.colB);
+  mainTitle.style.color = live.color;
+  statusText.style.color = live.color;
+}
+
+function applyLive() {
+  vectorMaterial.uniforms.uMorph.value = live.morph;
+  vectorMaterial.uniforms.uCompression.value = live.compress;
+  vectorMaterial.uniforms.uIntensity.value = live.intensity;
+  auraMat.uniforms.uIntensity.value = live.intensity;
+  orbit.autoRotateSpeed = live.rotate;
+  vectorMaterial.uniforms.uColor.value.set(live.color);
+  auraMat.uniforms.uColor.value.set(live.glowColor);
+  gradStop0.setAttribute('stop-color', live.glowColor);
+  currentAstSpeed = live.astSpeed;
+  currentAstChaos = live.astChaos;
+  currentFieldPulse = live.fieldPulse;
+  svgColorStr = live.color;
+  starColorStr = live.starColor;
+}
+
+/** Apply a full config state to ALL sliders (densities included) */
+function applyConfigState(n, animateCore = true) {
+  const densityChanged =
+    base.starCount !== n.starCount ||
+    base.asteroidCount !== n.asteroidCount ||
+    base.fieldLines !== n.fieldLines;
+
+  // numeric / color keys present on every preset
+  const keys = [
+    'starCount','asteroidCount','fieldLines',
+    'morph','compress','intensity','rotate','camY','camDist',
+    'color','glowColor','starColor',
+    'astSpeed','astChaos','fieldPulse','shellSpeed',
+    'hueSpeed','hueBoost','chromaStr','invertMix','discoDensity'
+  ];
+  keys.forEach(k => {
+    if (n[k] !== undefined) base[k] = n[k];
+  });
+
+  Object.assign(live, {
+    morph: base.morph, compress: base.compress, intensity: base.intensity,
+    rotate: base.rotate, camY: base.camY, camDist: base.camDist,
+    color: base.color, glowColor: base.glowColor, starColor: base.starColor,
+    astSpeed: base.astSpeed, astChaos: base.astChaos, fieldPulse: base.fieldPulse
+  });
+
+  if (animateCore) {
+    const tl = gsap.timeline({ defaults: { duration: 2.8, ease: 'power2.inOut' } });
+    tl.to(vectorMaterial.uniforms.uMorph, { value: n.morph }, 0);
+    tl.to(vectorMaterial.uniforms.uCompression, { value: n.compress }, 0);
+    tl.to(vectorMaterial.uniforms.uIntensity, { value: n.intensity }, 0);
+    tl.to(auraMat.uniforms.uIntensity, { value: n.intensity }, 0);
+    tl.to(orbit, { autoRotateSpeed: n.rotate }, 0);
+    tl.to(camera.position, {
+      y: n.camY,
+      onUpdate: () => { /* keep orbit consistent */ }
+    }, 0);
+    // cam distance
+    const fromD = camControl.distance;
+    const proxy = { d: fromD };
+    tl.to(proxy, {
+      d: n.camDist, duration: 2.8, ease: 'power2.inOut',
+      onUpdate: () => setCameraDistance(proxy.d)
+    }, 0);
+    const c = new THREE.Color(n.color), g = new THREE.Color(n.glowColor);
+    tl.to(vectorMaterial.uniforms.uColor.value, { r:c.r, g:c.g, b:c.b }, 0);
+    tl.to(auraMat.uniforms.uColor.value, { r:g.r, g:g.g, b:g.b }, 0);
+  } else {
+    applyLive();
+    camera.position.y = base.camY;
+    setCameraDistance(base.camDist);
+  }
+
+  currentAstSpeed = base.astSpeed;
+  currentAstChaos = base.astChaos;
+  currentFieldPulse = base.fieldPulse;
+  svgColorStr = base.color;
+  starColorStr = base.starColor;
+  gradStop0.setAttribute('stop-color', base.glowColor);
+
+  if (densityChanged) initializePlanetarySystem();
+  syncAll();
+}
+
+function triggerState() {
+  stateIdx = (stateIdx + 1) % config.length;
+  const n = config[stateIdx];
+  applyConfigState(n, true);
+  gsap.to([mainTitle, statusText, licenseVal, velVal, hudRad], {
+    opacity: 0, duration: 0.5,
+    onComplete: () => {
+      mainTitle.innerText = n.title; mainTitle.style.color = n.color;
+      statusText.innerText = n.status; statusText.style.color = n.color;
+      licenseVal.innerText = n.license; licenseVal.style.color = n.color;
+      velVal.innerText = n.vel; velVal.style.color = n.color;
+      hudRad.innerText = n.rad; hudRad.style.color = n.color;
+      gsap.to([mainTitle, statusText, licenseVal, velVal, hudRad], { opacity: 0.65, duration: 0.7 });
+    }
+  });
+}
+function startCycleTimer() {
+  if (cycleTimer) clearInterval(cycleTimer);
+  if (base.autoCycle) cycleTimer = setInterval(triggerState, 8000);
+}
+function doReset() {
+  stateIdx = 0;
+  applyConfigState(config[0], false);
+  discoMat.uniforms.uActive.value = 0;
+  base.rainbow = false; base.audioEnabled = false; base.autoCycle = true;
+  setToggle('rainbow', false); setToggle('audioEnabled', false); setToggle('autoCycle', true);
+  mainTitle.innerText = config[0].title; mainTitle.style.color = config[0].color;
+  statusText.innerText = config[0].status; statusText.style.color = config[0].color;
+  licenseVal.innerText = config[0].license; licenseVal.style.color = config[0].color;
+  velVal.innerText = config[0].vel; velVal.style.color = config[0].color;
+  hudRad.innerText = config[0].rad; hudRad.style.color = config[0].color;
+  startCycleTimer();
+}
+
+const clock = new THREE.Clock();
+function loop() {
+  const time = clock.getElapsedTime();
+  const dt = Math.min(clock.getDelta(), 0.05);
+
+  if (webAudioOn && analyser && freqData) {
+    analyser.getByteFrequencyData(freqData);
+    processAudio(freqData);
+  }
+
+  const sm = 8;
+  audioState.smoothBass   += (audioState.bass   - audioState.smoothBass)   * Math.min(1, dt * sm);
+  audioState.smoothMid    += (audioState.mid    - audioState.smoothMid)    * Math.min(1, dt * sm);
+  audioState.smoothHigh   += (audioState.high   - audioState.smoothHigh)   * Math.min(1, dt * sm);
+  audioState.smoothEnergy += (audioState.energy - audioState.smoothEnergy) * Math.min(1, dt * sm);
+  audioState.beat = Math.max(0, audioState.beat - dt * 4.5);
+
+  [['bass', audioState.smoothBass], ['mid', audioState.smoothMid],
+   ['high', audioState.smoothHigh], ['energy', audioState.smoothEnergy]].forEach(([name, v]) => {
+    const pct = Math.round(v * 100) + '%';
+    document.querySelectorAll(`[data-meter="${name}"]`).forEach(el => el.style.width = pct);
+    document.querySelectorAll(`[data-meter-val="${name}"]`).forEach(el => el.textContent = pct);
+    if (popupWin && !popupWin.closed) {
+      popupWin.document.querySelectorAll(`[data-meter="${name}"]`).forEach(el => el.style.width = pct);
+      popupWin.document.querySelectorAll(`[data-meter-val="${name}"]`).forEach(el => el.textContent = pct);
+    }
+  });
+
+  if (base.audioEnabled) {
+    const b = audioState.smoothBass * base.bassInf;
+    const m = audioState.smoothMid * base.midInf;
+    const h = audioState.smoothHigh * base.highInf;
+    const beat = audioState.beat * base.beatPunch;
+    live.morph = base.morph + b * 1.8 + beat * 0.6;
+    live.intensity = base.intensity + b * 2.2 + beat * 1.1;
+    live.astChaos = base.astChaos + m * 0.9 + beat * 0.35;
+    live.fieldPulse = base.fieldPulse + m * 3.5 + beat * 2;
+    live.rotate = base.rotate + h * 2.5 + beat * 0.8;
+    live.astSpeed = base.astSpeed + h * 1.8 + beat * 0.5;
+    live.compress = base.compress;
+  } else {
+    live.morph = base.morph; live.intensity = base.intensity;
+    live.astChaos = base.astChaos; live.fieldPulse = base.fieldPulse;
+    live.rotate = base.rotate; live.astSpeed = base.astSpeed;
+    live.compress = base.compress;
+  }
+
+  updateColorSystem(dt);
+  applyLive();
+
+  discoMat.uniforms.uTime.value = time;
+  vectorMaterial.uniforms.uTime.value = time;
+  auraMat.uniforms.uTime.value = time;
+  coreGroup.rotation.y = time * 0.02;
+
+  // OrbitControls handles zoom + rotate; keep camControl in sync
+  orbit.update();
+  camControl.distance = camera.position.distanceTo(orbit.target);
+
+  animatePlanetary(time);
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener('resize', () => {
+  width = window.innerWidth; height = window.innerHeight;
+  camera.aspect = width / height; camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+  discoMat.uniforms.uResolution.value.set(width, height);
+  initializePlanetarySystem();
+});
+
+initializePlanetarySystem();
+setCameraDistance(base.camDist);
+applyLive();
+syncAll();
+loop();
+startCycleTimer();
+</script>
+</body>
+</html>

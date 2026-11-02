@@ -1,0 +1,1162 @@
+
+      
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <!-- html2canvas for snapshot functionality -->
+        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <meta charset="UTF-8">
+    <title>GLITCH LAB // Revision 3 Blend</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+                                                #freeze-frame-btn-container {
+                                                    opacity: 0.55;
+                                            position: fixed;
+                                            top: 20px;
+                                            right: 20px;
+                                            z-index: 2101;
+                                            display: flex;
+                                            align-items: flex-start;
+                                            justify-content: flex-end;
+                                        }
+                                                #freeze-frame-btn {
+                                                    opacity: 0.55;
+                                            font-size: 1.1em;
+                                            padding: 0.5em 1.2em;
+                                            border-radius: 8px;
+                                            border: 2px solid #fff;
+                                            background: #222;
+                                            color: #fff;
+                                            font-family: 'Courier New', monospace;
+                                            cursor: pointer;
+                                            transition: background 0.2s, color 0.2s;
+                                        }
+                                        #freeze-frame-btn:hover {
+                                            background: #444;
+                                            color: #ff0;
+                                        }
+                                /* see inline style for position, etc. */
+                                
+                                #custom-bg-panel {
+                                    }
+                                #custom-bg-thumbnails img {
+                                    width: 48px;
+                                    height: 48px;
+                                    object-fit: cover;
+                                    border: 2px solid #fff;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    transition: border 0.2s, box-shadow 0.2s;
+                                }
+                                #custom-bg-thumbnails img.selected {
+                                    border: 2px solid #ff0;
+                                    box-shadow: 0 0 8px #ff0;
+                                }
+                                #custom-bg-btn-container {
+                                    opacity: 0.55;
+                            position: absolute;
+                            top: 10px;
+                            left: 20px;
+                            z-index: 2001;
+                            display: flex;
+                            align-items: flex-start;
+                            justify-content: flex-end;
+                            width: auto;
+                            height: auto;
+                            background: none;
+                            padding: 0;
+                            margin: 0;
+                        }
+                        .custom-bg-btn {
+                            opacity: 0.55;
+                            position: absolute;
+                            top: 10px;
+                            left: 20px;
+                            z-index: 20;
+                            font-size: 1.1em;
+                            padding: 0.5em 1.2em;
+                            border-radius: 8px;
+                            border: 2px solid #fff;
+                            background: #222;
+                            color: #fff;
+                            font-family: 'Courier New', monospace;
+                            cursor: pointer;
+                            transition: background 0.2s, color 0.2s;
+                        }
+                        .custom-bg-btn:hover {
+                            background: #444;
+                            color: #ff0;
+                        }
+
+                        
+                    /* Glitch Slider Theme Styles */
+                        /* --- UI Toggle Tab Styles (CRT Themed) --- */
+                        #ui-toggle-tab {
+                            position: fixed;
+                            right: -145px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            z-index: 9999;
+                            transition: right 0.3s ease-in-out, opacity 0.2s ease-in-out;
+                            cursor: pointer;
+                            opacity: 0.4;
+                        }
+                        #ui-toggle-tab:hover, #ui-toggle-tab.show {
+                            right: 0;
+                            opacity: 1;
+                        }
+                        #toggle-ui-btn {
+                            font-family: 'Courier New', Courier, monospace;
+                            text-decoration: none;
+                            color: #ffea01;
+                            background: rgba(0, 20, 20, 0.7);
+                            border: 2px solid #ffc800;
+                            border-right: none;
+                            border-radius: 8px 0 0 8px;
+                            box-shadow: 0 0 10px rgba(0, 255, 17, 0.5), 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 15px rgba(0, 255, 255, 0.2);
+                            text-shadow: 0 0 4px #00ff1a, 0 0 8px #00ffff;
+                            animation: crt-flicker 0.2s infinite;
+                            font-size: 1.1em;
+                            padding: 0.5em 1.2em;
+                            cursor: pointer;
+                        }
+                        #toggle-ui-btn:active {
+                            background: #222;
+                            color: #ff0;
+                        }
+                        @keyframes crt-flicker {
+                            0%, 100% { opacity: 1; }
+                            50% { opacity: 0.85; }
+                        }
+                        #ui-toggle-tab.hide { display: none !important; }
+
+                        #glitch-top-bar,
+                        #glitch-bottom-bar {
+                            position: fixed;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            z-index: 2000;
+                            display: flex;
+                            flex-direction: row;
+                            flex-wrap: nowrap;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 10px;
+                            width: max-content;
+                            max-width: min(860px, calc(100vw - 280px));
+                            opacity: 0.92;
+                            pointer-events: auto;
+                            background: rgba(0,0,0,0.78);
+                            padding: 5px 10px;
+                            border-radius: 8px;
+                            border: 1px solid #ffc800;
+                            box-shadow: 0 0 10px rgba(255,200,0,0.16);
+                            box-sizing: border-box;
+                        }
+                        #glitch-top-bar { top: 10px; }
+                        body.ghost-on #glitchCanvas { mix-blend-mode: screen; }
+                        body.ai-warp-on #hue-bg { will-change: filter, transform; }
+                        #glitch-bottom-bar { bottom: 10px; }
+                        #glitch-top-bar .glitch-toggle-btn,
+                        #glitch-bottom-bar .glitch-toggle-btn {
+                            font-size: 10px;
+                            padding: 3px 7px;
+                            margin: 0;
+                            border-width: 1px;
+                            border-radius: 5px;
+                            min-width: 0;
+                            white-space: nowrap;
+                            letter-spacing: 0.03em;
+                        }
+                        #custom-bg-btn-container,
+                        .custom-bg-btn {
+                            position: fixed !important;
+                            top: 10px !important;
+                            left: 12px !important;
+                            z-index: 2200 !important;
+                        }
+                        #freeze-frame-btn-container {
+                            position: fixed !important;
+                            top: 10px !important;
+                            right: 12px !important;
+                            z-index: 2200 !important;
+                        }
+                        .glitch-slider-group {
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            gap: 8px;
+                            flex: 0 1 auto;
+                            justify-content: center;
+                            background: none;
+                            padding: 0;
+                            border: none;
+                        }
+                        .glitch-slider-group + .glitch-slider-group {
+                            border-left: 1px solid rgba(255,200,0,0.45);
+                            padding-left: 16px;
+                        }
+                        .glitch-slider-group label {
+                            color: #ff0;
+                            font-family: 'Courier New', monospace;
+                            font-size: 10px;
+                            white-space: nowrap;
+                            letter-spacing: 0.04em;
+                        }
+                        #glitch-speed-slider, #glitch-opacity-slider,
+                        #ghost-strength-slider, #ai-warp-slider {
+                            width: 88px;
+                            height: 14px;
+                            vertical-align: middle;
+                            cursor: pointer;
+                            flex: 0 0 88px;
+                        }
+                        #glitch-top-bar input[type="range"]::-webkit-slider-thumb,
+                        #glitch-bottom-bar input[type="range"]::-webkit-slider-thumb {
+                            width: 14px;
+                            height: 14px;
+                            margin-top: -3px;
+                        }
+                    /* Glitch Slider Theme Styles */
+
+                        /* --- UI Toggle Tab Styles (CRT Themed) --- */
+                        #ui-toggle-tab {
+                            position: fixed;
+                            right: -145px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            z-index: 9999;
+                            transition: right 0.3s ease-in-out, opacity 0.2s ease-in-out;
+                            cursor: pointer;
+                            opacity: 0.4;
+                        }
+                        #ui-toggle-tab:hover, #ui-toggle-tab.show {
+                            right: 0;
+                            opacity: 1;
+                        }
+                        #toggle-ui-btn {
+                            font-family: 'Courier New', Courier, monospace;
+                            text-decoration: none;
+                            color: #ffea01;
+                            background: rgba(0, 20, 20, 0.7);
+                            border: 2px solid #ffc800;
+                            border-right: none;
+                            border-radius: 8px 0 0 8px;
+                            box-shadow: 0 0 10px rgba(0, 255, 17, 0.5), 0 0 20px rgba(0, 255, 255, 0.3), inset 0 0 15px rgba(0, 255, 255, 0.2);
+                            text-shadow: 0 0 4px #00ff1a, 0 0 8px #00ffff;
+                            animation: crt-flicker 0.2s infinite;
+                            font-size: 1.1em;
+                            padding: 0.5em 1.2em;
+                            cursor: pointer;
+                        }
+                        #toggle-ui-btn:active {
+                            background: #222;
+                            color: #ff0;
+                        }
+                        @keyframes crt-flicker {
+                            0%, 100% { opacity: 1; }
+                            50% { opacity: 0.85; }
+                        }
+                        #ui-toggle-tab.hide { display: none !important; }
+
+                        #glitch-speed-bar {
+                            opacity: 0.55;
+                    position: fixed;
+                    left: 0;
+                    right: 0;
+                    bottom: 45px;
+                    z-index: 2000;
+                    background: rgba(0, 0, 0, 0);
+                    padding: 8px 0 4px 0;
+                    text-align: center;
+                    margin-bottom: 12x;
+                }
+                #glitch-speed-bar label {
+                    color: #ff0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 1em;
+                    margin-right: 8px;
+                }
+                #glitch-speed-slider {
+                    width: 220px;
+                    vertical-align: middle;
+                }
+                        #glitch-opacity-bar {
+                            opacity: 0.55;
+                    position: fixed;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 2000;
+                    background: rgba(0, 0, 0, 0);
+                    padding: 8px 0 4px 0;
+                    text-align: center;
+                }
+                #glitch-opacity-bar label {
+                    color: #ff0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 1em;
+                    margin-right: 8px;
+                }
+                #glitch-opacity-slider {
+                    width: 220px;
+                    vertical-align: middle;
+                    cursor: pointer;
+                    pointer-events: auto;
+                    z-index: 2100;
+                }
+                    /* Glitch Slider Theme Styles */
+ /* Yellow and black slider styling for all browsers */
+        #glitch-speed-slider, #glitch-opacity-slider, #ghost-strength-slider, #ai-warp-slider {
+            accent-color: #ffc800; /* fallback for modern browsers */
+        }
+        /* Webkit browsers (Chrome, Safari, Edge) */
+        #glitch-speed-slider::-webkit-slider-runnable-track,
+        #glitch-opacity-slider::-webkit-slider-runnable-track,
+        #ghost-strength-slider::-webkit-slider-runnable-track,
+        #ai-warp-slider::-webkit-slider-runnable-track {
+            height: 8px;
+            background: #ffc800;
+            border-radius: 4px;
+        }
+        #glitch-speed-slider::-webkit-slider-thumb,
+        #glitch-opacity-slider::-webkit-slider-thumb,
+        #ghost-strength-slider::-webkit-slider-thumb,
+        #ai-warp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            background: #111;
+            border: 2px solid #ffc800;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #ffc80099;
+            cursor: pointer;
+            margin-top: -7px;
+            transition: background 0.2s, border 0.2s;
+        }
+        #glitch-speed-slider:focus::-webkit-slider-thumb,
+        #glitch-opacity-slider:focus::-webkit-slider-thumb,
+        #ghost-strength-slider:focus::-webkit-slider-thumb,
+        #ai-warp-slider:focus::-webkit-slider-thumb {
+            background: #222;
+            border-color: #fff200;
+        }
+        /* Firefox */
+        #glitch-speed-slider::-moz-range-track,
+        #glitch-opacity-slider::-moz-range-track,
+        #ghost-strength-slider::-moz-range-track,
+        #ai-warp-slider::-moz-range-track {
+            height: 8px;
+            background: #ffc800;
+            border-radius: 4px;
+        }
+        #glitch-speed-slider::-moz-range-thumb,
+        #glitch-opacity-slider::-moz-range-thumb,
+        #ghost-strength-slider::-moz-range-thumb,
+        #ai-warp-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            background: #111;
+            border: 2px solid #ffc800;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #ffc80099;
+            cursor: pointer;
+            transition: background 0.2s, border 0.2s;
+        }
+        #glitch-speed-slider:focus::-moz-range-thumb,
+        #glitch-opacity-slider:focus::-moz-range-thumb,
+        #ghost-strength-slider:focus::-moz-range-thumb,
+        #ai-warp-slider:focus::-moz-range-thumb {
+            background: #222;
+            border-color: #fff200;
+        }
+        /* Edge/IE */
+        #glitch-speed-slider::-ms-fill-lower,
+        #glitch-opacity-slider::-ms-fill-lower {
+            background: #ffc800;
+        }
+        #glitch-speed-slider::-ms-fill-upper,
+        #glitch-opacity-slider::-ms-fill-upper {
+            background: #ffc800;
+        }
+        #glitch-speed-slider::-ms-thumb,
+        #glitch-opacity-slider::-ms-thumb {
+            width: 22px;
+            height: 22px;
+            background: #111;
+            border: 2px solid #ffc800;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #ffc80099;
+            cursor: pointer;
+            transition: background 0.2s, border 0.2s;
+        }
+        #glitch-speed-slider:focus::-ms-thumb,
+        #glitch-opacity-slider:focus::-ms-thumb {
+            background: #222;
+            border-color: #fff200;
+        }
+        #glitch-speed-slider,
+        #glitch-opacity-slider,
+        #ghost-strength-slider,
+        #ai-warp-slider {
+            outline: none;
+        }
+  /* Glitch Toggle Button Theme */
+                    .glitch-toggle-btn {
+                        font-family: 'Courier New', monospace;
+                        font-size: 1em;
+                        padding: 0.5em 1.2em;
+                        border-radius: 8px;
+                        border: 2px solid #ffc800;
+                        background: #111;
+                        color: #fff;
+                        margin-right: 8px;
+                        cursor: pointer;
+                        transition: background 0.2s, color 0.2s, border 0.2s;
+                        box-shadow: 0 0 10px rgba(255, 255, 0, 0.1);
+                    }
+                    .glitch-toggle-btn:hover {
+                        background: #222;
+                        color: #ff0;
+                        border-color: #fff200;
+                    }
+                    .glitch-toggle-btn:active {
+                        background: #000;
+                        color: #ffc800;
+                        border-color: #fff;
+                    }
+
+            /* Effect Toggle Button Column */
+            #effect-toggle-column {
+                position: fixed;
+                top: 95px;
+                left: 0;
+                z-index: 3000;
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                background: rgba(0,0,0,0.18);
+                padding: 8px 2px 8px 1px;
+                border-radius: 0 10px 10px 0;
+                box-shadow: 2px 0 10px #0008;
+                max-height: 960px;
+                overflow-y: auto;
+            }
+            .effect-toggle-btn {
+                font-family: 'Courier New', monospace;
+                font-size: 0.92em;
+                padding: 0.25em 0.7em;
+                border-radius: 7px;
+                border: 2px solid #ffc800;
+                background: #111;
+                color: #fff;
+                cursor: pointer;
+                transition: background 0.2s, color 0.2s, border 0.2s;
+                box-shadow: 0 0 7px rgba(255, 255, 0, 0.08);
+                margin-bottom: 0px;
+                opacity: 0.55;
+                min-width: 90px;
+                max-width: 120px;
+            }
+            .effect-toggle-btn:hover {
+                background: #222;
+                color: #ff0;
+                border-color: #fff200;
+            }
+            .effect-toggle-btn:active {
+                background: #000;
+                color: #ffc800;
+                border-color: #fff;
+            }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+        #glitch-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 0;
+        }
+        #hue-bg {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+        .glitch-canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10;
+            pointer-events: none;
+        }
+    
+        /* Revision 3 blend skin — keeps the original yellow/black board, adds a compact engine rack. */
+        #effect-toggle-column {
+            top: 86px !important; left: 10px !important; width: 264px; max-width: calc(100vw - 20px);
+            max-height: calc(100vh - 112px) !important; overflow-y: auto; overflow-x: hidden;
+            gap: 7px !important; padding: 10px !important; border: 1px solid rgba(255,205,0,.5);
+            background: linear-gradient(150deg, rgba(8,10,14,.94), rgba(12,16,22,.86)) !important;
+            box-shadow: 0 8px 26px #000b, inset 0 0 24px rgba(0,245,255,.035) !important;
+            backdrop-filter: blur(8px);
+        }
+        .effect-palette-heading { display:flex; justify-content:space-between; align-items:center; padding:2px 3px 7px;
+            color:#fbd34a; font:700 11px 'Courier New',monospace; letter-spacing:.12em; border-bottom:1px solid #ffc80055; }
+        .effect-palette-heading small { color:#7fe8ed; font-size:9px; letter-spacing:.06em; }
+        .effect-control-row { display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:7px; align-items:center; }
+        .effect-control-row .effect-toggle-btn { width:100%; min-width:0; max-width:none; text-align:left; overflow:hidden;
+            text-overflow:ellipsis; white-space:nowrap; border-width:1px; border-radius:5px; font-size:10px; padding:6px 7px;
+            color:#dce5ec; background:rgba(18,24,31,.94); }
+        .effect-control-row .effect-toggle-btn[data-active="true"] { opacity:1; border-color:#5bf3dc; color:#73f4da; box-shadow:0 0 10px #2ce5bf33; }
+        .effect-control-row input[type=range] { width:76px; accent-color:#46e7d2; cursor:pointer; }
+        .effect-control-row .effect-level-label { grid-column:2; justify-self:end; margin-top:-5px; color:#9fb4bd; font:9px 'Courier New',monospace; }
+        #engine-control-dock { position:fixed; top:106px; right:12px; z-index:2300; width:min(310px,calc(100vw - 24px));
+            padding:10px; border:1px solid rgba(61,225,213,.42); border-radius:9px;
+            background:linear-gradient(145deg,rgba(4,10,16,.94),rgba(8,17,25,.86)); color:#e8f7f5;
+            max-height:calc(100vh - 88px); overflow-y:auto; overscroll-behavior:contain;
+            box-shadow:0 8px 28px #0009,0 0 18px #27deca16; backdrop-filter:blur(9px); font-family:'Courier New',monospace; }
+        .engine-dock-heading { display:flex; justify-content:space-between; align-items:center; margin:0 1px 8px;
+            color:#55e8d4; font-size:10px; font-weight:bold; letter-spacing:.12em; }
+        .engine-dock-heading span:last-child { color:#98aeb7; font-weight:normal; letter-spacing:.04em; }
+        .engine-dock-sliders { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; }
+        .engine-dock-sliders label { display:grid; grid-template-columns:1fr auto; gap:3px 6px; align-items:center;
+            color:#d6e0e4; font-size:9px; letter-spacing:.04em; }
+        .engine-dock-sliders output { color:#f8d64b; font-size:9px; }
+        .engine-dock-sliders input { grid-column:1 / -1; width:100%; accent-color:#50dfd0; }
+        .engine-dock-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:9px; }
+        .engine-dock-actions button { min-width:0; padding:6px 4px; border:1px solid #42616a; border-radius:5px;
+            background:#101a21; color:#d8e9ec; font:700 9px 'Courier New',monospace; cursor:pointer; }
+        .engine-dock-actions button:hover { color:#7ef4dc; border-color:#50dfd0; }
+        .engine-dock-actions button.active { color:#68f3d5; border-color:#68f3d5; box-shadow:0 0 9px #45ebcb24; }
+        .engine-dock-actions button:disabled { opacity:.64; cursor:wait; color:#a8c6c7; border-color:#527274; }
+        #zero-effects-btn { color:#ffb6a9; border-color:#9b4d45; }
+        body.hard-light #glitchCanvas { mix-blend-mode:hard-light; filter:contrast(1.12) saturate(1.2); }
+        body.soft-eye-on #engine-control-dock { border-color:#b98bff80; }
+        #vsync-mode-btn { min-width:88px; }
+        @media (max-width: 760px) {
+            #effect-toggle-column { top:74px !important; width:220px; max-height:calc(100vh - 90px) !important; }
+            #engine-control-dock { top:auto; bottom:58px; right:8px; width:min(286px,calc(100vw - 244px)); min-width:190px; }
+            #glitch-bottom-bar { max-width:calc(100vw - 10px) !important; gap:4px !important; padding:4px !important; }
+            #glitch-bottom-bar .glitch-slider-group { gap:4px; }
+            #glitch-bottom-bar input[type=range] { width:58px; flex-basis:58px; }
+        }
+        @media (max-width: 520px) {
+            #effect-toggle-column { width:190px; padding:7px !important; }
+            #engine-control-dock { width:calc(100vw - 210px); min-width:174px; right:6px; bottom:58px; padding:7px; }
+            .engine-dock-actions { grid-template-columns:repeat(2,1fr); }
+            #glitch-bottom-bar { transform:translateX(-50%) scale(.86); transform-origin:bottom center; }
+        }
+
+    
+        /* Per-voice sculpting controls: intensity stays visible; size/depth expand per effect. */
+        .effect-control-row { grid-template-columns:minmax(0,1fr) 72px auto; gap:5px 6px; }
+        .effect-control-row .effect-toggle-btn { grid-column:1; }
+        .effect-control-row > input[type=range] { grid-column:2; width:72px; }
+        .effect-control-row .effect-level-label { grid-column:3; grid-row:1; margin:0; min-width:29px; }
+        .effect-tune-toggle { grid-column:1 / -1; justify-self:end; border:0; background:none; color:#8ed6d5;
+            padding:0 2px 2px; font:9px 'Courier New',monospace; cursor:pointer; letter-spacing:.08em; }
+        .effect-tune-toggle:hover { color:#fff1a8; }
+        .effect-tune-panel { grid-column:1 / -1; display:none; grid-template-columns:1fr 1fr; gap:6px 10px;
+            padding:7px 7px 5px; margin:0 0 2px; border:1px solid #42d9cc38; border-radius:5px;
+            background:rgba(28,43,49,.48); }
+        .effect-tune-panel.open { display:grid; }
+        .effect-tune-panel label { display:grid; grid-template-columns:1fr auto; gap:2px 5px; color:#bdcbd0;
+            font:8px 'Courier New',monospace; letter-spacing:.08em; }
+        .effect-tune-panel output { color:#f5d95b; font-size:8px; }
+        .effect-tune-panel input { grid-column:1 / -1; width:100%; accent-color:#f6cd4b; }
+        .effect-control-row .effect-toggle-btn[data-active="true"] { opacity:1; }
+        @media (max-width:520px) { .effect-tune-panel { gap:5px; padding:5px; } }
+
+    
+        #engine-control-dock[hidden] { display:none !important; }
+        #engine-dock-toggle { position:fixed; top:74px; right:12px; z-index:2301; padding:5px 9px;
+            border:1px solid #46cfc2; border-radius:5px; background:rgba(4,10,16,.94); color:#7be9dc;
+            font:700 9px 'Courier New',monospace; letter-spacing:.08em; cursor:pointer; }
+        #engine-dock-toggle:hover { color:#fff; border-color:#fff; }
+        @media (max-width:760px) { #engine-dock-toggle { top:70px; right:8px; } }
+    </style>
+</head>
+<body>
+    <svg width="0" height="0" class="background-svg" style="position:absolute;z-index:-1;">
+      <filter id="ai-warp-filter" color-interpolation-filters="sRGB">
+        <feTurbulence id="ai-turbulence-large" type="turbulence" baseFrequency="0.005" numOctaves="1" seed="1" result="large_noise"/>
+        <feTurbulence id="ai-turbulence-small" type="turbulence" baseFrequency="0.05" numOctaves="2" seed="2" result="small_noise"/>
+        <feDisplacementMap in="large_noise" in2="small_noise" scale="40" result="warped_noise"/>
+        <feDisplacementMap id="ai-displacement" in="SourceGraphic" in2="warped_noise" scale="0" xChannelSelector="R" yChannelSelector="G" result="displaced_video"/>
+        <feBlend in="SourceGraphic" in2="displaced_video" mode="screen" result="warped_blend"/>
+        <feColorMatrix id="ai-color-matrix" in="warped_blend" type="hueRotate" values="0"/>
+      </filter>
+    </svg>
+
+                <!-- UI Toggle Tab -->
+                <div id="ui-toggle-tab">
+                    <button id="toggle-ui-btn">HIDE CONTROL U.I.</button>
+                </div>
+        <div id="freeze-frame-btn-container">
+            <button id="freeze-frame-btn">FREEZE FRAME!</button>
+        </div>
+    <div id="glitch-container" style="position:relative;width:100vw;height:100vh;overflow:hidden;">
+        <canvas id="hue-bg"></canvas>
+        <canvas id="bg-custom" style="display:none;position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:0;"></canvas>
+        <canvas class="glitch-canvas" id="glitchCanvas"></canvas>
+    </div>
+        <!-- Custom Background Toggle Button -->
+        <div id="custom-bg-btn-container">
+            <button id="custom-bg-btn" class="custom-bg-btn">Custom Background!</button>
+        </div>
+            <div id="custom-bg-panel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2100;background:rgba(20,20,20,0.98);border:2px solid #fff;border-radius:10px;padding:18px 18px 12px 18px;box-shadow:0 4px 24px #000;max-width:600px;">
+                <div style="font-family:'Courier New',monospace;color:#fff;font-size:1.1em;margin-bottom:10px;">Select up to 50 images for cycling background:</div>
+                <div id="custom-bg-thumbnails" style="display:grid;grid-template-columns:repeat(10,48px);grid-template-rows:repeat(5,48px);gap:10px;margin-bottom:10px;"></div>
+            <input type="file" id="custom-bg-file" accept="image/*" multiple style="margin-bottom:10px;" />
+            <button id="custom-bg-apply-btn" style="display:block;margin:10px auto 0 auto;padding:0.5em 1.2em;border-radius:8px;border:2px solid #fff;background:#222;color:#fff;font-family:'Courier New',monospace;cursor:pointer;transition:background 0.2s, color 0.2s;">Apply</button>
+            <div style="font-size:0.95em;color:#ccc;">Images will stretch to fit the background and cycle every 20 seconds with a fade effect.</div>
+        </div>
+                             
+          <div id="effect-toggle-column"></div>
+
+       
+
+        <div id="glitch-top-bar">
+            <div class="glitch-slider-group">
+                <button id="null-speed-btn" class="glitch-toggle-btn">0</button>
+                <label for="glitch-speed-slider">Speed</label>
+                <input type="range" id="glitch-speed-slider" min="0.01" max="3" step="0.01" value="1.5">
+            </div>
+            <div class="glitch-slider-group">
+                <button id="null-opacity-btn" class="glitch-toggle-btn">0</button>
+                <label for="glitch-opacity-slider">Opacity</label>
+                <input type="range" id="glitch-opacity-slider" min="0" max="1" step="0.01" value="0.5">
+            </div>
+        </div>
+
+        <div id="glitch-bottom-bar">
+            <div class="glitch-slider-group">
+                <button id="ghost-mode-btn" class="glitch-toggle-btn">GHOST OFF</button>
+                <label for="ghost-strength-slider">Ghost</label>
+                <input type="range" id="ghost-strength-slider" min="0" max="1" step="0.01" value="1">
+            </div>
+            <div class="glitch-slider-group">
+                <button id="vsync-mode-btn" class="glitch-toggle-btn" title="Cycle V-Sync modes: OFF, scanphasing, vertical color harmony, sharp">V-SYNC OFF</button>
+            </div>
+            <div class="glitch-slider-group">
+                <button id="ai-warp-btn" class="glitch-toggle-btn">WARP OFF</button>
+                <label for="ai-warp-slider">Warp</label>
+                <input type="range" id="ai-warp-slider" min="0" max="1" step="0.01" value="0.5">
+            </div>
+        </div>
+
+        <button id="engine-dock-toggle" type="button" aria-controls="engine-control-dock" aria-expanded="true">HIDE EXTRA PANEL</button>
+        <section id="engine-control-dock" aria-label="Revision 3 engine controls">
+            <div class="engine-dock-heading"><span>R3 // ENGINE DECK</span><span>SOFT-EYE · CHROMA · MOTION</span></div>
+            <div class="engine-dock-sliders">
+                <label>Effect intensity <output id="master-intensity-value">100%</output><input id="master-intensity-slider" type="range" min="0" max="1" step="0.01" value="1"></label>
+                <label>Motion scale <output id="motion-scale-value">100%</output><input id="motion-scale-slider" type="range" min="0.1" max="2.5" step="0.01" value="1"></label>
+                <label>Blend softness <output id="blend-softness-value">55%</output><input id="blend-softness-slider" type="range" min="0" max="1" step="0.01" value="0.55"></label>
+                <label>Continual speed <output id="continual-speed-value">85%</output><input id="continual-speed-slider" type="range" min="0" max="1" step="0.01" value="0.85"></label>
+                <label>Auto glitch power <output id="auto-glitch-power-value">75%</output><input id="auto-glitch-power-slider" type="range" min="0" max="1" step="0.01" value="0.75"></label>
+                <label>V-Sync strength <output id="vsync-strength-value">60%</output><input id="vsync-strength-slider" type="range" min="0" max="1" step="0.01" value="0.60"></label>
+                <label>Random seed <output id="random-seed-value">52%</output><input id="random-seed-slider" type="range" min="0" max="1" step="0.01" value="0.52"></label>
+                <label>Board energy <output id="board-energy-value">65%</output><input id="board-energy-slider" type="range" min="0" max="1" step="0.01" value="0.65"></label>
+            </div>
+            <div class="engine-dock-actions">
+                <button id="soft-eye-btn" title="SOFT-EYE crescendo pacing. Shift-click also calls a crescendo.">SOFT-EYE: OFF</button>
+                <button id="call-crescendo-btn" title="Boosts every currently enabled effect with a 4.6-second rise-and-release. Seven-second cooldown prevents spam.">CALL CRESCENDO</button>
+                <button id="hard-light-btn" title="Toggle the HARD-LIGHT blend">HARD-LIGHT: OFF</button>
+                <button id="auto-glitch-btn" title="Cycle short, eased random effect events">AUTO GLITCH: OFF</button>
+                <button id="randomize-effects-btn" title="Randomize active effect levels or start a 3-effect mix">RANDOMIZE</button>
+                <button id="zero-effects-btn" title="Turn off all effects, ghost, V-Sync and warp">ZERO ALL</button>
+            </div>
+        </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+    <script src="glitch-engine.js"></script>
+    <script src="glitch-script.js"></script>
+            <script>
+            // --- Hide U.I. Tabified Button Logic ---
+            document.addEventListener('DOMContentLoaded', function() {
+                const uiTab = document.getElementById('ui-toggle-tab');
+                const toggleBtn = document.getElementById('toggle-ui-btn');
+                // Elements to hide/show
+                const uiElements = [
+                    document.getElementById('glitch-top-bar'),
+                    document.getElementById('glitch-bottom-bar'),
+                    document.getElementById('effect-toggle-column'),
+                    document.getElementById('engine-control-dock')
+                ];
+                let uiHidden = false;
+
+                function setUIHidden(hidden) {
+                    uiHidden = hidden;
+                    uiElements.forEach(el => { if (el) el.style.display = hidden ? 'none' : ''; });
+                    if (hidden) {
+                        uiTab.classList.add('hide');
+                        setTimeout(() => {
+                            uiTab.classList.remove('hide');
+                            uiTab.classList.add('show');
+                        }, 200);
+                    } else {
+                        uiTab.classList.remove('hide');
+                        uiTab.classList.remove('show');
+                    }
+                    toggleBtn.textContent = hidden ? 'SHOW CONTROL U.I.' : 'HIDE CONTROL U.I.';
+                }
+
+                toggleBtn.addEventListener('click', function(e) {
+                    setUIHidden(!uiHidden);
+                    e.stopPropagation();
+                });
+
+                // Show tab on edge hover/tap
+                let tabTimeout = null;
+                function showTab() {
+                    if (!uiHidden) return;
+                    uiTab.classList.add('show');
+                    if (tabTimeout) clearTimeout(tabTimeout);
+                    tabTimeout = setTimeout(() => {
+                        if (uiHidden) uiTab.classList.remove('show');
+                    }, 2000);
+                }
+                document.addEventListener('mousemove', function(e) {
+                    if (uiHidden && e.clientX > window.innerWidth - 24) {
+                        showTab();
+                    }
+                });
+                uiTab.addEventListener('mouseenter', function() {
+                    if (uiHidden) uiTab.classList.add('show');
+                });
+                uiTab.addEventListener('mouseleave', function() {
+                    if (uiHidden) uiTab.classList.remove('show');
+                });
+                // Touch support
+                document.addEventListener('touchstart', function(e) {
+                    if (!uiHidden) return;
+                    const touch = e.touches[0];
+                    if (touch && touch.clientX > window.innerWidth - 24) {
+                        showTab();
+                    }
+                });
+                // Always start visible
+                setUIHidden(false);
+            });
+            </script>
+    <script>
+
+
+        // --- Main DOMContentLoaded Handler ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Freeze Frame Button Handler ---
+            const freezeFrameBtn = document.getElementById('freeze-frame-btn');
+            if (freezeFrameBtn) {
+                freezeFrameBtn.addEventListener('click', function() {
+                    html2canvas(document.body, {backgroundColor: null, useCORS: true}).then(function(canvas) {
+                        const link = document.createElement('a');
+                        link.download = 'freeze-frame.png';
+                        link.href = canvas.toDataURL('image/png');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    });
+                });
+            }
+
+            // --- Glitch Speed and Opacity Slider Handlers ---
+            const glitchSpeedSlider = document.getElementById('glitch-speed-slider');
+            const nullSpeedBtn = document.getElementById('null-speed-btn');
+            const glitchOpacitySlider = document.getElementById('glitch-opacity-slider');
+            const nullOpacityBtn = document.getElementById('null-opacity-btn');
+
+            // --- Speed Slider ---
+            if (glitchSpeedSlider) {
+                function setGlitchSpeed(val) {
+                    const speed = Math.max(0.01, Math.min(3, parseFloat(val)));
+                    window.__glitchSpeed = speed;
+                    glitchSpeedSlider.value = speed;
+                }
+
+                setGlitchSpeed(1.5); // Initial value
+
+                glitchSpeedSlider.addEventListener('input', () => setGlitchSpeed(glitchSpeedSlider.value));
+
+                if (nullSpeedBtn) {
+                    nullSpeedBtn.addEventListener('click', () => {
+                        const currentVal = parseFloat(glitchSpeedSlider.value);
+                        if (currentVal > 0.01) {
+                            setGlitchSpeed(0.01);
+                            nullSpeedBtn.textContent = 'MAX';
+                        } else {
+                            setGlitchSpeed(3);
+                            nullSpeedBtn.textContent = '0';
+                        }
+                    });
+                }
+            }
+
+            // --- Opacity Slider ---
+            if (glitchOpacitySlider) {
+                function setGlitchOpacity(val) {
+                    const opacity = Math.max(0, Math.min(1, parseFloat(val)));
+                    if (typeof window.__setGlitchMasterOpacity === 'function') {
+                        window.__setGlitchMasterOpacity(opacity);
+                    }
+                    glitchOpacitySlider.value = opacity;
+                }
+
+                setGlitchOpacity(0.5); // Initial value
+
+                glitchOpacitySlider.addEventListener('input', () => setGlitchOpacity(glitchOpacitySlider.value));
+
+                if (nullOpacityBtn) {
+                    nullOpacityBtn.addEventListener('click', () => {
+                        const currentVal = parseFloat(glitchOpacitySlider.value);
+                        if (currentVal > 0) {
+                            setGlitchOpacity(0);
+                            nullOpacityBtn.textContent = 'MAX';
+                        } else {
+                            setGlitchOpacity(1);
+                            nullOpacityBtn.textContent = '0';
+                        }
+                    });
+                }
+            }
+
+        });
+
+
+        function resizeCanvases() {
+            const dpr = window.devicePixelRatio || 1;
+            const bg = document.getElementById('hue-bg');
+            const glitch = document.getElementById('glitchCanvas');
+            bg.width = window.innerWidth * dpr;
+            bg.height = window.innerHeight * dpr;
+            bg.style.width = window.innerWidth + 'px';
+            bg.style.height = window.innerHeight + 'px';
+            glitch.width = window.innerWidth * dpr;
+            glitch.height = window.innerHeight * dpr;
+            glitch.style.width = window.innerWidth + 'px';
+            glitch.style.height = window.innerHeight + 'px';
+        }
+        window.addEventListener('resize', resizeCanvases);
+        window.addEventListener('orientationchange', resizeCanvases);
+        resizeCanvases();
+
+        // Animate the background hue canvas
+        const bgCanvas = document.getElementById('hue-bg');
+        const bgCtx = bgCanvas.getContext('2d');
+        let hue = 0, sat = 100, light = 50;
+        let hueSpeed = 360 / (30 * 60); // 360 degrees over 30 seconds at 60fps
+        let satSpeed = Math.PI * 2 / (30 * 60); // full sine wave over 30 seconds
+        let lightSpeed = Math.PI * 2 / (30 * 60); // full sine wave over 30 seconds
+        let satPhase = 0;
+        let lightPhase = 0;
+        let hueBGActive = true;
+        function animateHueBG() {
+            if (!hueBGActive) return;
+            const w = bgCanvas.width;
+            const h = bgCanvas.height;
+            hue = (hue + hueSpeed) % 360;
+            satPhase += satSpeed;
+            lightPhase += lightSpeed;
+            sat = 50 + 50 * Math.sin(satPhase);
+            light = 50 + 50 * Math.sin(lightPhase);
+            bgCtx.fillStyle = `hsl(${hue}, ${sat}%, ${light}%)`;
+            bgCtx.fillRect(0, 0, w, h);
+            requestAnimationFrame(animateHueBG);
+        }
+        animateHueBG();
+
+        // Custom background canvas logic
+        const customBGCanvas = document.getElementById('bg-custom');
+        const customBGCtx = customBGCanvas.getContext('2d');
+        function resizeCustomBG() {
+            const dpr = window.devicePixelRatio || 1;
+            customBGCanvas.width = window.innerWidth * dpr;
+            customBGCanvas.height = window.innerHeight * dpr;
+            customBGCanvas.style.width = window.innerWidth + 'px';
+            customBGCanvas.style.height = window.innerHeight + 'px';
+        }
+        resizeCustomBG();
+        window.addEventListener('resize', resizeCustomBG);
+        window.addEventListener('orientationchange', resizeCustomBG);
+
+        // User image cycling logic (smooth crossfade, no hard cuts)
+        let userBGImages = [];
+        let userBGSelected = [];
+        let userBGTimer = null;
+        let userBGPanelOpen = false;
+        // Configurable durations (ms)
+        const USER_BG_FADE_DURATION = 10000; // 10s fade
+        const USER_BG_DISPLAY_DURATION = 20000; // 20s fully visible
+        const USER_BG_TOTAL_DURATION = USER_BG_FADE_DURATION + USER_BG_DISPLAY_DURATION; // 30s per image
+
+
+        function startUserBGCycle() {
+            if (userBGTimer) cancelAnimationFrame(userBGTimer);
+            // Always show custom background canvas when cycling images
+            customBGCanvas.style.display = 'block';
+            document.getElementById('hue-bg').style.display = 'none';
+            hueBGActive = false;
+            let startTime = performance.now();
+            function cycle(now) {
+                if (userBGSelected.length === 0) return;
+                const totalImages = userBGSelected.length;
+                const totalCycle = USER_BG_TOTAL_DURATION * totalImages;
+                const elapsed = (now - startTime) % totalCycle;
+                const currIdx = Math.floor(elapsed / USER_BG_TOTAL_DURATION) % totalImages;
+                const nextIdx = (currIdx + 1) % totalImages;
+                const phase = elapsed % USER_BG_TOTAL_DURATION;
+                customBGCtx.clearRect(0, 0, customBGCanvas.width, customBGCanvas.height);
+                // Mobile fallback: try to draw even if image loading events are unreliable
+                const currImg = userBGSelected[currIdx];
+                const nextImg = userBGSelected[nextIdx];
+                try {
+                    if (currImg.naturalWidth > 0) {
+                        if (phase < USER_BG_DISPLAY_DURATION) {
+                            customBGCtx.globalAlpha = 1;
+                            customBGCtx.drawImage(currImg, 0, 0, customBGCanvas.width, customBGCanvas.height);
+                        } else {
+                            const fade = (phase - USER_BG_DISPLAY_DURATION) / USER_BG_FADE_DURATION;
+                            customBGCtx.globalAlpha = 1 - fade;
+                            customBGCtx.drawImage(currImg, 0, 0, customBGCanvas.width, customBGCanvas.height);
+                            if (nextImg.naturalWidth > 0) {
+                                customBGCtx.globalAlpha = fade;
+                                customBGCtx.drawImage(nextImg, 0, 0, customBGCanvas.width, customBGCanvas.height);
+                            }
+                            customBGCtx.globalAlpha = 1;
+                        }
+                    }
+                } catch (e) {
+                    // On mobile, ignore draw errors
+                }
+                userBGTimer = requestAnimationFrame(cycle);
+            }
+            userBGTimer = requestAnimationFrame(cycle);
+        }
+
+        function stopUserBGCycle() {
+            if (userBGTimer) cancelAnimationFrame(userBGTimer);
+            userBGTimer = null;
+        }
+
+
+
+        // Ensure glitch-canvas is initialized after DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.initializeGlitchCanvases) {
+                window.initializeGlitchCanvases();
+            }
+            // Custom BG toggle logic (now toggles panel and background)
+            const customBGBtn = document.getElementById('custom-bg-btn');
+            const customBGPanel = document.getElementById('custom-bg-panel');
+            const customBGThumbnails = document.getElementById('custom-bg-thumbnails');
+            const customBGFile = document.getElementById('custom-bg-file');
+            let customBGActivated = false;
+            customBGBtn.addEventListener('click', function() {
+                if (!customBGActivated) {
+                    // First click: activate custom background, show panel
+                    customBGActivated = true;
+                    document.getElementById('hue-bg').style.display = 'none';
+                    customBGCanvas.style.display = 'block';
+                    hueBGActive = false;
+                    customBGBtn.textContent = 'Select Background';
+                    customBGPanel.style.display = 'block';
+                } else {
+                    // Toggle panel
+                    userBGPanelOpen = !userBGPanelOpen;
+                    customBGPanel.style.display = userBGPanelOpen ? 'block' : 'none';
+                }
+            });
+
+            // Handle file input
+            customBGFile.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files).slice(0, 50);
+                userBGImages = [];
+                userBGSelected = [];
+                customBGThumbnails.innerHTML = '';
+                let loaded = 0;
+                files.forEach((file, idx) => {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const img = new window.Image();
+                        // Mobile fallback: always show custom background canvas when images are loaded
+                        img.onload = function() {
+                            userBGImages.push(img);
+                            userBGSelected.push(img);
+                            customBGCanvas.style.display = 'block';
+                            document.getElementById('hue-bg').style.display = 'none';
+                            hueBGActive = false;
+                            // Thumbnail
+                            const thumb = document.createElement('img');
+                            thumb.src = img.src;
+                            thumb.className = 'selected';
+                            thumb.title = 'Selected';
+                            function toggleSelection() {
+                                if (thumb.classList.contains('selected')) {
+                                    thumb.classList.remove('selected');
+                                    userBGSelected = userBGSelected.filter(i => i !== img);
+                                } else if (userBGSelected.length < 50) {
+                                    thumb.classList.add('selected');
+                                    userBGSelected.push(img);
+                                }
+                                if (userBGSelected.length === 0) {
+                                    stopUserBGCycle();
+                                    customBGCtx.clearRect(0, 0, customBGCanvas.width, customBGCanvas.height);
+                                    // On mobile, hide canvas if no images
+                                    customBGCanvas.style.display = 'none';
+                                    document.getElementById('hue-bg').style.display = 'block';
+                                    hueBGActive = true;
+                                } else {
+                                    userBGIndex = 0;
+                                    startUserBGCycle();
+                                }
+                            }
+                            thumb.onclick = toggleSelection;
+                            thumb.ontouchstart = function(e) {
+                                e.preventDefault();
+                                toggleSelection();
+                            };
+                            customBGThumbnails.appendChild(thumb);
+                            loaded++;
+                        };
+                        // Mobile fallback: force src assignment and canvas display
+                        img.src = ev.target.result;
+                        customBGCanvas.style.display = 'block';
+                        document.getElementById('hue-bg').style.display = 'none';
+                        hueBGActive = false;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            // Apply button logic
+            const customBGApplyBtn = document.getElementById('custom-bg-apply-btn');
+            customBGApplyBtn.addEventListener('click', function() {
+                if (userBGSelected.length > 0) {
+                    userBGIndex = 0;
+                    startUserBGCycle();
+                } else {
+                    stopUserBGCycle();
+                    customBGCtx.clearRect(0, 0, customBGCanvas.width, customBGCanvas.height);
+                }
+                customBGPanel.style.display = 'none';
+                userBGPanelOpen = false;
+            });
+        });
+
+    </script>
+            <script>
+        // Revision 3 mixer rack: an always-visible level fader plus per-effect SIZE and DEPTH.
+        document.addEventListener('DOMContentLoaded', function() {
+            const effectNames = [
+                'Neon Grad', 'Scanlines', 'Data Bands', 'Flash', 'HSL Rainbow', 'ASCII',
+                'Font Burn', 'Strobe', 'Gemini Bomb', 'Tech Artist', 'VHS Glitch',
+                'Data Bomb', 'Ink Glyphs', 'Matrix ASCII', 'Matrix Chord',
+                'B&W Invert', 'Hue/Color Cycle'
+            ];
+            const column = document.getElementById('effect-toggle-column');
+            if (!column) return;
+            column.innerHTML = '<div class="effect-palette-heading"><span>GLITCH PALETTE</span><small>17 VOICES · MIX LIVE</small></div>';
+            const controls = {};
+            const makeTune = (labelText, min, max, value, outputText) => {
+                const label = document.createElement('label'); label.appendChild(document.createTextNode(labelText));
+                const output = document.createElement('output'); output.textContent = outputText; label.appendChild(output);
+                const input = document.createElement('input'); input.type='range'; input.min=String(min); input.max=String(max); input.step='0.01'; input.value=String(value);
+                input.setAttribute('aria-label',labelText); label.appendChild(input);
+                return {label,input,output};
+            };
+            effectNames.forEach((name) => {
+                const row = document.createElement('div'); row.className = 'effect-control-row';
+                const button = document.createElement('button'); button.className = 'effect-toggle-btn';
+                button.textContent = name; button.dataset.effect = name; button.dataset.active = 'false';
+                button.setAttribute('aria-pressed','false');
+                button.addEventListener('click', () => {
+                    const on = button.dataset.active !== 'true';
+                    if (window.__toggleEffect) window.__toggleEffect(name, on);
+                });
+                const intensity = document.createElement('input'); intensity.type='range'; intensity.min='0'; intensity.max='1'; intensity.step='0.01'; intensity.value='1';
+                intensity.title = name + ' intensity'; intensity.setAttribute('aria-label',name + ' intensity');
+                const level = document.createElement('span'); level.className='effect-level-label'; level.textContent='100%';
+                intensity.addEventListener('input', () => {
+                    level.textContent = Math.round(Number(intensity.value)*100)+'%';
+                    if (window.__setEffectIntensity) window.__setEffectIntensity(name,intensity.value);
+                });
+                const tuneButton=document.createElement('button'); tuneButton.type='button'; tuneButton.className='effect-tune-toggle';
+                tuneButton.textContent='SIZE / DEPTH  +'; tuneButton.setAttribute('aria-expanded','false');
+                const tunePanel=document.createElement('div'); tunePanel.className='effect-tune-panel';
+                const size=makeTune('SIZE',0.4,2.4,1,'100%');
+                const depth=makeTune('DEPTH',0,1,0.62,'62%');
+                size.input.addEventListener('input',()=>{
+                    size.output.textContent=Math.round(Number(size.input.value)*100)+'%';
+                    if(window.__setEffectSize)window.__setEffectSize(name,size.input.value);
+                });
+                depth.input.addEventListener('input',()=>{
+                    depth.output.textContent=Math.round(Number(depth.input.value)*100)+'%';
+                    if(window.__setEffectDepth)window.__setEffectDepth(name,depth.input.value);
+                });
+                tunePanel.append(size.label,depth.label);
+                tuneButton.addEventListener('click',()=>{
+                    const open=tunePanel.classList.toggle('open');
+                    tuneButton.textContent=open?'SIZE / DEPTH  −':'SIZE / DEPTH  +';
+                    tuneButton.setAttribute('aria-expanded',String(open));
+                });
+                if(name==='Font Burn') { tunePanel.classList.add('open'); tuneButton.textContent='SIZE / DEPTH  −'; tuneButton.setAttribute('aria-expanded','true'); }
+                row.append(button,intensity,level,tuneButton,tunePanel); column.appendChild(row);
+                controls[name]={button,intensity,level,size,depth,tunePanel,tuneButton};
+            });
+            const bindRange = (id, hook, outputId, scale, suffix) => {
+                const input=document.getElementById(id), output=document.getElementById(outputId);
+                if(!input)return;
+                const apply=()=>{if(output)output.textContent=Math.round(Number(input.value)*scale)+suffix;if(typeof window[hook]==='function')window[hook](input.value);};
+                input.addEventListener('input',apply);apply();
+            };
+            bindRange('master-intensity-slider','__setMasterEffectIntensity','master-intensity-value',100,'%');
+            bindRange('motion-scale-slider','__setMotionScale','motion-scale-value',100,'%');
+            bindRange('blend-softness-slider','__setBlendSoftness','blend-softness-value',100,'%');
+            bindRange('continual-speed-slider','__setContinualSpeed','continual-speed-value',100,'%');
+            bindRange('auto-glitch-power-slider','__setAutoGlitchPower','auto-glitch-power-value',100,'%');
+            bindRange('vsync-strength-slider','__setVsyncLevel','vsync-strength-value',100,'%');
+            bindRange('random-seed-slider','__setRandomSeed','random-seed-value',100,'%');
+            bindRange('board-energy-slider','__setBoardEnergy','board-energy-value',100,'%');
+            const sync=(event)=>{
+                const d=event.detail||{};
+                Object.keys(controls).forEach(name=>{
+                    const c=controls[name],on=!!(d.effects&&d.effects[name]);
+                    c.button.dataset.active=String(on); c.button.setAttribute('aria-pressed',String(on));
+                    c.button.textContent=on?name+'  ·  ON':name;
+                    const level=d.levels&&Number.isFinite(d.levels[name])?d.levels[name]:1;
+                    c.intensity.value=level; c.level.textContent=Math.round(level*100)+'%';
+                    const size=d.sizes&&Number.isFinite(d.sizes[name])?d.sizes[name]:1;
+                    const depth=d.depths&&Number.isFinite(d.depths[name])?d.depths[name]:0.62;
+                    c.size.input.value=size; c.size.output.textContent=Math.round(size*100)+'%';
+                    c.depth.input.value=depth; c.depth.output.textContent=Math.round(depth*100)+'%';
+                });
+                const paint=(id,label,on)=>{const b=document.getElementById(id);if(!b)return;b.classList.toggle('active',!!on);b.textContent=label;};
+                paint('soft-eye-btn',d.softEye?'SOFT-EYE: ACTIVE':'SOFT-EYE: OFF',d.softEye);
+                paint('hard-light-btn',d.hardLight?'HARD-LIGHT: ON':'HARD-LIGHT: OFF',d.hardLight);
+                paint('auto-glitch-btn',d.autoGlitch?'AUTO GLITCH: ON':'AUTO GLITCH: OFF',d.autoGlitch);
+                const ghost=document.getElementById('ghost-mode-btn'); if(ghost&&d.ghost)ghost.textContent='GHOST '+d.ghost;
+                const vsync=document.getElementById('vsync-mode-btn'); if(vsync&&d.vsync)vsync.textContent='V-SYNC '+d.vsync.replace('_',' ');
+                const warp=document.getElementById('ai-warp-btn'); if(warp)warp.textContent=d.warp?'WARP ON':'WARP OFF';
+            };
+            window.addEventListener('glitch-ui-state',sync);
+            sync({detail:{effects:{},levels:{},sizes:{},depths:{},softEye:false,hardLight:false,autoGlitch:false}});
+        });
+        </script>
+</body>
+</html>

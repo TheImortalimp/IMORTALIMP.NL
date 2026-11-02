@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I KNOW BETTER — foobar2000_zu7N7Bp2vz.mp4 | imortalimp.nl</title>
+  <style>
+    :root {
+      --ikb-bg: #030805;
+      --ikb-panel: #06120b;
+      --ikb-border: #124427;
+      --ikb-green: #2bff6d;
+      --ikb-amber: #ffb000;
+      --ikb-cyan: #00e5ff;
+      --ikb-text: #e2f7ea;
+      --ikb-muted: #6ea182;
+      --ikb-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 15%, #0a2415 0%, #030805 70%);
+      color: var(--ikb-text);
+      font-family: var(--ikb-mono);
+      display: flex;
+      flex-direction: column;
+    }
+    .ikb-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(4, 12, 7, 0.95);
+      border-bottom: 1px solid var(--ikb-border);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
+    }
+    .ikb-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ikb-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--ikb-green);
+      box-shadow: 0 0 12px var(--ikb-green);
+      animation: ikb-pulse 1.6s infinite ease-in-out;
+    }
+    @keyframes ikb-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(0.85); }
+    }
+    .ikb-title {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      color: var(--ikb-green);
+      text-shadow: 0 0 14px rgba(43, 255, 109, 0.35);
+    }
+    .ikb-sub {
+      font-size: 11px;
+      color: var(--ikb-muted);
+    }
+    .ikb-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .ikb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 6px;
+      border: 1px solid var(--ikb-border);
+      background: #08180e;
+      color: var(--ikb-text);
+      font-family: var(--ikb-mono);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ikb-btn:hover {
+      border-color: var(--ikb-green);
+      color: var(--ikb-green);
+      box-shadow: 0 0 14px rgba(43, 255, 109, 0.25);
+    }
+    .ikb-btn.amber {
+      border-color: rgba(255, 176, 0, 0.55);
+      color: var(--ikb-amber);
+    }
+    .ikb-btn.amber:hover {
+      background: var(--ikb-amber);
+      color: #040805;
+    }
+    .ikb-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      gap: 16px;
+    }
+    .ikb-stage {
+      width: min(1240px, 96vw);
+      background: #000;
+      border: 1px solid var(--ikb-green);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 36px rgba(43, 255, 109, 0.16);
+      position: relative;
+    }
+    .ikb-stage video {
+      width: 100%;
+      max-height: 74vh;
+      display: block;
+      background: #000;
+      outline: none;
+    }
+    .ikb-deck {
+      width: min(1240px, 96vw);
+      background: var(--ikb-panel);
+      border: 1px solid var(--ikb-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ikb-seek-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ikb-seek {
+      flex: 1;
+      accent-color: var(--ikb-green);
+      cursor: pointer;
+      height: 6px;
+    }
+    .ikb-time {
+      font-size: 12px;
+      color: var(--ikb-amber);
+      font-weight: 800;
+      min-width: 110px;
+      text-align: right;
+    }
+    .ikb-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .ikb-left-ctrls, .ikb-right-ctrls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+    .ikb-select {
+      background: #040d07;
+      color: var(--ikb-green);
+      border: 1px solid var(--ikb-border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-family: var(--ikb-mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <header class="ikb-topbar">
+    <div class="ikb-brand">
+      <span class="ikb-dot"></span>
+      <div>
+        <div class="ikb-title">I KNOW BETTER</div>
+        <div class="ikb-sub">foobar2000_zu7N7Bp2vz.mp4 // imortalimp.nl Popout Video Player</div>
+      </div>
+    </div>
+    <div class="ikb-actions">
+      <button type="button" class="ikb-btn" id="btnPip">⧉ Picture-in-Picture</button>
+      <button type="button" class="ikb-btn" id="btnFs">⛶ Fullscreen</button>
+      <a class="ikb-btn" href="/foobar2000_zu7N7Bp2vz.mp4" download="foobar2000_zu7N7Bp2vz.mp4">⬇ Download .MP4</a>
+      <a class="ikb-btn amber" href="/index.html">⬅ Back to imortalimp.nl</a>
+    </div>
+  </header>
+
+  <main class="ikb-main">
+    <div class="ikb-stage">
+      <video id="ikbVideo" controls autoplay playsinline>
+        <source src="/foobar2000_zu7N7Bp2vz.mp4" type="video/mp4" />
+        <source src="https://www.imortalimp.nl/foobar2000_zu7N7Bp2vz.mp4" type="video/mp4" />
+        Your browser does not support HTML5 video.
+      </video>
+    </div>
+
+    <div class="ikb-deck">
+      <div class="ikb-seek-row">
+        <input type="range" id="ikbSeek" class="ikb-seek" min="0" max="1000" value="0" step="1" />
+        <span class="ikb-time" id="ikbTime">00:00 / 00:00</span>
+      </div>
+      <div class="ikb-controls-row">
+        <div class="ikb-left-ctrls">
+          <button type="button" class="ikb-btn" id="btnPlayPause">⏸ PAUSE</button>
+          <button type="button" class="ikb-btn" id="btnRestart">↺ RESTART</button>
+          <button type="button" class="ikb-btn" id="btnBack10">⏪ -10s</button>
+          <button type="button" class="ikb-btn" id="btnFwd10">⏩ +10s</button>
+          <button type="button" class="ikb-btn" id="btnLoop">🔁 LOOP: OFF</button>
+        </div>
+        <div class="ikb-right-ctrls">
+          <button type="button" class="ikb-btn" id="btnMute">🔊 MUTE</button>
+          <input type="range" id="ikbVol" min="0" max="1" step="0.02" value="1" style="width:88px; accent-color:#2bff6d;" />
+          <select id="ikbSpeed" class="ikb-select" aria-label="Playback Speed">
+            <option value="0.5">0.5× Speed</option>
+            <option value="0.75">0.75× Speed</option>
+            <option value="1" selected>1.0× Speed</option>
+            <option value="1.25">1.25× Speed</option>
+            <option value="1.5">1.5× Speed</option>
+            <option value="2">2.0× Speed</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+  (function () {
+    var vid = document.getElementById("ikbVideo");
+    var seek = document.getElementById("ikbSeek");
+    var timeEl = document.getElementById("ikbTime");
+    var btnPlay = document.getElementById("btnPlayPause");
+    var btnRestart = document.getElementById("btnRestart");
+    var btnBack10 = document.getElementById("btnBack10");
+    var btnFwd10 = document.getElementById("btnFwd10");
+    var btnLoop = document.getElementById("btnLoop");
+    var btnMute = document.getElementById("btnMute");
+    var vol = document.getElementById("ikbVol");
+    var speed = document.getElementById("ikbSpeed");
+    var btnPip = document.getElementById("btnPip");
+    var btnFs = document.getElementById("btnFs");
+
+    function fmt(s) {
+      if (!isFinite(s) || s < 0) return "00:00";
+      var m = Math.floor(s / 60);
+      var sec = Math.floor(s % 60);
+      return (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec;
+    }
+
+    function syncUI() {
+      btnPlay.textContent = vid.paused ? "▶ PLAY" : "⏸ PAUSE";
+      btnMute.textContent = vid.muted ? "🔇 UNMUTE" : "🔊 MUTE";
+      btnLoop.textContent = "🔁 LOOP: " + (vid.loop ? "ON" : "OFF");
+      var d = vid.duration || 0;
+      var c = vid.currentTime || 0;
+      timeEl.textContent = fmt(c) + " / " + fmt(d);
+      if (d > 0) seek.value = String(Math.round((c / d) * 1000));
+    }
+
+    ["play", "pause", "timeupdate", "loadedmetadata", "volumechange"].forEach(function (ev) {
+      vid.addEventListener(ev, syncUI);
+    });
+
+    btnPlay.addEventListener("click", function () {
+      if (vid.paused) vid.play(); else vid.pause();
+    });
+    btnRestart.addEventListener("click", function () {
+      vid.currentTime = 0;
+      vid.play();
+    });
+    btnBack10.addEventListener("click", function () {
+      vid.currentTime = Math.max(0, (vid.currentTime || 0) - 10);
+    });
+    btnFwd10.addEventListener("click", function () {
+      if (isFinite(vid.duration)) vid.currentTime = Math.min(vid.duration, (vid.currentTime || 0) + 10);
+    });
+    btnLoop.addEventListener("click", function () {
+      vid.loop = !vid.loop;
+      syncUI();
+    });
+    btnMute.addEventListener("click", function () {
+      vid.muted = !vid.muted;
+      syncUI();
+    });
+    vol.addEventListener("input", function () {
+      vid.volume = parseFloat(vol.value);
+      if (vid.volume > 0 && vid.muted) vid.muted = false;
+    });
+    speed.addEventListener("change", function () {
+      vid.playbackRate = parseFloat(speed.value) || 1;
+    });
+    seek.addEventListener("input", function () {
+      if (isFinite(vid.duration) && vid.duration > 0) {
+        vid.currentTime = (parseFloat(seek.value) / 1000) * vid.duration;
+      }
+    });
+    btnPip.addEventListener("click", function () {
+      if (document.pictureInPictureElement) document.exitPictureInPicture();
+      else if (vid.requestPictureInPicture) vid.requestPictureInPicture();
+    });
+    btnFs.addEventListener("click", function () {
+      if (vid.requestFullscreen) vid.requestFullscreen();
+    });
+  })();
+  </script>
+</body>
+</html>

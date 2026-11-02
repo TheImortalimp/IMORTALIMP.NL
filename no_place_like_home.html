@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Place Like Home</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Scrollbar -->
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(79,70,229,0.4);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="text-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#0b0f19]">
+
+    <div class="w-full max-w-5xl bg-[#131827] border border-gray-800/80 rounded-3xl shadow-2xl overflow-hidden p-4 sm:p-6 lg:p-8">
+        
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between border-b border-gray-800/80 pb-4 gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-900/30 border border-indigo-700/50 px-3 py-1 rounded-full shadow-inner">
+                    Now Playing
+                </span>
+                <h1 class="text-3xl font-bold text-white mt-4 tracking-tight">No Place Like Home ( @drivingfilmscore657 )</h1>
+                <p class="text-sm text-gray-400 mt-1">Portrait Edition & Synced Lyrics MADE WITH SUNO</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 items-stretch">
+            
+            <div class="w-full md:w-1/2 max-w-[400px] mx-auto md:mx-0 flex-shrink-0 aspect-[9/16] relative rounded-2xl overflow-hidden bg-black border border-gray-700 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                <video 
+                    id="videoPlayer" 
+                    class="absolute inset-0 w-full h-full object-cover" 
+                    controls 
+                    preload="metadata"
+                    poster="https://placehold.co/720x1280/1a2234/4f46e5?text=No+Place+Like+Home">
+                    <source src="No Place Like Home.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <div class="w-full md:w-1/2 flex flex-col bg-[#1a2234]/80 border border-gray-700/60 rounded-2xl shadow-inner overflow-hidden">
+                
+                <!-- Fixed Header for Lyrics Box (Duplicate removed) -->
+                <div class="flex items-center justify-between p-5 border-b border-gray-700/50 bg-[#1e273c]/50 shrink-0">
+                    <h2 class="text-sm font-semibold text-gray-100 uppercase tracking-wider flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Lyrics Showcase
+                    </h2>
+                    <span class="text-xs text-gray-500 bg-gray-900/50 px-2 py-1 rounded-md">Scroll to read</span>
+                </div>
+
+                <!-- Scrollable Body (Fills remaining height) -->
+                <div class="flex-1 overflow-y-auto p-5 space-y-6 text-[15px] text-gray-300 leading-relaxed custom-scrollbar bg-gradient-to-b from-transparent to-[#131827]/30">
+                    
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Intro]</span>
+                        <p>Bag by the doorway, dust along the brim<br>The room holds still while the minute hand swims</p>
+                    </div>
+
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Verse 1]</span>
+                        <p>No place like home, though I keep moving on<br>Its good to be out when the walls feel wrong<br>Lets take the scenic route, past the fields gone brown<br>One hand on the wheel, one eye on the town<br>Hope we make it before the last shop closes<br>Before the road folds up and the cold wind changes<br>I carry old receipts and a key with no door<br>Every mile asks what I’m traveling for</p>
+                    </div>
+
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Chorus]</span>
+                        <p>No place like home, but I needed the miles<br>Late night mirage in the rearview awhile<br>Ghosts in the fog where the roadside bends<br>I lay my hat to rest, let the journey end<br>Watch the time tick slowly away<br>One quiet room at the end of the day<br>Dream on, dream on, till the morning comes through<br>I found my way back, carrying less of you</p>
+                    </div>
+
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Verse 2]</span>
+                        <p>Hundred yard stare at the station clock<br>Through the wire, hear the old town talk<br>A plane ticket back folded under my hand<br>Like a small blue promise I could understand<br>The terminal hums, everybody’s half awake<br>I count the painted lines, I count the chances I take<br>Its good to be out, but the leaving gets old<br>When every new horizon repeats what you hold</p>
+                    </div>
+
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Bridge]</span>
+                        <p>Late night mirage, then the headlights clear<br>Ghosts in the fog lose their shape and disappear<br>I set the hat down beside the borrowed bed<br>Tea with milk before bed, let the miles leave my head</p>
+                    </div>
+
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Chorus]</span>
+                        <p>No place like home, but I needed the miles<br>Lets take the scenic route, just a few more miles<br>Hope we make it where the porch light stays<br>Where the clock moves slow through the ordinary days<br>Through the wire, through the weather, through the blue<br>Plane ticket back, and a room waiting too<br>I lay my hat to rest, let the silence stay<br>Watch the time tick slowly away</p>
+                    </div>
+
+                    <div class="space-y-1.5 transition-colors duration-300 hover:text-white pb-4">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1 opacity-80">[Outro]</span>
+                        <p class="text-gray-400">No place like home<br>Tea with milk before bed<br>The road can keep its questions<br>Dream on</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        
+        video.addEventListener('play', () => {
+            video.parentElement.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-[#131827]');
+        });
+
+        video.addEventListener('pause', () => {
+            video.parentElement.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2', 'ring-offset-[#131827]');
+        });
+    </script>
+
+</body>
+</html>

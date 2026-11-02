@@ -1,0 +1,482 @@
+﻿﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imortalimp Home</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Unica+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Lokale BlackBloc cursieve font */
+        @font-face {
+            font-family: 'BlackBloc';
+            src: url('/fonts/the-black-bloc-italic.ttf') format('truetype');
+            font-weight: normal;
+            font-style: italic;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            font-style: italic;
+            background-color: #ac4af1; /* A light lilac background for the page */
+            color: #f0e6f2; /* A dark purple for the text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'BlackBloc', Impact, 'Arial Black', sans-serif;
+            font-weight: normal;
+            font-style: italic;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            font-size: clamp(2em, 5vw, 4em); /* Responsive font size */
+            margin: 20px 0;
+        }
+        
+        a {
+            color: #00ccff;
+            text-decoration: underline;
+            font-weight: bold;
+            display: inline-block;
+            margin: 8px 0;
+        }
+        
+        a:hover {
+            color: #88ffff;
+            text-decoration: none;
+        }
+        
+        .iframe-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 2706px; /* Increased width by 65% from 1640px */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 130%; /* Aspect ratio of 130% height to width */
+            overflow: hidden;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            flex: 1 1 100%; /* Default to full width on small screens */
+            box-sizing: border-box;
+        }
+        
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Specific styling for the Bandcamp player container */
+        .bandcamp-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 25%; /* Aspect ratio for the horizontal player */
+            overflow: hidden;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            flex: 1 1 100%; 
+            box-sizing: border-box;
+        }
+        
+        .bandcamp-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        p {
+            max-width: 90%;
+            margin: 10px auto;
+        }
+
+.album-container {
+    text-align: center;
+}
+
+.track-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center the tracks container */
+}
+
+.track-item {
+    display: flex;
+    flex-direction: column; /* Stack track title and audio player */
+    align-items: center;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease; /* Smooth transition for the highlight effect */
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Existing CSS for the track item when it's active */
+.track-item.active {
+    background-color: #af98c7; /* Light lilac background */
+    border: 1px solid #e591e1; /* Lilac border */
+}
+
+/* New CSS to change the text color of the track title inside the active item */
+.track-item.active .track-title {
+    color: #4b0082; /* Dark purple text */
+}
+
+.track-title {
+    text-align: center;
+    margin-bottom: 10px; /* Space between title and player */
+}
+
+audio {
+    filter: hue-rotate(270deg) saturate(1.5) brightness(1.2);
+    accent-color: #c9a3e6;
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: #e6d8f5;
+}
+
+audio::-webkit-media-controls-play-button {
+    background-color: #c9a3e6;
+    border-radius: 50%;
+    color: #4b0082;
+}
+
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display {
+    color: #4b0082;
+}
+
+audio::-webkit-media-controls-timeline {
+    background-color: #e6d8f5;
+}
+
+/* New CSS for the image grid */
+.image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.image-grid picture {
+    flex: 1 1 200px; /* Adjust the base width as needed */
+    max-width: 25%;
+    box-sizing: border-box;
+}
+
+.image-grid img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Footer styles */
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto; /* Pushes the footer to the bottom */
+}
+
+.main-footer {
+    background: #181c24;
+    color: #ffeb3b;
+    font-size: 1.1rem;
+    letter-spacing: 0.03em;
+    padding: 1rem 0.5rem;
+}
+
+.golden-footer {
+    background-color: transparent;
+    font-size: 5em; /* Default large font for desktop */
+    color: #FFD700;
+}
+
+.golden-footer h2 {
+    font-size: 1em; /* Ensures font sizes are relative to the footer */
+}
+
+/* MEDIA QUERIES FOR DIFFERENT SCREEN SIZES */
+
+/* Tablets and Desktops */
+@media (min-width: 769px) {
+    .iframe-container {
+        flex: 1 1 calc(50% - 10px); /* Two columns on larger screens */
+    }
+    .bandcamp-container {
+        flex: 1 1 calc(50% - 10px);
+    }
+}
+
+/* Small screens */
+@media (max-width: 768px) {
+    .golden-footer {
+        font-size: 2.5em; /* Smaller font on mobile devices */
+    }
+    .iframe-wrapper {
+        flex-direction: column; /* Stack iframes vertically on small screens */
+        align-items: center; /* Center the iframes */
+    }
+}
+    </style>
+</head>
+<body>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTXL35MFPT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NTXL35MFPT');
+    </script>
+    <h1>Welcome to Imortalimp</h1>
+
+    <div class="iframe-wrapper">
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/the_dual_logic_of_societal_systems_capitalism_and_Corporateism.pdf&embedded=true" title="The Dual Logic of Societal Systems_Capitalism and Corporate-ism"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/Profieloverzicht_Diego_Conesa_Guerrero.pdf&embedded=true" title="Profieloverzicht Diego Conesa Guerrero"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/The_Interdependence_of_Religion_and_Science_in_Defining_Reality.pdf&embedded=true" title="Religion A Document"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/medicine_devolved_or_evolved_into_our_baby_or_is_it_a_monster_i_ask_you.pdf&embedded=true" title="Medicine A Document"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/timeisefforts.pdf&embedded=true" title="timeiseffort"></iframe>
+        </div>
+        <div class="iframe-container">
+            <iframe src="https://docs.google.com/gview?url=https://www.imortalimp.nl/bin/Poetic-Justice.pdf&embedded=true" title="Poetic-Justice.pdf"></iframe>
+        </div>
+    </div>
+
+    <p>SUGGESTED HIDDEN LINK <a href="https://www.academia.edu/143060054/_The_Dual_Logic_of_Societal_Systems_Capitalism_and_Coprorate_ism_">_The_Dual_Logic_of_Societal_Systems_Capitalism_and_Coprorate_ism_</a></p>
+    <p>SUGGESTED VIDEO FOR THE <a href="https://www.academia.edu/142945725/Profieloverzicht_Diego_Conesa_(Guerrero)">Profieloverzicht_Diego_Conesa_(Guerrero)</a></p>
+    <p>SUGGESTED TRUTH AND SCIENCE STUDY <a href="https://www.academia.edu/143147572/The_Interdependence_of_Religion_and_Science_in_Defining_Reality">The_Interdependence_of_Religion_and_Science_in_Defining_Reality</a></p>
+    <p>SUGGESTED HEALTH AND SCIENCE STUDY <a href="https://www.academia.edu/143150396/Medicine_Devolved_Evolved_into_our_baby_or_is_it_a_monster_i_ask_you">Medicine_Devolved_Evolved_into_our_baby_or_is_it_a_monster_i_ask_you</a></p>
+    <p>SUGGESTED HEALTH AND SCIENCE STUDY <a href="https://www.academia.edu/143171482/_Time_Is_Effort_A_New_Measure_of_Human_Worth_Q_and_A">🕰️ “Time Is Effort” — A New Measure of Human Worth +Q&A</a></p>
+    <p>SUGGESTED Poetic Justice <a href=" https://www.academia.edu/143906887/Poetic_Justice">POETIC JUSTICE</a></p>
+   
+    <h1>THIS IS THE END OF THE LIN</h1>
+
+    <div class="album-container">
+        
+        
+        <div class="image-grid">
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+            </picture>
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+            </picture>
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+            </picture>
+            <picture>
+                <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+            </picture>
+        </div>
+        <h1>PLACEBO BY GAS1312</h1>
+        <p>[Listen to the full album on Bandcamp:]</p><br>
+        <p><a href="https://gas1312.bandcamp.com/album/placebo">PLACEBO GAS1312</a></p><br>
+        <picture>
+            <source media="(min-width: 720px)" srcset="gas1312-placebo/cover.jpg">
+            <source media="(min-width: 690px)" srcset="gas1312-placebo/cover.jpg">
+            <img src="gas1312-placebo/cover.jpg" alt="Album cover for PLACEBO" style="width:auto; max-width:100%;">
+        </picture>
+        <div class="track-list">
+            <div class="track-item">
+                <span class="track-title">Smoking Your Brain</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-01-smoking-your-brain.mp3" type="audio/mpeg">
+                </audio> 
+            </div>
+    
+            <div class="track-item">
+                <span class="track-title">Nicoteen</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-02-nicoteen.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+    
+            <div class="track-item">
+                <span class="track-title">Heroin Bagno</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-03-heroin-bagno.mp3" type="audio/mpeg">
+                </audio> 
+            </div>
+    
+            <div class="track-item">
+                <span class="track-title">Alcool</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-04-alcool.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Cocain Forno</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-05-coccaine-forno.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Emblem</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-06-emblem.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Placebo</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-07-placebo.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Onlynetears</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-08-onlynetears.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            
+            <div class="track-item">
+                <span class="track-title">Methings</span>
+                <audio class="track" controls preload="auto">
+                    <source src="/gas1312-placebo/gas1312-placebo-09-methings.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+            <picture>
+                    <source media="(min-width: 720px)" srcset="gas1312-placebo/cover.jpg">
+                    <source media="(min-width: 690px)" srcset="gas1312-placebo/cover.jpg">
+                    <img src="gas1312-placebo/cover.jpg" alt="Album cover for PLACEBO" style="width:auto; max-width:100%;">
+            </picture>
+            <div class="image-grid">
+                    <picture>
+                        <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                        <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                        <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+                    </picture>
+                    <picture>
+                        <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                        <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                        <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+                    </picture>
+                    <picture>
+                        <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                        <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                        <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+                    </picture>
+                    <picture>
+                        <source media="(min-width: 720px)" srcset="bin/Medicine & Health.png">
+                        <source media="(min-width: 690px)" srcset="bin/Medicine & Health.png">
+                        <img src="bin/Medicine & Health.png" alt="Medicine & Health" style="width:auto;">
+                    </picture>
+                   
+                </div>
+        </div>
+    </div>
+    
+    <p><a href="https://gas1312.bandcamp.com/album/placebo">PLACEBO GAS1312</a></p>
+
+    <footer class="main-footer">© 2025 Imortalimp</footer>
+    <picture>
+        <source media="(min-width: 720px)" srcset="IMG20250902145510.jpg">
+        <source media="(min-width: 690px)" srcset="IMG20250902145510.jpg">
+        <img src="IMG20250902145510.jpg" alt="River Lyle" style="width:auto; max-width:100%;">
+    </picture>
+    <footer class="golden-footer">
+        <h2>
+            &copy; 2025 Imortalimp &copy; (created by @riverlyle donations welcome :-) 💳) {contact at webmaster@imortalimp.nl & [paypal: reuveni.river.lyle.reuveni@gmail.com]}
+        </h2>
+    </footer>
+
+<!-- Botpress Widget -->
+<div class="botpress-widget">
+  <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
+  <script src="https://files.bpcontent.cloud/2025/07/16/18/20250716182151-D4S5G5R5.js" defer></script>
+  <div style="width:100%;height:500px;background:#CB65F0;border-radius:12px;"></div>
+</div>
+
+    <script>
+        const audioPlayers = document.querySelectorAll('.track');
+        const trackItems = document.querySelectorAll('.track-item');
+    
+        // Function to remove the 'active' class from all track items
+        function clearActiveClasses() {
+            trackItems.forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+    
+        // Add event listeners to each audio player
+        audioPlayers.forEach((player, index) => {
+            // Event listener for when a track starts to play
+            player.addEventListener('play', () => {
+                // Stop any other track that is playing
+                audioPlayers.forEach((otherPlayer) => {
+                    if (otherPlayer !== player) {
+                        otherPlayer.pause();
+                    }
+                });
+
+                clearActiveClasses();
+                trackItems[index].classList.add('active');
+            });
+    
+            // Event listener for when a track is paused
+            player.addEventListener('pause', () => {
+                trackItems[index].classList.remove('active');
+            });
+    
+            // Event listener for when a track ends, and then play the next one
+            player.addEventListener('ended', () => {
+                trackItems[index].classList.remove('active');
+                if (index + 1 < audioPlayers.length) {
+                    const nextPlayer = audioPlayers[index + 1];
+                    // The play() method returns a promise. On mobile, it might be rejected.
+                    // We catch the error to prevent the script from breaking.
+                    const playPromise = nextPlayer.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => console.error("Sequential playback was prevented by the browser.", error));
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

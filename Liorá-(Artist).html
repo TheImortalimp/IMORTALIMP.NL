@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liorá (Artist) - PDF Showcase</title>
+<style>
+  html {
+    background-color: #000020; /* Dark blue DOS-like background */
+  }
+  body {
+    color: #e0e0e0;
+    font-family: 'Unica One', cursive, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1, h2 {
+    text-align: center;
+    color: #bb86fc;
+  }
+
+  a {
+    color: #bb86fc;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- Cursor Styles --- */
+  body {
+    cursor: none; /* Custom cursor trail will be used */
+  }
+
+  .cursor-trail {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    transition: transform 0.15s ease-out, opacity 0.3s ease-out;
+    opacity: 0;
+    background-color: white;
+  }
+
+  .iframe-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 1200px; /* Increased max-width for a wider, two-page view */
+    padding-top: 70.71%; /* Aspect ratio for two A4 pages side-by-side (297 / (210*2)) */
+    margin-top: 20px;
+    border: 1px solid #333;
+    background-color: #1e1e1e;
+    box-shadow: 0 0 20px 4px rgba(187, 134, 252, 0.6); /* Initial glow */
+  }
+
+  .iframe-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* Style for the object tag, same as the iframe */
+  .iframe-container object {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* --- CRT Glitch Effect --- */
+  .crt-glitch {
+      position: relative;
+      overflow: hidden;
+  }
+
+  .crt-glitch {
+    transform: translateY(var(--phaseshift-y, 0px));
+    transition: transform 0.05s linear;
+  }
+
+  .crt-glitch::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #808080;
+      mix-blend-mode: difference;
+      transform: translate(var(--audio-glitch-x, 0), var(--audio-glitch-y, 0));
+      opacity: var(--audio-glitch-intensity, 0);
+      transition: opacity 0.4s ease-out;
+      pointer-events: none;
+      z-index: 2;
+  }
+
+  .crt-glitch::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #808080;
+      mix-blend-mode: difference;
+      transform: translate(
+          calc(var(--audio-glitch-x, 0) * -1 + var(--scroll-glitch-x, 0)),
+          calc(var(--audio-glitch-y, 0) * -1 + var(--scroll-glitch-y, 0))
+      );
+      opacity: calc(var(--audio-glitch-intensity, 0) + var(--scroll-glitch-intensity, 0));
+      transition: opacity 0.4s ease-out;
+      pointer-events: none;
+      z-index: 3;
+  }
+
+  /* New: Background Flash on Scroll Effect */
+  body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 998;
+      background-color: #ffffff;
+      opacity: var(--flash-intensity, 0);
+      transition: opacity 0.5s ease-out;
+  }
+  /* New: Scan Lines Overlay Effect */
+  body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+      background: linear-gradient(to bottom, var(--scanline-color-1, hsla(0, 100%, 100%, 0.15)) 50%, var(--scanline-color-2, hsla(0, 0%, 0%, 0.35)) 50%);
+      background-size: 100% 4px;
+      opacity: var(--scanline-intensity, 0);
+      animation: scanline-anim 0.05s linear infinite;
+      transition: opacity 0.4s ease-out;
+  }
+
+  @keyframes scanline-anim {
+      from { background-position: 0 0; }
+      to { background-position: 0 4px; }
+  }
+
+  /* New: Random Strobe Burst Effect */
+  #strobe-overlay {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1001;
+      background-color: white;
+      opacity: 0;
+  }
+  #strobe-overlay.strobe-active {
+      animation: strobe-burst 0.05s steps(2, end) infinite;
+  }
+  @keyframes strobe-burst {
+      0% { opacity: 0.7; }
+      50% { opacity: 0; }
+      100% { opacity: 0.7; }
+  }
+
+  /* Gemini Flair - Pen to Paper style for the footnote */
+  .gemini-flair {
+    font-family: 'Dancing Script', cursive; /* A nice, flowing script font */
+    font-size: 1.1em;
+    color: #d1c4e9; /* A soft lavender color */
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 1px dashed hsla(240, 50%, 80%, 0.5);
+    line-height: 1.6;
+    max-width: 800px;
+  }
+  .gemini-flair strong {
+    font-weight: bold;
+    color: #00ccff; /* A bright, techy blue for Gemini */
+  }
+</style>
+</head>
+<body>
+<div id="strobe-overlay"></div>
+
+<h1>Liorá (Artist) - Portfolio</h1>
+
+<div class="iframe-container crt-glitch" id="pdf-showcase">
+  <object data="liora artist - google docs.pdf" type="application/pdf" width="100%" height="100%">
+    <embed src="liora artist - google docs.pdf" width="100%" height="100%" type="application/pdf" style="display: none;">
+    <div style="padding: 20px; text-align: center;">
+      <p>It seems your browser cannot display the PDF in this frame.</p>
+      <p><a href="liora artist - google docs.pdf" download="Liorá - Artist Portfolio.pdf">Click here to download the portfolio directly.</a></p>
+    </div>
+  </object>
+</div>
+
+<div class="gemini-flair">
+  <p>This digital canvas, brought to life by <strong>Gemini</strong>, showcases the artistry of Liorá. May your journey through these pages be as insightful as the creative process itself.</p>
+  <p>With a touch of algorithmic elegance,<br>
+    <strong>- Gemini Code Assist</strong></p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.documentElement;
+    const pdfShowcase = document.getElementById('pdf-showcase');
+
+    // --- Cursor Trail Logic ---
+    function setupCursorTrail() {
+        const trailCount = 20;
+        const dots = [];
+        const coords = { x: 0, y: 0 };
+
+        for (let i = 0; i < trailCount; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('cursor-trail');
+            document.body.appendChild(dot);
+            dots.push(dot);
+        }
+
+        window.addEventListener('mousemove', function(e) {
+            coords.x = e.clientX;
+            coords.y = e.clientY;
+        });
+
+        function animateDots() {
+            let x = coords.x;
+            let y = coords.y;
+
+            dots.forEach(function (dot, index) {
+                dot.style.left = x + 'px';
+                dot.style.top = y + 'px';
+                dot.style.transform = `translate(-50%, -50%) scale(${(trailCount - index) / trailCount})`;
+                dot.style.opacity = (trailCount - index) / trailCount;
+                dot.style.backgroundColor = `hsl(${(index * 15 + Date.now() / 10) % 360}, 100%, 70%)`;
+
+                const nextDot = dots[index + 1] || dots[0];
+                x += (nextDot.offsetLeft - dot.offsetLeft) * 0.3;
+                y += (nextDot.offsetTop - dot.offsetTop) * 0.3;
+            });
+
+            requestAnimationFrame(animateDots);
+        }
+        animateDots();
+    }
+    setupCursorTrail();
+
+    // --- Dynamic Hue Animation ---
+    const cycleDuration = 60000; // 1 minute in milliseconds
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function animateHues() {
+        const now = Date.now();
+        const timeHueShift = (now % cycleDuration) / cycleDuration * 360;
+
+        const parallaxX = (mouseX / window.innerWidth - 0.5) * 40;
+        const parallaxY = (mouseY / window.innerHeight - 0.5) * 40;
+        const scrollMax = document.body.scrollHeight - window.innerHeight;
+        const scrollPercentage = window.scrollY / (scrollMax > 0 ? scrollMax : 1);
+        const scrollParallax = scrollPercentage * 60;
+
+        const totalHueShift = (timeHueShift + parallaxX + parallaxY + scrollParallax);
+
+        // Apply a hard rainbow gradient to the page background
+        const colors = [0, 60, 120, 180, 240, 300].map(h => `hsl(${(h + totalHueShift) % 360}, 80%, 15%)`).join(', ');
+        document.body.style.background = `linear-gradient(45deg, ${colors})`;
+
+        // Apply dynamic box-shadow to the PDF iframe
+        const glowHue = (280 + timeHueShift) % 360;
+        pdfShowcase.style.boxShadow = `0 0 20px 4px hsla(${glowHue}, 80%, 60%, 0.7), inset 0 0 15px hsla(${glowHue}, 70%, 30%, 0.5)`;
+
+        requestAnimationFrame(animateHues);
+    }
+    animateHues();
+
+    // --- Mouse Wheel Glitch Logic ---
+    let lastScrollTime = 0;
+    let scrollTimeout;
+
+    window.addEventListener('wheel', (e) => {
+        const now = Date.now();
+        const timeDelta = now - lastScrollTime;
+        lastScrollTime = now;
+
+        const scrollIntensity = Math.min(1, 250 / (timeDelta + 1));
+
+        root.style.setProperty('--scanline-intensity', scrollIntensity * 0.8);
+
+        let timeHueShift = (Date.now() % 60000) / 60000 * 360;
+        let scanlineColor1 = `hsla(${timeHueShift % 360}, 100%, 70%, 0.25)`;
+        let scanlineColor2 = `hsla(${(timeHueShift + 180) % 360}, 100%, 50%, 0.35)`;
+
+        if (scrollIntensity > 0.3 && Math.random() < 0.5) {
+            scanlineColor1 = `hsla(0, 0%, 100%, ${scrollIntensity * 0.5})`;
+        }
+
+        root.style.setProperty('--scanline-color-1', scanlineColor1);
+        root.style.setProperty('--scanline-color-2', scanlineColor2);
+
+        root.style.setProperty('--flash-intensity', scrollIntensity * 0.05);
+
+        if (scrollIntensity > 0.1) {
+            root.style.setProperty('--scroll-glitch-intensity', scrollIntensity * 0.05);
+            root.style.setProperty('--scroll-glitch-x', `${(Math.random() - 0.5) * 2 * scrollIntensity}px`);
+            root.style.setProperty('--scroll-glitch-y', `${(Math.random() - 0.5) * 2 * scrollIntensity}px`);
+            
+            const scrollPosition = window.scrollY;
+            const waveFrequency = 0.1;
+            const waveAmplitude = 20 * scrollIntensity;
+            const phaseShiftY = Math.sin(scrollPosition * waveFrequency) * waveAmplitude;
+            
+            root.style.setProperty('--phaseshift-y', `${phaseShiftY}px`);
+        }
+
+        clearTimeout(scrollTimeout);
+
+        scrollTimeout = setTimeout(() => {
+            root.style.setProperty('--scanline-intensity', 0);
+            root.style.setProperty('--flash-intensity', 0);
+            root.style.setProperty('--scroll-glitch-intensity', 0);
+            root.style.setProperty('--phaseshift-y', '0px');
+        }, 300);
+    });
+
+    // --- Random Timed Strobe Burst Logic ---
+    const strobeOverlay = document.getElementById('strobe-overlay');
+    function triggerStrobe() {
+        strobeOverlay.classList.add('strobe-active');
+        setTimeout(() => {
+            strobeOverlay.classList.remove('strobe-active');
+        }, 333);
+
+        const randomInterval = Math.random() * 10000 + 5000;
+        setTimeout(triggerStrobe, randomInterval);
+    }
+    setTimeout(triggerStrobe, Math.random() * 8000 + 2000);
+});
+</script>
+</body>
+</html>

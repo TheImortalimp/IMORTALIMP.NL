@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI WARP ENGINE — Hyper-Integrated Synthesis | IMORTALIMP.NL</title>
+    <meta name="description" content="AI Warp Engine unified synthesis: YouTube Randoms with forward/back navigation, the YouTube Warp Bus and per-pixel SVG Warp Lens, browser tab/window/full-screen capture feeding real pixels and optional audio into the Canvas engine, independent microphone monitoring and Audio Reactive Ear modes, local media, 34 glitch voices, 29 AI Warp modes, presets, Soft-Eye crescendo, and the DROP THE MILK? audio-reactive feedback FX automation with 80 shuffled presets cross-blended with all AI Warp modes and FX voices.">
+    <style>
+/* ==========================================================================
+   AI WARP ENGINE — HYPER-INTEGRATED STYLESHEET (media_page.css)
+   ========================================================================== */
+
+:root {
+    --theme-accent: #00ffaa;
+    --theme-sub: #00e5ff;
+    --theme-bg: #04070a;
+    --theme-card: #0c1218;
+    --theme-line: rgba(0, 255, 170, 0.32);
+    --theme-glow: rgba(0, 255, 170, 0.45);
+    --theme-text: #e0fff4;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --font-title: 'Unica One', 'Special Elite', cursive, sans-serif;
+    --border-radius: 6px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background: var(--theme-bg);
+    color: var(--theme-text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    user-select: none;
+}
+
+/* ── STAGE & CANVAS CONTAINER ────────────────────────────────────────── */
+#canvas-stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    overflow: hidden;
+    background: #020307;
+    perspective: 900px;
+    perspective-origin: 50% 50%;
+}
+
+/* YouTube IFrame Mount Behind Canvas */
+#ytWarpShell {
+    position: absolute;
+    inset: -6%;
+    width: 112%;
+    height: 112%;
+    overflow: hidden;
+    z-index: 0;
+    /* YouTube Warp Bus: the AI Warp modes and all 34 voices drive
+       transform / filter / clip-path on this shell every frame. */
+    transform-origin: 50% 50%;
+    will-change: transform, filter, clip-path;
+    backface-visibility: hidden;
+}
+
+/* Browser display capture: live state on the YouTube-cluster capture button */
+#ytCaptureTabBtn.capture-active {
+    background: linear-gradient(90deg, rgba(0, 255, 170, 0.35), rgba(0, 229, 255, 0.35)) !important;
+    border-color: #00ffaa !important;
+    color: #eafff5 !important;
+    box-shadow: 0 0 14px rgba(0, 255, 170, 0.5) !important;
+}
+
+/* SVG Warp Lens (v6.3.1): hidden graph definition host.
+   Must NOT use display:none — a display:none <svg> kills url(#ytSvgWarp) refs. */
+.svg-warp-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    display: none;
+    transform-origin: 50% 50%;
+    /* Canvas/WebGL rendering only — no SVG filter pipeline. */
+    will-change: transform, filter;
+}
+
+#ytPlayerMount {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#ytPlayerMount iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    object-fit: cover;
+    pointer-events: auto;
+}
+
+#glitchCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    z-index: 2;
+    pointer-events: none !important;
+    /* Effects are painted directly to this Canvas; no SVG filter URL. */
+    will-change: contents;
+}
+
+/* Fullscreen CRT Scanlines & Cyber Vignette */
+#fullscreen-fx-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.crt-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 6px 100%;
+    opacity: 0.65;
+}
+
+.cyber-vignette {
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85);
+}
+
+.vcr-osd-badge {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 13px;
+    color: var(--theme-accent);
+    text-shadow: 0 0 8px var(--theme-glow);
+    letter-spacing: 1px;
+    opacity: 0.85;
+    animation: vcr-pulse 2s infinite ease-in-out;
+}
+
+@keyframes vcr-pulse {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.45; }
+}
+
+/* Drag-and-drop Fullscreen Overlay */
+#dropOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 255, 170, 0.15);
+    backdrop-filter: blur(8px);
+    border: 4px dashed var(--theme-accent);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    pointer-events: none;
+}
+
+#dropOverlay.active {
+    display: flex;
+}
+
+.drop-message {
+    font-size: 20px;
+    color: #fff;
+    text-shadow: 0 0 12px var(--theme-accent);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px 36px;
+    border-radius: 8px;
+    border: 1px solid var(--theme-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ── TOP HUD BAR ─────────────────────────────────────────────────────── */
+#glitch-top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 16px;
+    background: rgba(8, 12, 18, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--theme-line);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+}
+
+.hud-title-cluster {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hud-title-cluster h1 {
+    font-size: 17px;
+    letter-spacing: 1.5px;
+    color: var(--theme-accent);
+    text-shadow: 0 0 10px var(--theme-glow);
+    text-transform: uppercase;
+}
+
+.hud-version-badge {
+    font-size: 9px;
+    background: rgba(0, 255, 170, 0.15);
+    border: 1px solid var(--theme-accent);
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: var(--theme-accent);
+}
+
+/* Visualizer Group */
+.hud-visualizer-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#spectrum-canvas {
+    width: 150px;
+    height: 34px;
+    background: #050510;
+    border: 1px solid var(--theme-line);
+    border-radius: 4px;
+    box-shadow: inset 0 0 8px rgba(0, 255, 170, 0.1);
+}
+
+#waveform-canvas {
+    width: 100px;
+    height: 34px;
+    background: #050510;
+    border: 1px solid var(--theme-line);
+    border-radius: 4px;
+    box-shadow: inset 0 0 8px rgba(0, 229, 255, 0.1);
+}
+
+/* Stereo VU Meters */
+.stereo-vu-display {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 3px 5px;
+    background: #050510;
+    border: 1px solid var(--theme-line);
+    border-radius: 4px;
+}
+
+.vu-channel {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.vu-label {
+    font-size: 8px;
+    font-weight: bold;
+    color: var(--theme-sub);
+    width: 7px;
+}
+
+.vu-bar {
+    display: flex;
+    gap: 2px;
+}
+
+.vu-segment {
+    width: 4px;
+    height: 9px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 1px;
+    transition: background 0.04s ease;
+}
+
+.vu-segment.green.active { background: #00ffaa; box-shadow: 0 0 6px #00ffaa; }
+.vu-segment.yellow.active { background: #ffb703; box-shadow: 0 0 6px #ffb703; }
+.vu-segment.red.active { background: #ff0055; box-shadow: 0 0 6px #ff0055; }
+
+/* Themes & Controls in Top Bar */
+.hud-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-rack {
+    display: flex;
+    gap: 4px;
+}
+
+.theme-btn {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.theme-btn:hover {
+    transform: scale(1.25);
+    box-shadow: 0 0 8px currentColor;
+}
+
+.theme-btn.active {
+    transform: scale(1.3);
+    border: 2px solid #fff !important;
+    box-shadow: 0 0 12px currentColor, inset 0 0 3px #000;
+}
+
+.theme-btn.theme-cyber { background: #00ffaa; }
+.theme-btn.theme-neon { background: #ff007f; }
+.theme-btn.theme-gold { background: #ffb703; }
+.theme-btn.theme-cyan { background: #00e5ff; }
+.theme-btn.theme-white { background: #ffffff; }
+.theme-btn.theme-retro { background: #bb86fc; }
+
+/* ── SECONDARY HUD: YOUTUBE RANDOMS & LOCAL MEDIA DOCK ───────────────── */
+#ytMediaBar {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(12, 18, 26, 0.94);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+}
+
+.yt-randoms-cluster {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.yt-status-badge {
+    font-size: 10px;
+    color: var(--theme-sub);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--theme-line);
+    padding: 4px 8px;
+    border-radius: 4px;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#ytUrlInput {
+    background: #05070a;
+    border: 1px solid var(--theme-line);
+    color: var(--theme-text);
+    padding: 4px 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    width: 140px;
+    font-family: var(--font-mono);
+}
+
+.local-media-cluster {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Media Transport Bar (Timeline, Play/Pause, Artwork) */
+#mediaTransportBar {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid var(--theme-line);
+    border-radius: 4px;
+}
+
+#mediaTransportBar .wired-button {
+    padding: 3px 6px;
+    font-size: 9px;
+    line-height: 1.1;
+}
+
+.media-title-badge {
+    font-size: 10px;
+    color: var(--theme-accent);
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#mediaSeekSlider {
+    width: 80px;
+    height: 4px;
+    accent-color: var(--theme-accent);
+}
+
+.media-time-display {
+    font-size: 9px;
+    color: var(--theme-sub);
+    width: 65px;
+    text-align: center;
+}
+
+.artwork-controls {
+    display: none;
+    align-items: center;
+    gap: 4px;
+}
+
+.artwork-badge {
+    font-size: 9px;
+    color: #ffb703;
+    background: rgba(255, 183, 3, 0.12);
+    border: 1px solid rgba(255, 183, 3, 0.3);
+    padding: 2px 4px;
+    border-radius: 3px;
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── EFFECT MIXER COLUMN (LEFT RACK) ─────────────────────────────────── */
+#effect-toggle-column {
+    position: fixed;
+    top: var(--mixer-top, 96px);
+    bottom: calc(var(--bottom-dock-height, 148px) + 14px);
+    left: 14px;
+    width: 280px;
+    max-height: none;
+    overflow-y: auto;
+    z-index: 9;
+    padding: 10px;
+    background: rgba(10, 16, 24, 0.90);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-accent) transparent;
+    transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+}
+
+.effect-palette-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--theme-line);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--theme-accent);
+    letter-spacing: 0.05em;
+}
+
+.effect-palette-heading small {
+    font-size: 9px;
+    color: var(--theme-sub);
+}
+
+.effect-control-row {
+    padding: 7px 6px;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.effect-control-row:hover {
+    border-color: var(--theme-line);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.effect-control-row.is-active {
+    border-left: 3px solid var(--theme-accent);
+    background: rgba(0, 255, 200, 0.08);
+    border-color: rgba(0, 255, 200, 0.35);
+}
+
+/* R3 voices are separate rails, never replacements for the original 17. */
+.effect-control-row.gc3-voice {
+    border-color: rgba(187, 134, 252, 0.28);
+}
+
+.effect-row-top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 4px;
+}
+
+.effect-toggle-btn {
+    flex: 1;
+    font-size: 10.5px;
+    padding: 4px 6px;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #a0b0b8;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.effect-toggle-btn.active {
+    background: var(--theme-accent);
+    color: #000;
+    font-weight: bold;
+    box-shadow: 0 0 10px var(--theme-glow);
+    border-color: var(--theme-accent);
+}
+
+.effect-level-fader {
+    width: 62px;
+    height: 4px;
+    accent-color: var(--theme-accent);
+    cursor: pointer;
+}
+
+.level-val {
+    font-size: 9px;
+    width: 26px;
+    text-align: right;
+    color: var(--theme-sub);
+    font-family: var(--font-mono);
+}
+
+.effect-row-params {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    padding-top: 3px;
+    font-size: 8px;
+    color: #7a8890;
+}
+
+.effect-row-params label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.param-size-text,
+.param-depth-text {
+    font-family: var(--font-mono);
+    font-size: 7.5px;
+    color: var(--theme-sub);
+    min-width: 44px;
+}
+
+.effect-row-params input[type="range"] {
+    width: 40px;
+    height: 3px;
+    accent-color: var(--theme-sub);
+    cursor: pointer;
+}
+
+/* ── BOTTOM DOCK & PRESETS ───────────────────────────────────────────── */
+#glitch-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(8, 12, 18, 0.94);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--theme-line);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.6);
+    transition: transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+}
+
+.preset-rack {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#presetSelect {
+    background: #06090e;
+    color: var(--theme-text);
+    border: 1px solid var(--theme-line);
+    padding: 5px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    max-width: 200px;
+}
+
+#presetNameInput {
+    background: #06090e;
+    color: var(--theme-text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 4px 6px;
+    font-size: 10px;
+    border-radius: 3px;
+    width: 90px;
+}
+
+.wired-button {
+    background: rgba(0, 0, 0, 0.6);
+    color: var(--theme-text);
+    border: 1px solid var(--theme-line);
+    padding: 5px 10px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+}
+
+.wired-button:hover {
+    background: rgba(0, 255, 170, 0.15);
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+
+.wired-button.active {
+    background: var(--theme-accent);
+    color: #000;
+    font-weight: bold;
+    box-shadow: 0 0 12px var(--theme-glow);
+}
+
+.wired-button.preset-mode-machine {
+    border-color: #ffb703;
+    color: #ffb703;
+}
+
+.wired-button.preset-mode-user {
+    border-color: #bb86fc;
+    color: #bb86fc;
+}
+
+.wired-button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.master-controls-cluster {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.slider-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--theme-sub);
+}
+
+.slider-group input[type="range"] {
+    width: 60px;
+    height: 4px;
+    accent-color: var(--theme-accent);
+}
+
+.raum-thanks {
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 4px;
+    font-size: 10px;
+    line-height: 1.5;
+    color: #c5d6de;
+}
+
+.raum-thanks h3 {
+    margin: 0 0 6px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #00e5ff;
+}
+
+.raum-thanks p { margin: 0 0 6px; }
+.raum-back-cover {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.raum-thanks a { color: #00e5ff; }
+
+.poleR-cover {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ── POLE - R SHOWCASE MODAL / DRAWER ────────────────────────────────── */
+#pole-r-drawer {
+    position: fixed;
+    bottom: 64px;
+    right: 18px;
+    width: 420px;
+    max-height: 440px;
+    overflow-y: auto;
+    background: rgba(8, 14, 22, 0.96);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    padding: 14px;
+    z-index: 5000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85), 0 0 20px var(--theme-glow);
+    display: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--theme-accent) transparent;
+}
+
+.slider-val-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--theme-accent);
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--theme-line);
+    padding: 1px 5px;
+    border-radius: 3px;
+    min-width: 26px;
+    text-align: center;
+    display: inline-block;
+}
+
+#synthToggleBtn.active {
+    background: rgba(0, 255, 170, 0.25) !important;
+    border-color: #00ffaa !important;
+    color: #00ffaa !important;
+    box-shadow: 0 0 16px rgba(0, 255, 170, 0.6) !important;
+}
+
+#poleRDrawerBtn.active {
+    background: rgba(0, 229, 255, 0.25) !important;
+    border-color: #00e5ff !important;
+    color: #00e5ff !important;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.6) !important;
+}
+
+#pole-r-drawer.open {
+    display: block;
+}
+
+.poleR-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--theme-line);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.poleR-drawer-header h2 {
+    font-size: 13px;
+    color: var(--theme-accent);
+}
+
+.poleR-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.poleR-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.poleR-item header {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.poleR-num {
+    font-size: 10px;
+    color: var(--theme-sub);
+    font-weight: bold;
+}
+
+.poleR-item h3 {
+    font-size: 11px;
+    flex: 1;
+    color: #fff;
+}
+
+.poleR-room {
+    font-size: 9px;
+    color: #7a8890;
+}
+
+.poleR-credit {
+    font-size: 9px;
+    color: #9fb3bd;
+    margin-bottom: 6px;
+}
+
+.poleR-controls {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.poleR-play-btn {
+    background: rgba(0, 255, 170, 0.12);
+    border: 1px solid var(--theme-accent);
+    color: var(--theme-accent);
+    padding: 3px 8px;
+    font-size: 9px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.poleR-play-btn:hover {
+    background: var(--theme-accent);
+    color: #000;
+}
+
+/* ── UI TOGGLE TAB (CRT VERTICAL BEZEL HANDLE) ────────────────────────── */
+#ui-toggle-tab {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: auto;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    align-items: center;
+}
+
+#ui-toggle-tab:hover {
+    transform: translateY(-50%) scale(1.06);
+}
+
+#toggle-ui-btn {
+    font-family: 'Courier New', var(--font-mono), monospace;
+    color: var(--theme-accent);
+    background: rgba(8, 14, 20, 0.94);
+    border: 2px solid var(--theme-accent);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    padding: 14px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    box-shadow: -4px 0 18px var(--theme-glow);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+    pointer-events: auto;
+    display: block;
+}
+
+#ui-toggle-tab:hover #toggle-ui-btn,
+#toggle-ui-btn:hover {
+    background: var(--theme-accent);
+    color: #000;
+    box-shadow: -6px 0 26px var(--theme-glow);
+}
+
+body.ui-collapsed #ui-toggle-tab {
+    right: 0;
+    opacity: 1;
+}
+
+body.ui-collapsed #toggle-ui-btn {
+    background: rgba(0, 255, 200, 0.22);
+    border-color: #00ffcc;
+    color: #00ffcc;
+    box-shadow: -5px 0 22px rgba(0, 255, 200, 0.7);
+    animation: tabPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes tabPulse {
+    0%, 100% { box-shadow: -3px 0 12px rgba(0, 255, 200, 0.4); }
+    50% { box-shadow: -6px 0 25px rgba(0, 255, 200, 0.9); }
+}
+
+.audio-monitor-badge {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    font-weight: 700;
+    color: var(--theme-accent);
+    background: rgba(0, 255, 170, 0.12);
+    border: 1px solid var(--theme-line);
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    box-shadow: 0 0 8px rgba(0, 255, 170, 0.15);
+    transition: all 0.2s ease;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    #glitch-top-bar {
+        padding: 6px 10px;
+    }
+    .hud-title-cluster h1 {
+        font-size: 14px;
+    }
+    #spectrum-canvas {
+        width: 100px;
+        height: 28px;
+    }
+    #waveform-canvas {
+        display: none;
+    }
+    #ytMediaBar {
+        top: 48px;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+    .yt-status-badge {
+        max-width: 140px;
+    }
+    #ytUrlInput {
+        width: 100px;
+    }
+    #effect-toggle-column {
+        width: 220px;
+        top: var(--mixer-top, 90px);
+        bottom: calc(var(--bottom-dock-height, 176px) + 10px);
+        left: 8px;
+    }
+    #glitch-bottom-bar {
+        padding: 6px 8px;
+        gap: 6px;
+    }
+    #pole-r-drawer {
+        width: calc(100vw - 20px);
+        right: 10px;
+    }
+}
+
+/* ── COLLAPSIBLE UI FULLSCREEN IMMERSION RULES (HIDES 100% OF UI) ──────── */
+body.ui-collapsed #glitch-top-bar,
+body.ui-collapsed #ytMediaBar,
+body.ui-collapsed #mediaTransportBar,
+body.ui-collapsed #effect-toggle-column,
+body.ui-collapsed #glitch-bottom-bar,
+body.ui-collapsed #pole-r-drawer,
+body.ui-collapsed #hudNotificationBanner,
+body.ui-collapsed #dropOverlay {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    transform: scale(0.96) !important;
+    transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease !important;
+}
+
+body.ui-collapsed #ui-toggle-tab {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+.cadence-clock-badge {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    font-weight: 700;
+    color: #ffb703;
+    background: rgba(255, 183, 3, 0.12);
+    border: 1px solid rgba(255, 183, 3, 0.4);
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    box-shadow: 0 0 8px rgba(255, 183, 3, 0.2);
+    transition: all 0.2s ease;
+}
+
+.cadence-clock-badge.pulse {
+    background: rgba(255, 183, 3, 0.35);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(255, 183, 3, 0.85);
+}
+
+/* Master Button Active Styling */
+#aiWarpBtn.active {
+    background: rgba(0, 255, 170, 0.25) !important;
+    border-color: #00ffaa !important;
+    color: #00ffaa !important;
+    box-shadow: 0 0 16px rgba(0, 255, 170, 0.6) !important;
+}
+#ghostProtocolBtn.active {
+    background: rgba(220, 20, 255, 0.25) !important;
+    border-color: #dc14ff !important;
+    color: #f066ff !important;
+    box-shadow: 0 0 16px rgba(220, 20, 255, 0.6) !important;
+    animation: ghostGlow 2s ease-in-out infinite;
+}
+#vsyncScanBtn.active {
+    background: rgba(255, 150, 0, 0.25) !important;
+    border-color: #ff9600 !important;
+    color: #ffb733 !important;
+    box-shadow: 0 0 16px rgba(255, 150, 0, 0.6) !important;
+}
+#autoGlitchBtn.active {
+    background: rgba(255, 30, 80, 0.25) !important;
+    border-color: #ff1e50 !important;
+    color: #ff5577 !important;
+    box-shadow: 0 0 16px rgba(255, 30, 80, 0.6) !important;
+    animation: glitchPulse 1.2s ease-in-out infinite;
+}
+#continualRandomizeBtn.active {
+    background: rgba(0, 229, 255, 0.25) !important;
+    border-color: #00e5ff !important;
+    color: #00e5ff !important;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.6) !important;
+    animation: randBreathe 2.4s ease-in-out infinite;
+}
+#timedAutoBtn.active {
+    background: rgba(255, 215, 0, 0.25) !important;
+    border-color: #ffd700 !important;
+    color: #ffe033 !important;
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.6) !important;
+    animation: timedPulse 1.5s ease-in-out infinite;
+}
+#zeroAllBtn:hover {
+    background: rgba(255, 50, 50, 0.3) !important;
+    border-color: #ff3333 !important;
+    color: #ff6666 !important;
+    box-shadow: 0 0 20px rgba(255, 50, 50, 0.7) !important;
+}
+
+@keyframes ghostGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(220, 20, 255, 0.4); }
+    50% { box-shadow: 0 0 22px rgba(220, 20, 255, 0.85); }
+}
+@keyframes glitchPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 30, 80, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(255, 30, 80, 0.9); }
+}
+@keyframes randBreathe {
+    0%, 100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.35); }
+    50% { box-shadow: 0 0 22px rgba(0, 229, 255, 0.8); }
+}
+@keyframes timedPulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+}
+
+/* Mic Active Indicator */
+#micToggleBtn.mic-active {
+    background: rgba(255, 30, 60, 0.25) !important;
+    border-color: #ff3355 !important;
+    color: #ff5577 !important;
+    font-weight: bold;
+    animation: micPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(255, 50, 80, 0.6); }
+    50% { box-shadow: 0 0 18px rgba(255, 50, 80, 1); }
+}
+
+/* Copied URL Button Glow */
+#ytCopyUrlBtn.copied {
+    background: var(--theme-accent) !important;
+    color: #000 !important;
+    font-weight: bold;
+    box-shadow: 0 0 14px var(--theme-glow);
+}
+
+/* HUD Notification Banner */
+.hud-notification-banner {
+    position: fixed;
+    top: 96px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    z-index: 3000;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--theme-accent);
+    background: rgba(8, 14, 22, 0.92);
+    border: 1px solid var(--theme-accent);
+    padding: 5px 16px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px var(--theme-glow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    text-transform: uppercase;
+}
+
+.hud-notification-banner.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── PRO VJ ITERATION STYLES ───────────────────────────────────────────── */
+
+/* Warp Mode Direct Select */
+.warp-mode-select {
+    background: #06090e;
+    color: var(--theme-accent);
+    border: 1px solid var(--theme-line);
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    border-radius: var(--border-radius);
+    max-width: 170px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 255, 170, 0.15);
+    transition: all 0.2s ease;
+}
+
+.warp-mode-select:hover, .warp-mode-select:focus {
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 16px var(--theme-glow);
+}
+
+/* Master Glitch Rail Cluster */
+.rail-cluster {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.rail-btn {
+    background: transparent;
+    color: var(--theme-sub);
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.rail-btn:last-child {
+    border-right: none;
+}
+
+.rail-btn:hover {
+    background: var(--theme-accent);
+    color: #000;
+    box-shadow: 0 0 12px var(--theme-glow);
+}
+
+/* Voice Row Lock Button */
+.effect-lock-btn {
+    background: transparent;
+    border: none;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 0 4px;
+    opacity: 0.5;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.effect-lock-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.effect-lock-btn.locked {
+    opacity: 1;
+    color: #ffd700;
+    text-shadow: 0 0 8px #ffd700;
+    transform: scale(1.15);
+}
+
+/* Cyber Modal (Keyboard Shortcuts) */
+.cyber-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 6, 10, 0.85);
+    backdrop-filter: blur(14px);
+    z-index: 6000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.cyber-modal.open {
+    display: flex;
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.cyber-modal-card {
+    background: rgba(10, 16, 24, 0.96);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9), 0 0 25px var(--theme-glow);
+    width: 100%;
+    max-width: 580px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cyber-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--theme-line);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.cyber-modal-header h3 {
+    font-size: 15px;
+    color: var(--theme-accent);
+    letter-spacing: 0.08em;
+}
+
+.shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.shortcut-item kbd {
+    background: var(--theme-card);
+    border: 1px solid var(--theme-accent);
+    color: var(--theme-accent);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    box-shadow: 0 2px 0 rgba(0, 255, 170, 0.3);
+    min-width: 24px;
+    text-align: center;
+}
+
+.shortcut-item span {
+    color: var(--theme-text);
+}
+
+.cyber-modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+    margin-top: 16px;
+    text-align: center;
+    color: var(--theme-sub);
+    font-size: 10px;
+}
+
+/* Audio Reactive EQ Drawer */
+.cyber-drawer {
+    position: fixed;
+    top: 56px;
+    right: 20px;
+    width: 320px;
+    background: rgba(8, 14, 22, 0.96);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    padding: 14px;
+    z-index: 5000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85), 0 0 20px var(--theme-glow);
+    display: none;
+}
+
+.cyber-drawer.open {
+    display: block;
+    animation: modalFadeIn 0.22s ease-out;
+}
+
+.cyber-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--theme-line);
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.cyber-drawer-header h3 {
+    font-size: 12px;
+    color: var(--theme-accent);
+    letter-spacing: 0.06em;
+}
+
+.eq-slider-row {
+    margin-bottom: 12px;
+}
+
+.eq-slider-row label {
+    display: block;
+    font-size: 9.5px;
+    color: var(--theme-sub);
+    margin-bottom: 4px;
+    font-family: var(--font-mono);
+}
+
+.eq-slider-row input[type="range"] {
+    width: 78%;
+    vertical-align: middle;
+}
+
+.eq-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 10px;
+}
+
+.eq-preset-btn {
+    font-size: 9px;
+    padding: 3px 6px;
+}
+
+/* Ensure body.ui-collapsed also closes/hides modals and drawers */
+body.ui-collapsed #shortcutsModal,
+body.ui-collapsed #eqDrawer {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+/* Hard-Light Mode & R3 Additions */
+body.hard-light #glitchCanvas {
+    filter: contrast(1.25) saturate(1.35) brightness(1.08);
+}
+body.hard-light .wired-button {
+    border-color: #ffcc66 !important;
+    color: #ffcc66 !important;
+    box-shadow: 0 0 12px rgba(255, 204, 102, 0.45) !important;
+}
+
+#hardLightBtn.active {
+    background: linear-gradient(90deg, rgba(255, 204, 102, 0.35), rgba(255, 43, 214, 0.35)) !important;
+    border-color: #ffcc66 !important;
+    color: #fff !important;
+    box-shadow: 0 0 16px rgba(255, 204, 102, 0.7) !important;
+}
+
+#autoMastersBtn.active {
+    background: rgba(0, 229, 255, 0.25) !important;
+    border-color: #00e5ff !important;
+    color: #00e5ff !important;
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.6) !important;
+}
+
+#softEyeBtn {
+    --k: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+#softEyeBtn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: calc(var(--k, 0) * 100%);
+    background: linear-gradient(90deg, #ff007f, #00ffaa, #ffb703);
+    transition: width 0.15s linear;
+}
+
+#softEyeBtn.active {
+    background: rgba(0, 255, 170, 0.25) !important;
+    border-color: #00ffaa !important;
+    color: #00ffaa !important;
+    box-shadow: 0 0 16px rgba(0, 255, 170, 0.6) !important;
+}
+
+/* Synth Sub-Buttons & Group */
+.synth-cluster-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.synth-sub-btn {
+    padding: 3px 7px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    background: rgba(0, 229, 255, 0.12);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    color: var(--theme-accent);
+}
+.synth-sub-btn:hover {
+    background: rgba(0, 229, 255, 0.35);
+    box-shadow: 0 0 8px var(--theme-glow);
+}
+.synth-sub-btn.active {
+    background: var(--theme-accent) !important;
+    color: #000 !important;
+    font-weight: 700;
+    box-shadow: 0 0 12px var(--theme-glow) !important;
+}
+.synth-stop-btn {
+    background: rgba(255, 45, 85, 0.2) !important;
+    border-color: #ff2d55 !important;
+    color: #ff2d55 !important;
+}
+
+/* Master Sliders Null and Lock Buttons */
+.null-btn {
+    padding: 2px 5px;
+    font-size: 9px;
+    font-weight: 700;
+    font-family: inherit;
+    background: rgba(255, 45, 85, 0.15);
+    border: 1px solid rgba(255, 45, 85, 0.4);
+    color: #ff2d55;
+    border-radius: 3px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.15s ease;
+}
+.null-btn:hover {
+    background: #ff2d55;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(255, 45, 85, 0.8);
+}
+.lock-btn {
+    padding: 2px 5px;
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.15s ease;
+}
+.lock-btn.locked {
+    background: rgba(255, 204, 102, 0.3) !important;
+    border-color: #ffcc66 !important;
+    color: #ffcc66 !important;
+    box-shadow: 0 0 8px rgba(255, 204, 102, 0.6) !important;
+}
+
+/* EAR Button */
+#earBtn.ear-audio {
+    border-color: #00e5ff;
+    color: #00e5ff;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+#earBtn.ear-canvas {
+    border-color: #ff007f;
+    color: #ff007f;
+    box-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+}
+
+/* ── GUARANTEED BOTTOM DOCK & FULLSCREEN IMMERSION OVERRIDES ─────────── */
+#glitch-bottom-bar {
+    z-index: 500 !important;
+    pointer-events: auto !important;
+}
+
+.master-controls-cluster,
+.preset-rack {
+    position: relative;
+    z-index: 501 !important;
+    pointer-events: auto !important;
+}
+
+.master-controls-cluster button,
+.master-controls-cluster select,
+.master-controls-cluster input,
+.preset-rack button,
+.preset-rack select,
+.preset-rack input,
+.rail-btn,
+.null-btn,
+.lock-btn {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 502 !important;
+    cursor: pointer;
+}
+
+.warp-mode-select {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 505 !important;
+    background: #06090e !important;
+    color: var(--theme-accent) !important;
+}
+
+#ui-toggle-tab {
+    position: fixed !important;
+    right: 0 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    display: flex !important;
+}
+
+#toggle-ui-btn {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    position: relative;
+    z-index: 100000 !important;
+    display: block !important;
+}
+
+/* 100% Fullscreen UI Collapse & Hidden Rules */
+body.ui-collapsed #glitch-top-bar,
+body.ui-collapsed #ytMediaBar,
+body.ui-collapsed #mediaTransportBar,
+body.ui-collapsed #effect-toggle-column,
+body.ui-collapsed #glitch-bottom-bar,
+body.ui-collapsed #pole-r-drawer,
+body.ui-collapsed #hudNotificationBanner,
+body.ui-collapsed #dropOverlay,
+body.ui-collapsed #shortcutsModal,
+body.ui-collapsed #eqDrawer,
+body.ui-hidden #glitch-top-bar,
+body.ui-hidden #ytMediaBar,
+body.ui-hidden #mediaTransportBar,
+body.ui-hidden #effect-toggle-column,
+body.ui-hidden #glitch-bottom-bar,
+body.ui-hidden #pole-r-drawer,
+body.ui-hidden #hudNotificationBanner,
+body.ui-hidden #dropOverlay,
+body.ui-hidden #shortcutsModal,
+body.ui-hidden #eqDrawer {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+body.ui-collapsed #ui-toggle-tab,
+body.ui-hidden #ui-toggle-tab {
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    z-index: 99999 !important;
+}
+
+body.ui-collapsed #toggle-ui-btn,
+body.ui-hidden #toggle-ui-btn {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    z-index: 100000 !important;
+}
+
+
+/* Master AI Warp Strength Precision Slider */
+.slider-group.warp-slider-group {
+    background: rgba(0, 255, 170, 0.08);
+    border: 1px solid rgba(0, 255, 170, 0.45);
+    padding: 3px 10px;
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(0, 255, 170, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 320px;
+}
+
+.slider-group.warp-slider-group label {
+    color: #00ffaa;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.slider-group.warp-slider-group input[type="range"] {
+    flex: 1;
+    min-width: 140px;
+    max-width: 240px;
+    height: 6px;
+    accent-color: #00ffaa;
+    cursor: pointer;
+}
+
+.burst-btn {
+    background: rgba(255, 0, 127, 0.18);
+    border: 1px solid #ff007f;
+    color: #ff007f;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.burst-btn:hover {
+    background: #ff007f;
+    color: #ffffff;
+    box-shadow: 0 0 10px #ff007f;
+}
+
+/* ==========================================================================
+   YOUTUBE KNOWLEDGEBASE & PLAYLIST VAULT STYLES
+   ========================================================================== */
+.yt-kb-modal-card {
+    max-width: 820px !important;
+    max-height: 88vh !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.yt-kb-stats-bar {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    background: rgba(0, 255, 170, 0.06);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--theme-accent);
+    flex-wrap: wrap;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(0, 255, 170, 0.05);
+}
+
+.yt-kb-stats-bar span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.05em;
+}
+
+.yt-kb-input-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.yt-kb-input-box input {
+    flex: 1;
+    min-width: 240px;
+    background: rgba(4, 7, 10, 0.85);
+    border: 1px solid var(--theme-line);
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    color: var(--theme-text);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.yt-kb-input-box input:focus {
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 12px var(--theme-glow);
+}
+
+.yt-kb-filter-strip {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.yt-kb-filter-strip input {
+    flex: 1;
+    min-width: 180px;
+    background: rgba(4, 7, 10, 0.7);
+    border: 1px solid rgba(0, 255, 170, 0.25);
+    border-radius: var(--border-radius);
+    padding: 7px 12px;
+    color: var(--theme-text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    outline: none;
+}
+
+.yt-kb-filter-strip select {
+    background: #080e14;
+    border: 1px solid var(--theme-line);
+    color: var(--theme-accent);
+    padding: 7px 10px;
+    border-radius: var(--border-radius);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    outline: none;
+    cursor: pointer;
+}
+
+.yt-kb-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 400px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding-right: 6px;
+    margin-bottom: 14px;
+}
+
+.yt-kb-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.yt-kb-list::-webkit-scrollbar-thumb {
+    background: var(--theme-accent);
+    border-radius: 3px;
+}
+
+.yt-kb-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(14, 22, 32, 0.75);
+    border: 1px solid rgba(0, 255, 170, 0.18);
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+}
+
+.yt-kb-item:hover {
+    background: rgba(20, 32, 48, 0.95);
+    border-color: var(--theme-accent);
+    box-shadow: 0 0 10px rgba(0, 255, 170, 0.2);
+}
+
+.yt-kb-item.active-playing {
+    border-color: #00ffaa;
+    background: rgba(0, 255, 170, 0.14);
+    box-shadow: 0 0 15px rgba(0, 255, 170, 0.35);
+}
+
+.yt-kb-thumb {
+    width: 60px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 3px;
+    background: #060a0f;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+}
+
+.yt-kb-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.yt-kb-title {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--theme-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.02em;
+}
+
+.yt-kb-meta {
+    font-size: 9.5px;
+    color: var(--theme-sub);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.yt-kb-source-badge {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 8.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.yt-kb-source-badge.curated {
+    background: rgba(0, 229, 255, 0.2);
+    color: #00e5ff;
+    border: 1px solid rgba(0, 229, 255, 0.4);
+}
+
+.yt-kb-source-badge.user {
+    background: rgba(0, 255, 170, 0.2);
+    color: #00ffaa;
+    border: 1px solid rgba(0, 255, 170, 0.4);
+}
+
+.yt-kb-source-badge.playlist {
+    background: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+}
+
+.yt-kb-item-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.yt-kb-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+.highlight-btn {
+    border-color: #ffd700 !important;
+    color: #ffd700 !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
+}
+
+.highlight-btn:hover {
+    background: rgba(255, 215, 0, 0.2) !important;
+}
+
+.danger-btn {
+    border-color: #ff3366 !important;
+    color: #ff3366 !important;
+}
+
+.danger-btn:hover {
+    background: rgba(255, 51, 102, 0.2) !important;
+}
+
+</style>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unica+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+
+    <!-- ── PRIMARY STAGE CANVAS & MEDIA MOUNT ───────────────────────────── -->
+    <main id="canvas-stage">
+        <!-- YouTube Mount Behind Canvas -->
+        <div id="ytWarpShell">
+            <div id="ytPlayerMount"></div>
+        </div>
+
+        <!-- Glitch / Warp Canvas -->
+        <canvas id="glitchCanvas"></canvas>
+
+        <!-- Hidden Local Media Elements -->
+        <video id="localVideo" playsinline loop style="display:none;"></video>
+        <audio id="localAudio" playsinline loop style="display:none;"></audio>
+        <img id="localArtworkImg" style="display:none;" alt="Local Artwork">
+    </main>
+
+    <!-- ── SVG WARP LENS (v6.3.1): per-pixel displacement graph for the YouTube feed ─
+         The cross-origin iframe pixels are rasterized by the compositor through
+         feTurbulence → feDisplacementMap. Display-only: JS never reads the pixels.
+         IMPORTANT: keep width/height 0 sizing — never display:none, or url() refs die. -->
+    <svg class="svg-warp-defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="ytSvgWarp" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+                <feTurbulence id="ytWarpTurb" type="fractalNoise" baseFrequency="0.006 0.01" numOctaves="2" seed="7" result="warpNoise"/>
+                <feDisplacementMap id="ytWarpDisp" in="SourceGraphic" in2="warpNoise" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- ── FULLSCREEN OVERLAY FX (CRT + VIGNETTE + OSD) ──────────────────── -->
+    <div id="fullscreen-fx-layer">
+        <div class="crt-overlay"></div>
+        <div class="cyber-vignette"></div>
+        <div class="vcr-osd-badge">AI WARP ▶ PLAY SP 00:06:00</div>
+        <div id="hudNotificationBanner" class="hud-notification-banner">AI WARP // READY</div>
+    </div>
+
+    <!-- ── DRAG AND DROP FULLSCREEN OVERLAY ──────────────────────────────── -->
+    <div id="dropOverlay">
+        <div class="drop-message">📁 DROP VIDEO / AUDIO / FOLDER HERE TO PLAY</div>
+    </div>
+
+    <!-- ── TOP HUD BAR ──────────────────────────────────────────────────── -->
+    <header id="glitch-top-bar">
+        <div class="hud-title-cluster">
+            <h1>AI Warp Engine</h1>
+            <span class="hud-version-badge">v6.4.36 · RAUM</span>
+        </div>
+
+        <div class="hud-visualizer-group">
+            <canvas id="spectrum-canvas" width="150" height="34" title="Real-time Audio Spectrum"></canvas>
+            <canvas id="waveform-canvas" width="100" height="34" title="Waveform Oscilloscope"></canvas>
+            
+            <div class="stereo-vu-display" title="Stereo VU Meter">
+                <div class="vu-channel"><span class="vu-label">L</span><div class="vu-bar" id="vu-bar-l"></div></div>
+                <div class="vu-channel"><span class="vu-label">R</span><div class="vu-bar" id="vu-bar-r"></div></div>
+            </div>
+            <span id="audioMonitorBadge" class="audio-monitor-badge" title="Active Audio Sync Source">MONITOR: STANDBY</span>
+            <span id="cadenceClockBadge" class="cadence-clock-badge" title="Timed Effects Automation Clock">CADENCE: IDLE</span>
+        </div>
+
+        <div class="hud-actions">
+            <button id="micToggleBtn" class="wired-button" title="Toggle Live Microphone Audio Monitor (Drives Visualizers & Warp)">🎙 MIC: OFF</button>
+            <div class="synth-cluster-group">
+                <button id="synthToggleBtn" class="wired-button" title="Cycle Web Audio Synthesizer Grooves">SYNTH DUB: OFF</button>
+                <button id="btn-play-keygen" class="wired-button synth-sub-btn" title="138 BPM Keygen Techno">KEYGEN</button>
+                <button id="btn-play-mellow" class="wired-button synth-sub-btn" title="96 BPM Mellow Deep Bass">MELLOW</button>
+                <button id="btn-play-hybrid" class="wired-button synth-sub-btn" title="Cyber-Hybrid Dub">HYBRID</button>
+                <button id="btn-stop-synth" class="wired-button synth-sub-btn synth-stop-btn" title="Stop Web Audio Synth" style="display:none;">⏹</button>
+            </div>
+            <button id="poleRDrawerBtn" class="wired-button" title="Open Raum X-R Showcase">RAUM · X-R (4)</button>
+            <button id="eqDrawerBtn" class="wired-button" title="Adjust Audio Reactive EQ Sensitivity (Bass/Mid/Treble)">🎛 EQ GAIN</button>
+            <button id="shortcutsBtn" class="wired-button" title="View Cyber VJ Keyboard Shortcuts [?]">⌨ HOTKEYS</button>
+
+            <!-- Theme Presets -->
+            <div class="theme-rack" title="Change Theme Palette">
+                <button class="theme-btn theme-cyber active" data-theme="cyber" title="Cyber Matrix"></button>
+                <button class="theme-btn theme-neon" data-theme="neon" title="Neon Pulse"></button>
+                <button class="theme-btn theme-gold" data-theme="gold" title="Void Gold"></button>
+                <button class="theme-btn theme-cyan" data-theme="cyan" title="Terminal Cyan"></button>
+                <button class="theme-btn theme-white" data-theme="white" title="CRT Monochrome"></button>
+                <button class="theme-btn theme-retro" data-theme="retro" title="Retro HUD"></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── SECONDARY HUD: YOUTUBE RANDOMS & LOCAL MEDIA DOCK ───────────────── -->
+    <section id="ytMediaBar">
+        <!-- YouTube Randoms Navigation -->
+        <div class="yt-randoms-cluster">
+            <button id="ytPrevBtn" class="wired-button" title="Previous YouTube Video in History" disabled>⏮ BACK</button>
+            <button id="ytRandomBtn" class="wired-button" title="Play Completely Random YouTube Video from Knowledgebase">🎲 RANDOM YT</button>
+            <button id="ytNextBtn" class="wired-button" title="Skip to Next Video / New Random">NEXT ⮞</button>
+            <span id="ytStatusBadge" class="yt-status-badge">YT: IDLE</span>
+            <input id="ytUrlInput" type="text" placeholder="YouTube URL, Video ID, or Playlist (Press Enter)" title="Active YouTube URL or Playlist">
+            <button id="ytLoadBtn" class="wired-button" title="Load & Play Entered Video URL, Playlist, or ID">LOAD ▶</button>
+            <button id="ytOpenSourceBtn" class="wired-button" title="Open the current YouTube source in a separate tab. Then use FULL FX capture to run the original Canvas effects on its frames.">↗ OPEN SOURCE TAB</button>
+            <button id="ytPlaylistBtn" class="wired-button highlight-btn" title="Load and play the featured playlist through the AI Warp Engine">▶ PLAY FEATURED PLAYLIST</button>
+            <a class="wired-button" href="https://www.youtube.com/playlist?list=PLGQdK_CU4B7w" target="_blank" rel="noopener noreferrer" title="Open the featured playlist directly on YouTube">↗ YOUTUBE</a>
+            <button id="ytExtractPlaylistBtn" class="wired-button highlight-btn" title="Extract All Videos from YouTube Playlist into Knowledgebase">📑 EXTRACT PLAYLIST</button>
+            <button id="ytKbModalBtn" class="wired-button" title="Open YouTube Knowledgebase & Stored Links Vault">📚 KB: [16]</button>
+            <button id="ytCopyUrlBtn" class="wired-button" title="Copy YouTube URL to Clipboard">📋 COPY URL</button>
+            <button id="ytPasteUrlBtn" class="wired-button" title="Paste YouTube URL from Clipboard & Play">📋 PASTE & PLAY</button>
+            <button id="ytCaptureTabBtn" class="wired-button" title="AI Warp modes process graphics drawn by enabled voice rails on the transparent voice canvas. To warp actual YouTube pixels, use OPEN SOURCE TAB, then capture that tab/window. Choose tab audio too for audio-reactive FX. Captured real pixels run through all original Canvas warp modes and voices. Click again to stop. [Hotkey: N]">🖥 FULL FX: CAPTURE YT TAB</button>
+        </div>
+
+        <!-- Local Media & Artwork Controls -->
+        <div class="local-media-cluster">
+            <button id="openLocalMediaBtn" class="wired-button" title="Open Local MP4, AVI, MKV, MOV, MP3, M4A">📁 OPEN MEDIA</button>
+            <button id="openLocalFolderBtn" class="wired-button" title="Select Folder: Plays Audio & Cycles Folder Images">📂 FOLDER (AUDIO+PICS)</button>
+            <button id="addArtworkBtn" class="wired-button" title="Select Artwork Images for MP3 Playback">🖼 ARTWORK</button>
+            <button id="customBgBtn" class="wired-button" title="Select Custom Backdrop Images (From glitch-test.html)">🖼 CUSTOM BG</button>
+
+            <!-- Media Transport Strip -->
+            <div id="mediaTransportBar">
+                <button id="mediaPrevTrackBtn" class="wired-button" title="Previous Audio Track" style="display:none;">⏮</button>
+                <button id="mediaPlayPauseBtn" class="wired-button">PLAY ▶</button>
+                <button id="mediaNextTrackBtn" class="wired-button" title="Next Audio Track" style="display:none;">⏭</button>
+                <span id="mediaTitleBadge" class="media-title-badge">Local Media</span>
+                <input id="mediaSeekSlider" type="range" min="0" max="100" value="0" title="Scrub Timeline">
+                <span id="mediaTimeDisplay" class="media-time-display">00:00 / 00:00</span>
+                
+                <div id="artworkControls" class="artwork-controls">
+                    <button id="prevArtworkBtn" class="wired-button" title="Previous Folder Artwork">❮</button>
+                    <span id="artworkBadge" class="artwork-badge">IMG [0/0]</span>
+                    <button id="nextArtworkBtn" class="wired-button" title="Next Folder Artwork">❯</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden File Inputs -->
+        <input type="file" id="localFileInput" accept=".mp4,.avi,.mkv,.mov,.webm,.m4v,.mp3,.m4a,.wav,.ogg,.flac" style="display:none;">
+        <input type="file" id="localFolderInput" webkitdirectory directory multiple accept="video/*,audio/*,image/*" style="display:none;">
+        <input type="file" id="localArtworkInput" multiple accept="image/*" style="display:none;">
+        <input type="file" id="customBgFile" multiple accept="image/*" style="display:none;">
+    </section>
+
+    <!-- ── LEFT MIXER RACK (17 CORE + 17 GC#(3) VOICES) ───────────────────── -->
+    <aside id="effect-toggle-column">
+        <!-- Generated dynamically by media_page.js -->
+    </aside>
+
+    <!-- ── BOTTOM CONTROL DOCK & PRESETS ─────────────────────────────────── -->
+    <footer id="glitch-bottom-bar">
+        <!-- Preset Memory Rack -->
+        <div class="preset-rack">
+            <button id="presetListToggleBtn" class="wired-button preset-mode-machine" title="Swap memory list: USER ⇄ MACHINE">MACHINE</button>
+            <select id="presetSelect" title="Preset Selection"></select>
+            <button id="presetPrevBtn" class="wired-button" title="Previous Preset">&lsaquo;</button>
+            <button id="presetNextBtn" class="wired-button" title="Next Preset">&rsaquo;</button>
+            <button id="presetAutoBtn" class="wired-button" title="Curated Auto Roulette Cycler"> -ʁ%AUTO%ʁ- </button>
+            <input id="presetNameInput" type="text" placeholder="preset name">
+            <button id="presetSaveBtn" class="wired-button" title="Save board as User Preset">Save</button>
+            <button id="presetDeleteBtn" class="wired-button" title="Delete User Preset">Del</button>
+        </div>
+
+        <!-- Master Automation & Mode Buttons -->
+        <div class="master-controls-cluster">
+            <button id="aiWarpBtn" class="wired-button active" title="Toggle AI Warp Pipeline [ON/OFF]">AI WARP: [ON]</button>
+            <button id="warpModeCycleBtn" class="wired-button" title="Cycle AI Warp Mode (29 Algorithmic Modes)">MODE: LIQUID [1/29]</button>
+            <select id="warpModeSelect" class="warp-mode-select" title="Directly Select AI Warp Mode (29 Modes)">
+                <option value="liquid">1. LIQUID · Fluid Waves</option>
+                <option value="prism">2. PRISM · Crystal Dispersion</option>
+                <option value="breathe">3. BREATHE · Radial Expansion</option>
+                <option value="fold">4. FOLD · Origami Accordion</option>
+                <option value="aurora">5. AURORA · Neon Curtains</option>
+                <option value="vortex">6. VORTEX · Centrifugal Black Hole</option>
+                <option value="cybergrid">7. CYBERGRID · Isometric Matrix</option>
+                <option value="hyperdrive">8. HYPERDRIVE · Starburst Zoom</option>
+                <option value="kaleidoscope">9. KALEIDOSCOPE · Mandala Symmetry</option>
+                <option value="quantum">10. QUANTUM · Probabilistic Foam</option>
+                <option value="ripple">11. RIPPLE · Concentric Shockwaves</option>
+                <option value="analog_crt">12. ANALOG CRT · Cathode Tube</option>
+                <option value="newblue_roll">13. ROLL · NewBlue Shutter Roll</option>
+                <option value="newblue_active_cam">14. ACTIVE CAM · NewBlue Handheld Shake</option>
+                <option value="newblue_shear">15. SHEAR · NewBlue Vector Slant</option>
+                <option value="newblue_wiggle">16. WIGGLE · NewBlue Micro Jitter</option>
+                <option value="newblue_zoom_blur">17. ZOOM BLAST · NewBlue Velocity Streaks</option>
+                <option value="newblue_video_tile">18. VIDEO TILE · NewBlue Multi-pane Grid</option>
+                <option value="newblue_twirl">19. TWIRL · NewBlue Polar Vortex Spiral</option>
+                <option value="newblue_light_ring">20. LIGHT RING · NewBlue Anamorphic Flare</option>
+                <option value="newblue_earthquake">21. EARTHQUAKE · NewBlue Seismic Shockwave</option>
+                <option value="newblue_water_drop">22. WATER DROP · NewBlue Caustic Lens</option>
+                <option value="newblue_rgb_shift">23. RGB FAST SHIFT · NewBlue Prism Split</option>
+                <option value="newblue_quad_mirror">24. QUAD MIRROR · NewBlue 4-Way Symmetry</option>
+                <option value="newblue_fish_eye">25. FISH EYE · NewBlue Convex Bulge Glass</option>
+                <option value="newblue_pinch">26. PINCH · NewBlue Optical Contraction</option>
+                <option value="newblue_solarize">27. SOLARIZE · NewBlue Sabattier Luma Wash</option>
+                <option value="newblue_cathode_beam">28. CATHODE BEAM · NewBlue Raster Deflection</option>
+                <option value="newblue_neon_edges">29. NEON EDGES · NewBlue Electric Vector Outlines</option>
+            </select>
+            <button id="ghostProtocolBtn" class="wired-button" title="Toggle & Cycle Ghost Protocol">GHOST: OFF</button>
+            <button id="vsyncScanBtn" class="wired-button" title="Toggle & Cycle V-Sync Raster">V-SYNC: OFF</button>
+            <button id="autoGlitchBtn" class="wired-button" title="Toggle Rhythmic Auto Glitch Surges">AUTO GLITCH: OFF</button>
+            <button id="randomizeBtn" class="wired-button" title="One-Shot Scramble: Randomize Active Effects Board">🎲 RANDOMIZE</button>
+            <button id="continualRandomizeBtn" class="wired-button" title="Toggle Continual LFO Randomization">CONTINUAL RAND: OFF</button>
+            <button id="autoMastersBtn" class="wired-button" title="Toggle Automated Drift for Speed, Opacity & Motion">AUTO MASTERS: OFF</button>
+            <button id="hardLightBtn" class="wired-button" title="Toggle High-Contrast Electric Blend Mode">HARD-LIGHT: OFF</button>
+            <button id="softEyeBtn" class="wired-button" title="Toggle Soft-Eye Crescendo Scheduler & Pacing">SOFT-EYE: CALM</button>
+            <button id="milkdropBtn" class="wired-button" title="Toggle Drop the Milk? — soupy, audio-reactive Milkdrop/projectM-inspired feedback FX">DROP THE MILK? OFF</button>
+            <button id="earBtn" class="wired-button" title="Audio Reactive Ear: AUTO / AUDIO / CANVAS">EAR: AUTO</button>
+            <button id="timedAutoBtn" class="wired-button" title="Toggle Timed Effects Automation Cadence">TIMED AUTO: OFF</button>
+            <button id="crescendoBtn" class="wired-button" title="Trigger Soft-Eye Crescendo Overdrive">CRESCENDO ⚡</button>
+            
+            <!-- Quick Glitch Rails -->
+            <div class="rail-cluster" title="Quick Master Intensity Rails">
+                <button class="rail-btn" data-rail="0.5" title="Set Master Intensity to 50%">50%</button>
+                <button class="rail-btn" data-rail="0.75" title="Set Master Intensity to 75%">75%</button>
+                <button class="rail-btn" data-rail="1.0" title="Set Master Intensity to 100%">100%</button>
+            </div>
+
+            <button id="zeroAllBtn" class="wired-button" title="EMP Purge Flash: Zero All Active Levels">ZERO ALL</button>
+            <button id="freezeFrameBtn" class="wired-button" title="Export PNG Screenshot">FREEZE FRAME 📷</button>
+        </div>
+
+        <!-- Master Sliders with Quick Zero & Lock Controls -->
+        <div class="master-controls-cluster">
+            <!-- Master AI Warp Strength Slider (Wide precision fader from 0% No Warp to 100% Full Burst) -->
+            <div class="slider-group warp-slider-group" title="Master AI Warp Strength (0% Flat to 100% Full Burst)">
+                <button id="null-warp-btn" class="null-btn" title="Quick Zero AI Warp Strength">0</button>
+                <label for="ai-warp-strength-slider">WARP STRENGTH</label>
+                <input id="ai-warp-strength-slider" type="range" min="0" max="1" step="0.005" value="0.65" title="Master AI Warp Strength (0% No Warp to 100% Full Burst)">
+                <button id="burst-warp-btn" class="burst-btn" title="Max Burst (100% Full Strength)">⚡ MAX</button>
+                <span id="warpStrengthValBadge" class="slider-val-badge">65%</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-speed-btn" class="null-btn" title="Quick Zero Speed">0</button>
+                <label for="glitch-speed-slider">SPEED</label>
+                <input id="glitch-speed-slider" type="range" min="0.1" max="3" step="0.05" value="1.2">
+                <span id="speedValBadge" class="slider-val-badge">1.2x</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-opacity-btn" class="null-btn" title="Quick Zero Opacity">0</button>
+                <label for="glitch-opacity-slider">OPACITY</label>
+                <input id="glitch-opacity-slider" type="range" min="0" max="1" step="0.01" value="0.95">
+                <span id="opacityValBadge" class="slider-val-badge">95%</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-ghost-btn" class="null-btn" title="Quick Zero Ghost Protocol">0</button>
+                <label for="ghostProtocolSlider">GHOST</label>
+                <input id="ghostProtocolSlider" type="range" min="0" max="1" step="0.01" value="0">
+                <span id="ghostValBadge" class="slider-val-badge">0%</span>
+            </div>
+            <div class="slider-group">
+                <button id="null-vsync-btn" class="null-btn" title="Quick Zero V-Sync Level">0</button>
+                <label for="vsyncScanSlider">V-SYNC</label>
+                <input id="vsyncScanSlider" type="range" min="0" max="1" step="0.01" value="0">
+                <button id="vsyncLockBtn" class="lock-btn" title="Lock V-Sync against Automation">🔓</button>
+                <span id="vsyncValBadge" class="slider-val-badge">0%</span>
+            </div>
+            <div class="slider-group milkdrop-opacity-group" title="Subtle Milkdrop opacity; unlocked presets gently automate this level.">
+                <button id="null-milkdrop-opacity-btn" class="null-btn" title="Set Drop the Milk opacity to zero">0</button>
+                <label for="milkdropOpacitySlider">MILKDROP</label>
+                <input id="milkdropOpacitySlider" type="range" min="0" max="1" step="0.01" value="0.30" aria-label="Drop the Milk opacity">
+                <button id="milkdropOpacityLockBtn" class="lock-btn" title="Lock Milkdrop opacity against preset automation" aria-label="Lock Milkdrop opacity">🔓</button>
+                <span id="milkdropOpacityValBadge" class="slider-val-badge">82%</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ── POLE - R SHOWCASE MODAL / DRAWER ──────────────────────────────── -->
+    <div id="pole-r-drawer">
+        <div class="poleR-drawer-header">
+            <h2>RAUM · X-R SHOWCASE</h2>
+            <button id="poleRCloseBtn" class="wired-button">✕</button>
+        </div>
+        <div class="poleR-grid" id="poleR-grid">
+            <!-- Dynamically populated from media_page.json -->
+        </div>
+        <div class="raum-thanks">
+            <img class="raum-back-cover" src="audio/back-cover.jpg" alt="Back cover: pole - Я - raum - variant X-R, tracklist and credits" loading="lazy">
+            <h3>THANKS &amp; DEDICATION</h3>
+            <p>Pole - Я - Raum 1, 2, 3 &amp; 4 - variant X-R are original, fully synthesized works with no sampled audio. They are dedicated to <b>Stefan Betke (Pole)</b> and the artists behind the 1998 album <i>R</i> on DIN &mdash; <b>Daniel Meteo</b>, <b>Burnt Friedman</b> and <b>Kit Clayton</b> &mdash; whose Raum compositions inspired them.</p>
+            <p>Created by <b>GitHub Copilot</b> (AI) as an original work, prompted and directed by <b>River Lyle Reuveni</b> (Imortalimp). Not affiliated with Stefan Betke, Pole, DIN or the artists named above; no recordings by them are used.</p>
+            <p>If you enjoy the original album, please support it: <a href="https://pole-stefanbetke.bandcamp.com/album/r" target="_blank" rel="noopener">pole-stefanbetke.bandcamp.com/album/r</a></p>
+        </div>
+    </div>
+
+    <!-- ── FLOATING UI TOGGLE TAB ────────────────────────────────────────── -->
+    <div id="ui-toggle-tab" title="Click to Collapse / Expand UI" role="button" tabindex="0">
+        <button id="toggle-ui-btn" type="button" tabindex="-1">HIDE U.I. ▶</button>
+    </div>
+
+    <!-- ── EXTERNAL & INTERNAL ENGINE LIBRARIES ───────────────────────────── -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="glitch_engine.js?v=6.4.36"></script>
+    <script src="r3_gc3_factories.js?v=6.4.36"></script>
+    <script src="r3_ghost_vsync.js?v=6.4.36"></script>
+    <script src="ai_warp_engine.js?v=6.4.36"></script>
+    <script src="media_page.js?v=6.4.36"></script>
+
+
+    <!-- ── YOUTUBE KNOWLEDGEBASE & PLAYLIST VAULT MODAL ────────────────── -->
+    <div id="ytKbModal" class="cyber-modal">
+        <div class="cyber-modal-card yt-kb-modal-card">
+            <div class="cyber-modal-header">
+                <h3>📚 YOUTUBE KNOWLEDGEBASE & PLAYLIST VAULT</h3>
+                <button id="ytKbCloseBtn" class="wired-button">✕</button>
+            </div>
+            <div class="cyber-modal-body">
+                <!-- Stats Bar -->
+                <div class="yt-kb-stats-bar">
+                    <span id="ytKbTotalCount">TOTAL STORED: 16 LINKS</span>
+                    <span id="ytKbPlaylistCount">PLAYLISTS: 0</span>
+                    <span id="ytKbUserCount">USER ADDED: 0</span>
+                </div>
+
+                <!-- Input & Extraction Strip -->
+                <div class="yt-kb-input-box">
+                    <input id="ytKbInput" type="text" placeholder="Paste YouTube Video URL, Playlist URL, or Batch of Links...">
+                    <button id="ytKbAddBtn" class="wired-button">➕ ADD LINK / PLAYLIST</button>
+                    <button id="ytKbExtractBtn" class="wired-button highlight-btn">📑 EXTRACT PLAYLIST</button>
+                </div>
+
+                <!-- Filter & Search Strip -->
+                <div class="yt-kb-filter-strip">
+                    <input id="ytKbSearchInput" type="text" placeholder="Search Knowledgebase titles or IDs...">
+                    <select id="ytKbSourceFilter" class="wired-select">
+                        <option value="all">ALL SOURCES</option>
+                        <option value="playlist">PLAYLIST EXTRACTED</option>
+                        <option value="user">USER INPUTTED</option>
+                        <option value="curated">CURATED DEFAULTS</option>
+                    </select>
+                    <button id="ytKbPlayRandomBtn" class="wired-button">🎲 RANDOM ROLL FROM KB</button>
+                </div>
+
+                <!-- List of Stored Links -->
+                <div id="ytKbList" class="yt-kb-list">
+                    <!-- Populated dynamically by YouTubeKnowledgebase -->
+                </div>
+            </div>
+            <div class="cyber-modal-footer yt-kb-modal-footer">
+                <div class="yt-kb-actions">
+                    <button id="ytKbExportBtn" class="wired-button">📤 EXPORT KB (JSON)</button>
+                    <button id="ytKbImportBtn" class="wired-button">📥 IMPORT KB (JSON)</button>
+                    <input id="ytKbImportFile" type="file" accept=".json,application/json" style="display:none;">
+                    <button id="ytKbResetBtn" class="wired-button">🔄 RESET TO CURATED</button>
+                    <button id="ytKbClearBtn" class="wired-button danger-btn">🗑 CLEAR CUSTOM</button>
+                </div>
+                <small>Every video or playlist link input is permanently remembered in your browser and available for random rerolls!</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── KEYBOARD SHORTCUTS MODAL ────────────────────────────────────── -->
+    <div id="shortcutsModal" class="cyber-modal">
+        <div class="cyber-modal-card">
+            <div class="cyber-modal-header">
+                <h3>⚡ CYBER VJ KEYBOARD SHORTCUTS</h3>
+                <button id="shortcutsCloseBtn" class="wired-button">✕</button>
+            </div>
+            <div class="cyber-modal-body">
+                <div class="shortcut-grid">
+                    <div class="shortcut-item"><kbd>Space</kbd><span>Play / Pause Active Media</span></div>
+                    <div class="shortcut-item"><kbd>W</kbd><span>Cycle AI Warp Mode (12 Modes)</span></div>
+                    <div class="shortcut-item"><kbd>G</kbd><span>Toggle / Cycle Ghost Protocol</span></div>
+                    <div class="shortcut-item"><kbd>V</kbd><span>Toggle / Cycle V-Sync Raster</span></div>
+                    <div class="shortcut-item"><kbd>A</kbd><span>Toggle Rhythmic Auto Glitch</span></div>
+                    <div class="shortcut-item"><kbd>R</kbd><span>Toggle Continual LFO Randomization</span></div>
+                    <div class="shortcut-item"><kbd>T</kbd><span>Toggle Timed Effects Automation</span></div>
+                    <div class="shortcut-item"><kbd>C</kbd><span>Trigger Soft-Eye Crescendo Overdrive ⚡</span></div>
+                    <div class="shortcut-item"><kbd>D</kbd><span>Toggle DROP THE MILK? soupy feedback and wave automation</span></div>
+                    <div class="shortcut-item"><kbd>Z</kbd><span>EMP Purge / Zero All Active Channels</span></div>
+                    <div class="shortcut-item"><kbd>M</kbd><span>Toggle the live microphone audio input</span></div>
+                    <div class="shortcut-item"><kbd>Y</kbd><span>Load the featured YouTube playlist into the YouTube canvas feed</span></div>
+                    <div class="shortcut-item"><kbd>E</kbd><span>Cycle the Audio Reactive Ear: AUTO / AUDIO / CANVAS</span></div>
+                    <div class="shortcut-item"><kbd>N</kbd><span>Share a browser tab, window, or full screen (real pixels and optional shared audio)</span></div>
+                    <div class="shortcut-item"><kbd>H</kbd><span>Fullscreen Mode / Hide All U.I.</span></div>
+                    <div class="shortcut-item"><kbd>S</kbd><span>Freeze Frame / Export High-Res PNG</span></div>
+                    <div class="shortcut-item"><kbd>1 - 9</kbd><span>Quick-Toggle Glitch Voices 1 to 9 (75%)</span></div>
+                    <div class="shortcut-item"><kbd>?</kbd><span>Toggle This Hotkeys Overlay</span></div>
+                </div>
+            </div>
+            <div class="cyber-modal-footer">
+                <small>PRO TIP: Click Spectrum or Waveform in Top Bar to cycle visualizer display modes!</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── AUDIO REACTIVE EQ GAIN DRAWER ─────────────────────────────────── -->
+    <div id="eqDrawer" class="cyber-drawer">
+        <div class="cyber-drawer-header">
+            <h3>🎛 AUDIO REACTIVE EQ SENSITIVITY</h3>
+            <button id="eqCloseBtn" class="wired-button">✕</button>
+        </div>
+        <div class="cyber-drawer-body">
+            <div class="eq-slider-row">
+                <label for="eqBassGain">SUB / BASS BOOST (20-160Hz)</label>
+                <input id="eqBassGain" type="range" min="0.2" max="3.0" step="0.1" value="1.2">
+                <span id="eqBassVal" class="slider-val-badge">1.2x</span>
+            </div>
+            <div class="eq-slider-row">
+                <label for="eqMidGain">MID BAND SENSITIVITY (200-2kHz)</label>
+                <input id="eqMidGain" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
+                <span id="eqMidVal" class="slider-val-badge">1.0x</span>
+            </div>
+            <div class="eq-slider-row">
+                <label for="eqTrebleGain">TREBLE / AIR SENSITIVITY (3.5-11kHz)</label>
+                <input id="eqTrebleGain" type="range" min="0.2" max="3.0" step="0.1" value="1.0">
+                <span id="eqTrebleVal" class="slider-val-badge">1.0x</span>
+            </div>
+            <div class="eq-presets">
+                <button class="wired-button eq-preset-btn" data-eq="bass">BASS HEAVY</button>
+                <button class="wired-button eq-preset-btn" data-eq="vocal">MID VOCAL</button>
+                <button class="wired-button eq-preset-btn" data-eq="crisp">CRISP HIGH</button>
+                <button class="wired-button eq-preset-btn" data-eq="flat">FLAT (1.0x)</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

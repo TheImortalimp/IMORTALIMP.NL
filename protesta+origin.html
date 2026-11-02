@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murcia Tractor Protests - Origin Map & Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        header {
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            color: #1a1a1a;
+            font-size: 24px;
+        }
+        p.subtitle {
+            margin: 0;
+            color: #666;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        /* Grid Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 768px) {
+            .content-grid {
+                grid-template-columns: 500px 1fr;
+            }
+        }
+        /* Left Column: Video Embed */
+        .video-panel {
+            display: flex;
+            justify-content: center;
+        }
+        /* Right Column: Map Context & Button */
+        .context-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #fcfcfc;
+            border: 1px solid #eef0f3;
+            padding: 25px;
+            border-radius: 8px;
+        }
+        .info-box h2 {
+            margin-top: 0;
+            color: #d9381e; /* Protest theme red accent */
+            font-size: 18px;
+        }
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a73e8; /* Google Maps Blue */
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            font-weight: 600;
+            border-radius: 6px;
+            border: none;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(26,115,232,0.2);
+        }
+        .map-btn:hover {
+            background-color: #1557b0;
+        }
+        .map-btn svg {
+            margin-right: 8px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Murcia Tractor Protests</h1>
+        <p class="subtitle">Investigating the origins and geographic hotspots of agricultural demonstrations in Spain.</p>
+    </header>
+
+    <div class="content-grid">
+        <!-- Video Report Frame -->
+        <div class="video-panel">
+            <iframe 
+                src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Friverlylereuveni%2Fposts%2Fpfbid02J8duG6wjwFmhoVQ7ZxYDvTzHsGH2sVeG7insoqNtmbqkzYJwabaptANwyYQXasnHl&show_text=true&width=500" 
+                width="500" 
+                height="526" 
+                style="border:none;overflow:hidden; max-width: 100%;" 
+                scrolling="no" 
+                frameborder="0" 
+                allowfullscreen="true" 
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+            </iframe>
+        </div>
+
+        <!-- Interactive Map Reference Panel -->
+        <div class="context-panel">
+            <div class="info-box">
+                <h2>Protest Origin Mapping</h2>
+                <p>The video document detailed in the report captures key operational updates regarding the tractor demonstrations across the region.</p>
+                <p>To provide factual transparency and map out the mobilization, use the interaction button below to jump to the exact target location coordinates where this activity was anchored.</p>
+                
+                <p><strong>Location Reference:</strong> Finca Ecológica Azoe, Cartagena, Región de Murcia, España.</p>
+            </div>
+
+            <!-- Map Redirection Trigger Button -->
+            <button id="openMapBtn" class="map-btn">
+                <!-- Simple Location Marker Icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                View Protest Coordinates on Google Maps
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('openMapBtn').addEventListener('click', function() {
+        // Target map coordinates provided for Finca Ecológica Azoe
+        const mapUrl = "https://www.google.com/maps/place/Finca+Ecol%C3%B3gica+Azoe/@37.6602273,-1.0781085,17z/data=!3m1!4b1!4m6!3m5!1s0xd63675ecda22cdb:0x7cacb9b65538c831!8m2!3d37.6602231!4d-1.0755336!16s%2Fg%2F11fj7kdzbd?entry=ttu";
+        
+        // Opens the specific reference map securely in a fresh browser tab
+        window.open(mapUrl, '_blank', 'noopener,noreferrer');
+    });
+</script>
+
+</body>
+</html>

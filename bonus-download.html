@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Download the mixtapes bonus package as an EPUB archive.">
+  <title>Bonus package — Mixtapes download</title>
+  <style>
+    :root{color-scheme:dark;--bg:#111310;--text:#eeeae0;--muted:#aaa99f;--line:#353830;--lime:#d3eb85}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.5}
+    a{color:inherit}
+    .wrap{max-width:1180px;margin:auto;padding:0 48px}
+    header{border-bottom:1px solid var(--line)}
+    .header-inner{height:82px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{text-decoration:none;font-weight:800;font-size:14px;letter-spacing:.13em;text-transform:uppercase}
+    .brand span{color:var(--lime)}
+    .header-tag,.eyebrow,.section-label,.file-meta,.footer{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+    .header-tag{color:var(--muted)}
+    main{padding:86px 0 92px}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:80px;align-items:center}
+    .eyebrow{display:flex;gap:11px;align-items:center;color:var(--lime);margin:0 0 26px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 18px #d3eb85}
+    h1{font-size:clamp(54px,7.7vw,105px);line-height:.91;letter-spacing:-.065em;margin:0 0 30px;font-weight:800}
+    h1 em{font-style:normal;color:var(--lime)}
+    .intro{max-width:510px;color:#c4c3b9;font-size:17px;line-height:1.7;margin:0 0 32px}
+    .button{display:inline-flex;align-items:center;justify-content:space-between;gap:44px;min-height:64px;padding:0 23px;background:var(--lime);color:#171b10;text-decoration:none;font-size:13px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;transition:background .2s,transform .2s}
+    .button:hover{background:#e5faa0;transform:translateY(-2px)}
+    .button:focus-visible,a:focus-visible{outline:2px solid white;outline-offset:4px}
+    .arrow{font-size:22px;line-height:1}
+    .under-button{font-size:12px;color:var(--muted);margin:13px 0 0}
+    .cover{aspect-ratio:1;position:relative;overflow:hidden;background:#d3eb85;color:#15180f;padding:30px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:14px 14px 0 #282c21}
+    .cover:before,.cover:after{content:"";position:absolute;width:92%;height:92%;border:1px solid rgba(21,24,15,.2);border-radius:50%;right:-36%;top:-18%}
+    .cover:after{width:66%;height:66%;right:-23%;top:-5%}
+    .cover-top,.cover-bottom{display:flex;justify-content:space-between;align-items:flex-start;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;position:relative;z-index:1}
+    .cover-title{font-size:clamp(43px,6vw,76px);line-height:.88;letter-spacing:-.075em;font-weight:900;position:relative;z-index:1}
+    .cover-bottom{border-top:1px solid rgba(21,24,15,.5);padding-top:14px}
+    .details{border-top:1px solid var(--line);margin-top:94px;padding-top:35px;display:grid;grid-template-columns:1fr 2fr;gap:60px}
+    .section-label{color:var(--lime);margin:4px 0}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+    .step-number{color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.1em}
+    h2{font-size:15px;margin:18px 0 8px;letter-spacing:-.01em}
+    .step p{font-size:13px;line-height:1.65;color:var(--muted);margin:0}
+    .notice{border:1px solid var(--line);padding:17px 20px;margin-top:36px;font-size:13px;line-height:1.6;color:#babbb0}
+    .notice strong{color:var(--text)}
+    footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted)}
+    .footer{display:flex;justify-content:space-between;gap:20px;font-size:10px}
+    @media(max-width:760px){.wrap{padding:0 24px}.header-inner{height:70px}.header-tag{font-size:9px}main{padding:60px 0}.hero{grid-template-columns:1fr;gap:54px}h1{font-size:clamp(54px,13vw,88px)}.cover{max-width:480px}.cover-title{font-size:clamp(56px,15vw,82px)}.details{margin-top:75px;grid-template-columns:1fr;gap:20px}.steps{grid-template-columns:1fr;gap:25px}.step{display:grid;grid-template-columns:40px 1fr;column-gap:12px}.step h2{margin:0 0 7px}.step p{grid-column:2}.notice{margin-top:28px}.footer{flex-direction:column;gap:5px}}
+  </style>
+</head>
+<body>
+  <header><div class="wrap header-inner"><a class="brand" href="./">IMORTALIMP<span>.</span>NL</a><span class="header-tag">Digital bonus package / EPUB</span></div></header>
+  <main class="wrap">
+    <section class="hero" aria-labelledby="title">
+      <div>
+        <p class="eyebrow"><span class="dot" aria-hidden="true"></span> The bonus download</p>
+        <h1 id="title">The extra<br><em>collection.</em></h1>
+        <p class="intro">A collection of mixtape files, artwork and videos, packaged together for download.</p>
+        <a class="button" href="mixtapes-bonus.epub" download="mixtapes-bonus.epub"><span>Download the EPUB</span><span class="arrow" aria-hidden="true">↘</span></a>
+        <p class="under-button">EPUB file · approximately 886 MB · archive tool required</p>
+      </div>
+      <div class="cover" aria-hidden="true">
+        <div class="cover-top"><span>Bonus<br>collection</span><span>Digital edition<br>01 / 01</span></div>
+        <div class="cover-title">THE<br>EXTRA<br>FILES.</div>
+        <div class="cover-bottom"><span>Mixtapes + more</span><span>EPUB / ZIP</span></div>
+      </div>
+    </section>
+    <section class="details" aria-labelledby="how-title">
+      <p class="section-label" id="how-title">How to open</p>
+      <div>
+        <div class="steps">
+          <div class="step"><span class="step-number">01 /</span><h2>Download</h2><p>Save the EPUB file to your device. The download is approximately 886 MB.</p></div>
+          <div class="step"><span class="step-number">02 /</span><h2>Open as an archive</h2><p>Open the EPUB with an archive tool such as 7-Zip. If needed, rename a copy from .epub to .zip first.</p></div>
+          <div class="step"><span class="step-number">03 /</span><h2>Extract the files</h2><p>Extract <strong>EPUB/bonus.zip</strong>, then extract that ZIP to access the contents.</p></div>
+        </div>
+        <div class="notice"><strong>Good to know.</strong> This EPUB is used as a package, not a conventional ebook. Most ebook readers will not display the enclosed files. A computer and an archive tool are recommended.</div>
+      </div>
+    </section>
+  </main>
+  <footer><div class="wrap footer"><span>Imortalimp.nl / Digital collection</span><span>Download · Extract · Explore</span></div></footer>
+</body>
+</html>

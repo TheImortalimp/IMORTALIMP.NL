@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#14060a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>ADAM TRISTAR — VHS HORROR TAPE (Mobile)</title>
+  <style>
+    :root { --blood: #e32c3c; --blood-soft: #ff7b88; --ink: #0c0507; --paper: #f2e9ea; }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      padding: 0 12px 28px 12px;
+      background:
+        radial-gradient(ellipse at 50% -10%, rgba(180, 12, 28, 0.30) 0%, rgba(10, 0, 0, 0) 55%),
+        linear-gradient(180deg, #0c0507 0%, #14060a 55%, #090304 100%);
+      background-attachment: fixed;
+      color: var(--paper);
+      font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .wrap { max-width: 560px; margin: 0 auto; position: relative; }
+    /* CRT scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      background: repeating-linear-gradient(to bottom,
+        rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 2px,
+        rgba(0,0,0,0.28) 3px, rgba(0,0,0,0.28) 4px);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body::after { display: none; }
+      * { animation: none !important; transition: none !important; }
+    }
+    h1 {
+      font-size: clamp(1.5rem, 7.5vw, 2.1rem);
+      color: var(--blood-soft);
+      text-shadow: 0 0 10px rgba(227,44,60,0.9), 0 2px 2px #000;
+      margin: 18px 0 4px 0;
+      letter-spacing: 1px;
+    }
+    .osd {
+      display: flex; flex-wrap: wrap; gap: 6px 12px; justify-content: center;
+      background: rgba(0,0,0,0.66); border: 1px dashed rgba(227,44,60,0.55);
+      border-radius: 8px; padding: 8px 12px; margin: 10px 0 16px 0;
+      font-family: ui-monospace, 'Courier New', monospace; font-size: 0.72rem;
+      letter-spacing: 2px; color: #d8f3dc;
+    }
+    .osd .play { color: #7dffa8; font-weight: 700; }
+    .osd .rec { color: #ff3b4e; font-weight: 700; animation: blink 1.2s steps(1) infinite; }
+    @keyframes blink { 0%,60% { opacity: 1; } 61%,100% { opacity: 0.15; } }
+    .cover-frame {
+      padding: 12px; margin: 8px 0 18px 0;
+      background: linear-gradient(160deg, #16070a 0%, #200a10 60%, #120407 100%);
+      border: 2px solid #6e0d18; border-radius: 12px;
+      box-shadow: 0 0 22px rgba(178,12,32,0.4);
+    }
+    .cover-frame img {
+      display: block; width: 100%; height: auto; border-radius: 6px;
+      border: 1px solid rgba(227,44,60,0.45); box-shadow: 0 0 18px rgba(178,12,32,0.45);
+    }
+    .cover-frame .label {
+      text-align: center; padding-top: 10px;
+      font-family: ui-monospace, 'Courier New', monospace;
+      font-size: 0.68rem; letter-spacing: 3px; color: #c96b76;
+    }
+    .tape-controls {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 4px 0 18px 0;
+    }
+    button.big, a.big {
+      flex: 1 1 45%;
+      min-height: 54px;
+      padding: 12px 14px;
+      font-size: 1.02rem;
+      font-weight: 700;
+      border-radius: 10px;
+      border: 2px solid rgba(227,44,60,0.75);
+      background: linear-gradient(160deg, #2a0c12 0%, #47101c 100%);
+      color: #ffd7dc;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button.big:active, a.big:active { transform: scale(0.97); background: #5c1420; }
+    .track {
+      background: rgba(255,255,255,0.035);
+      border-left: 3px solid rgba(227,44,60,0.55);
+      border-radius: 0 10px 10px 0;
+      padding: 12px;
+      margin: 10px 0;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    .track.playing {
+      border-left-color: var(--blood);
+      background: rgba(227,44,60,0.12);
+      box-shadow: 0 0 18px rgba(227,44,60,0.35);
+    }
+    .track h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.05rem;
+      color: #ff8d99;
+      display: flex; align-items: baseline; gap: 8px;
+    }
+    .track.playing h3 { color: #fff; }
+    .tnum {
+      font-family: ui-monospace, 'Courier New', monospace;
+      color: var(--blood); font-size: 0.85rem;
+    }
+    .tdur { margin-left: auto; font-size: 0.75rem; color: #b98a90; letter-spacing: 1px; }
+    audio {
+      width: 100%; min-height: 54px; border-radius: 8px;
+      accent-color: var(--blood);
+    }
+    .bandcamp {
+      margin: 22px 0; padding: 16px;
+      background: rgba(187,134,252,0.10); border: 1px solid rgba(187,134,252,0.55);
+      border-radius: 12px; text-align: center;
+    }
+    .bandcamp p { margin: 0 0 12px 0; font-weight: 600; font-size: 0.95rem; }
+    .tribute {
+      margin: 22px 0; padding: 16px;
+      background: rgba(0,0,0,0.55); border: 1px dashed rgba(227,44,60,0.5);
+      border-radius: 12px;
+    }
+    .tribute p { margin: 0 0 12px 0; }
+    .tribute a, .wikis a { color: var(--blood-soft); font-weight: 700; }
+    .wikis {
+      margin: 22px 0; padding: 16px;
+      background: rgba(8,2,4,0.85); border: 2px dashed rgba(227,44,60,0.65);
+      border-radius: 12px;
+    }
+    .wikis h2 {
+      margin: 0 0 8px 0; font-size: 1.06rem; color: var(--blood-soft);
+      font-family: ui-monospace, 'Courier New', monospace; letter-spacing: 0.5px;
+    }
+    .wikis .note { color: #e8b8be; font-size: 0.92rem; margin: 0 0 12px 0; }
+    .wikis ul { list-style: none; margin: 0; padding: 0; }
+    .wikis li {
+      margin: 8px 0; padding: 10px 12px;
+      border-left: 3px solid rgba(227,44,60,0.55);
+      background: rgba(227,44,60,0.06); border-radius: 0 8px 8px 0;
+    }
+    .wikis li a { display: block; min-height: 44px; display: flex; align-items: center; }
+    .wikis li .desc { display: block; color: #b98a90; font-size: 0.8rem; margin-top: 2px; }
+    .rewind {
+      text-align: center; color: #ff6b78;
+      font-family: ui-monospace, 'Courier New', monospace;
+      font-size: 0.78rem; letter-spacing: 1px; margin: 26px 0 8px 0;
+    }
+    .links-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+    .links-row a.big { flex: 1 1 100%; font-size: 0.95rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>&#127909; ADAM TRISTAR — VHS HORROR TAPE</h1>
+    <div class="osd" aria-hidden="true">
+      <span class="play">&#9654; PLAY</span><span>SP</span><span>HI-FI STEREO</span>
+      <span>TRK 01&#8211;08</span><span>0:31:13</span><span class="rec">&#9679; REC</span>
+    </div>
+
+    <div class="cover-frame">
+      <img src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/cover.png" alt="ADAM TRISTAR - VHS Horror Tape cover artwork">
+      <div class="label">VHS &#183; SP &#183; HI-FI STEREO &#183; 31:13 &#183; ORACULO OR150</div>
+    </div>
+
+    <div class="tape-controls">
+      <button class="big" id="playAll" type="button">&#9654; PLAY TAPE (all 8 tracks)</button>
+      <button class="big" id="stopAll" type="button">&#9632; STOP / REWIND</button>
+    </div>
+
+      <div class="track" id="track-01">
+        <h3><span class="tnum">01</span> VHS Horror Tape <span class="tdur">2:49</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2001%20VHS%20Horror%20Tape.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-02">
+        <h3><span class="tnum">02</span> Save Me Tonight <span class="tdur">4:05</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2002%20Save%20Me%20Tonight.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-03">
+        <h3><span class="tnum">03</span> Divide and Conquer <span class="tdur">3:44</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2003%20Divide%20and%20Conquer.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-04">
+        <h3><span class="tnum">04</span> Complicated Calculator <span class="tdur">3:52</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2004%20Complicated%20Calculator.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-05">
+        <h3><span class="tnum">05</span> The Creeps Come Out <span class="tdur">4:40</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2005%20The%20Creeps%20Come%20Out.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-06">
+        <h3><span class="tnum">06</span> Losing His Mind <span class="tdur">3:42</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2006%20Losing%20His%20Mind.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-07">
+        <h3><span class="tnum">07</span> Isolation <span class="tdur">3:48</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2007%20Isolation.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+      <div class="track" id="track-08">
+        <h3><span class="tnum">08</span> Days Turn Into Years <span class="tdur">4:32</span></h3>
+        <audio class="tap" preload="metadata" controls playsinline>
+          <source src="https://www.imortalimp.nl/bin/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape/ADAM%20TRISTAR%20-%20VHS%20Horror%20Tape%20-%2008%20Days%20Turn%20Into%20Years.mp3" type="audio/mpeg">
+        </audio>
+      </div>
+
+    <div class="bandcamp">
+      <p>PLEASE SUPPORT THE ARTIST ON BANDCAMP!<br>(even just listening there helps a lot)</p>
+      <a class="big" href="https://oraculorecords.bandcamp.com/album/vhs-horror-tape" target="_blank" rel="noopener">&#128190; VHS Horror Tape — Oraculo Records</a>
+      <div style="height:10px"></div>
+      <a class="big" href="https://adamtristar.bandcamp.com/" target="_blank" rel="noopener">&#127925; Adam Tristar — Bandcamp</a>
+      <div style="height:10px"></div>
+      <a class="big" href="https://oraculorecords.bandcamp.com/" target="_blank" rel="noopener">&#127911; Oraculo Records — Bandcamp</a>
+    </div>
+
+    <div class="tribute">
+      <p>A tribute to <strong>ADAM TRISTAR</strong> — and to every <strong>VHS HORROR TAPE(S)</strong> that ever hissed in the dark. Following “The Red Pill” and “Suicide Neighborhood”, <em>VHS Horror Tape</em> marks the next chapter in the sonic universe of Dutch synthwave wizard Adam Tristar (Daniel Spiekerman, Amsterdam): darker tones, gritty analog textures and a strong cinematic horror influence — late-night VHS aesthetics, neon-lit nightmares and retro-futuristic suspense. Released 23 January 2026 via <a href="https://oraculorecords.bandcamp.com/" target="_blank" rel="noopener">Oraculo Records</a> — 300 copies on 180 gr. vinyl, remastered for vinyl by Daniel Hallhuber at Young &amp; Cold Studios.</p>
+      <p>Be kind — rewind.</p>
+    </div>
+
+    <div class="wikis">
+      <h2>&#127909; WIKI INFO LINKS — “BRAIN DEAD” (1992): THE MOST WELL-KNOWN HORROR VHS TAPE EVER</h2>
+      <p class="note">Info-wikis on the horror movie <strong>Brain Dead</strong> — Peter Jackson’s 1992 splatter classic <em>Braindead</em> (US title: <em>Dead Alive</em>).</p>
+      <ul>
+        <li><a href="https://en.wikipedia.org/wiki/Braindead_(film)" target="_blank" rel="noopener">&#9654; Braindead (1992 film) — Wikipedia</a><span class="desc">The movie itself</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Dead_Alive" target="_blank" rel="noopener">&#9654; Dead Alive — US video-store title</a><span class="desc">Same tape, other clamshell</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Peter_Jackson" target="_blank" rel="noopener">&#9654; Peter Jackson — director</a><span class="desc">The man behind the rat-monkey</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Fran_Walsh" target="_blank" rel="noopener">&#9654; Fran Walsh — co-writer</a><span class="desc">Co-scripted the nightmare</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Stephen_Sinclair" target="_blank" rel="noopener">&#9654; Stephen Sinclair — co-writer</a><span class="desc">Originated the story idea</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Timothy_Balme" target="_blank" rel="noopener">&#9654; Timothy Balme — starring (Lionel)</a><span class="desc">Mum’s favourite son</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Diana_Pe%C3%B1alver" target="_blank" rel="noopener">&#9654; Diana Pe&#241;alver — starring (Paquita)</a><span class="desc">“I kick ass for the Lord!” era</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Bad_Taste" target="_blank" rel="noopener">&#9654; Bad Taste — Jackson’s 1987 debut</a><span class="desc">The warm-up act for the carnage</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Splatter_film" target="_blank" rel="noopener">&#9654; Splatter film — the genre</a><span class="desc">Where Brain Dead sits on the shelf</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/VHS" target="_blank" rel="noopener">&#9654; VHS — the format</a><span class="desc">The tape this page worships</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Video_nasty" target="_blank" rel="noopener">&#9654; Video nasty — the era</a><span class="desc">The moral panic that made these tapes legendary</span></li>
+        <li><a href="https://en.wikipedia.org/wiki/Brain_Dead_(1990_film)" target="_blank" rel="noopener">&#9654; Brain Dead (1990 film) — not to be confused</a><span class="desc">The other horror film with this title</span></li>
+      </ul>
+    </div>
+
+    <div class="links-row">
+      <a class="big" href="/media_page_MASTERFULLY_INTEGRATED_v5.html#vhs-horror-tape-showcase" target="_blank" rel="noopener">&#128421;&#65039; Open the showcase on the full desktop archive</a>
+      <a class="big" href="/media_page_MASTERFULLY_INTEGRATED_v5_MOBILE.html" target="_blank" rel="noopener">&#128241; Open the full mobile archive</a>
+    </div>
+
+    <p class="rewind">.&#8209;.[ PLEASE BE KIND, REWIND ].&#8209;.<br>THE TAPE REMEMBERS EVERYTHING YOU RENTED. STAY SPOOKY.</p>
+  </div>
+
+  <script>
+    (function () {
+      var players = Array.prototype.slice.call(document.querySelectorAll('audio.tap'));
+      var chainOn = false;
+      function clearStates() {
+        players.forEach(function (p) {
+          var t = p.closest('.track');
+          if (t) t.classList.remove('playing');
+        });
+      }
+      players.forEach(function (p, i) {
+        p.addEventListener('play', function () {
+          players.forEach(function (o) { if (o !== p) o.pause(); });
+          clearStates();
+          var t = p.closest('.track');
+          if (t) t.classList.add('playing');
+        });
+        p.addEventListener('pause', function () {
+          if (!chainOn) clearStates();
+        });
+        p.addEventListener('ended', function () {
+          if (!chainOn) { clearStates(); return; }
+          var next = players[i + 1];
+          if (next) {
+            next.play().catch(function () { chainOn = false; });
+          } else {
+            chainOn = false;
+            clearStates();
+          }
+        });
+      });
+      document.getElementById('playAll').addEventListener('click', function () {
+        chainOn = true;
+        var first = players[0];
+        if (first) {
+          first.currentTime = 0;
+          first.play().catch(function () { chainOn = false; });
+        }
+      });
+      document.getElementById('stopAll').addEventListener('click', function () {
+        chainOn = false;
+        players.forEach(function (p) { p.pause(); p.currentTime = 0; });
+        clearStates();
+      });
+    })();
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a46454759ba3febb',t:'MTc5MTI4NjE4Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

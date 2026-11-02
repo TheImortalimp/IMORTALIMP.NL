@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standalone Glitch Player</title>
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html{ overflow-y:auto; }
+
+body{
+    font-family:Segoe UI,Arial,sans-serif;
+    background:#000;
+    color:white;
+    min-height:100vh;
+    overflow-x:hidden;
+    overflow-y:auto;
+    padding:48px 0;
+}
+
+#matrix-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    pointer-events:auto;
+    z-index:1;
+}
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:repeating-linear-gradient(
+        transparent 0px,
+        rgba(255,255,255,.02) 1px,
+        transparent 3px
+    );
+    pointer-events:none;
+    animation:flicker .18s infinite;
+    z-index:2;
+}
+
+.vignette{
+    position:fixed;
+    inset:0;
+    background:radial-gradient(ellipse at center,
+        rgba(0,0,0,0) 20%,
+        rgba(0,0,0,.72) 100%
+    );
+    pointer-events:none;
+    z-index:3;
+}
+
+.container{
+    position:relative;
+    z-index:5;
+    display:grid;
+    gap:56px;
+    text-align:center;
+    width:min(900px,90%);
+    margin:0 auto;
+}
+
+.subtitle{
+    color:#bdbdbd;
+    margin:20px 0 32px;
+    letter-spacing:4px;
+    text-transform:uppercase;
+}
+
+.glitch,#glitch{
+    position:relative;
+    display:inline-block;
+    width:fit-content;
+    margin:0 auto;
+    font-size:clamp(3rem,7vw,5.5rem);
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:5px;
+}
+
+.glitch::before,.glitch::after,
+#glitch::before,#glitch::after{
+    content:attr(data-text);
+    position:absolute;
+    inset:0;
+}
+
+.glitch::before,#glitch::before{
+    color:#00ffff;
+    transform:translate(-2px,0);
+    mix-blend-mode:screen;
+    animation:glitch1 .6s infinite;
+}
+
+.glitch::after,#glitch::after{
+    color:#ff0066;
+    transform:translate(2px,0);
+    mix-blend-mode:screen;
+    animation:glitch2 .7s infinite;
+}
+
+.download{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:25px;
+    text-decoration:none;
+    color:white;
+    font-size:1.6rem;
+    font-weight:700;
+    padding:28px 42px;
+    border:2px solid #00ffee;
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(8px);
+    transition:.25s;
+    box-shadow:0 0 25px rgba(0,255,255,.15);
+}
+
+.download img{ width:72px; height:72px; image-rendering:auto; }
+
+.download:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 15px cyan, 0 0 35px cyan;
+    border-color:white;
+}
+
+.download:active{ transform:scale(.98); }
+
+.panel{ display:grid; gap:18px; justify-items:center; }
+
+@keyframes glitch1{
+0%  {clip-path:inset(0 0 80% 0);}
+20% {clip-path:inset(35% 0 20% 0);}
+40% {clip-path:inset(70% 0 5% 0);}
+60% {clip-path:inset(15% 0 45% 0);}
+80% {clip-path:inset(45% 0 15% 0);}
+100%{clip-path:inset(0 0 80% 0);}
+}
+
+@keyframes glitch2{
+0%  {clip-path:inset(75% 0 0 0);}
+20% {clip-path:inset(10% 0 60% 0);}
+40% {clip-path:inset(45% 0 15% 0);}
+60% {clip-path:inset(0 0 80% 0);}
+80% {clip-path:inset(30% 0 30% 0);}
+100%{clip-path:inset(75% 0 0 0);}
+}
+
+@keyframes flicker{
+0%,100%{opacity:.08;}
+50%    {opacity:.16;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix-canvas"></canvas>
+<div class="overlay"></div>
+<div class="vignette"></div>
+
+<main class="container">
+  <section class="panel">
+    <h1 class="glitch" data-text="Standalone Glitch Player r2-github">
+      Standalone Glitch Player r2-github
+    </h1>
+    <p class="subtitle">Minimal • Lightweight • Standalone</p>
+    <a class="download" href="standalone.glitch.glitch.player.r2-github.exe">
+      <img src="/icon.png" alt="Download">
+    </a>
+  </section>
+
+  <section class="panel">
+    <h1 class="glitch" data-text="Standalone Glitch Player river lyle reuveni co-pilot hardened ver2">
+      Standalone Glitch Player river lyle reuveni co-pilot hardened ver2
+    </h1>
+    <p class="subtitle">Minimal • Lightweight • Standalone</p>
+    <a class="download" href="Glitch-Player-Freeware-River-Lyle-Reuveni-and-copilot-20260801-1512.exe">
+      <img src="/icon.png" alt="Download">
+    </a>
+  </section>
+
+  <section class="panel">
+    <h1 class="glitch" data-text="Standalone Glitch Player-Version 3.3.0 R-4.0">
+      Standalone Glitch Player-Version 3.3.0 R-4.0
+    </h1>
+    <p class="subtitle">Minimal • Lightweight • Standalone</p>
+    <a class="download" href="Glitch-Player-Final R-4.0.exe">
+      <img src="/icon.png" alt="Download">
+    </a>
+  </section>
+
+  <section class="panel">
+    <h1 class="glitch" data-text="standalone-revision-R-final-1.0-package">
+      standalone-revision-R-final-1.0-package
+    </h1>
+    <p class="subtitle">Minimal • Lightweight • Standalone</p>
+    <a class="download" href="Alpha-User-Playtest/standalone-revision-R-final-1.0-package.zip">
+      <img src="/icon.png" alt="Download">
+    </a>
+  </section>
+</main>
+
+<script>
+(function () {
+
+/* ── Multi-script character pool (from ASCII Rainbow Grid) ── */
+const latin      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:"<>,./?`~ ';
+const cyrillic   = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+const greek      = 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω';
+const katakana   = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾ';
+const hebrew     = 'אבגדהוזחטיכךלמםנןסעפףצץקרשת';
+const arabic     = 'ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوي';
+const hangul     = 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ';
+const hanzi      = '的一是在不了有和人这中大为上个国我以要他时来用们生到作地于出就分子你说年着那她也得里后自会家可下而过天去能对小多然心学';
+const symbols    = '░▒▓─│┌┐└┘├┤┬┴┼═║╔╗╚╝╠╣╦╩╬▀▄█▌▐■□◆◇▲▼●○★☆←↑→↓×÷±≠≈≤≥∞√∑∏∫';
+const mathop     = '∀∂∃∆∇∎∙√∝∞∴∵⊕⊗⊙⊛⊜⊝⋄⋆⟑⟒⧜⧝⨝⨹⨺⨻⩤⩥⫶⫽≫∦ℵ⌘⎈';
+
+const allChars = (latin+cyrillic+greek+katakana+hebrew+arabic+hangul+hanzi+symbols+mathop).split('');
+function rndChar() { return allChars[Math.floor(Math.random() * allChars.length)]; }
+
+const canvas = document.getElementById('matrix-canvas');
+const ctx    = canvas.getContext('2d');
+
+/* ── Sizing ── */
+const FONT_SIZE = 20;   // original column width
+let W, H, COLS;
+
+/* ── Drop model (old-style falling columns) ── */
+// Each column has several independent drops, each with its own:
+//   y        — current row position (in font-size units)
+//   speed    — rows per frame multiplier
+//   length   — trail length in chars
+//   chars[]  — per-cell characters (refreshed randomly)
+//   hueBase  — starting hue for this drop
+let columns = [];   // columns[col] = array of drops
+
+function makeDrops(col) {
+    const count = 2 + Math.floor(Math.random() * 4);
+    const drops = [];
+    for (let i = 0; i < count; i++) {
+        drops.push({
+            y      : -(Math.random() * H / FONT_SIZE),   // start above screen
+            speed  : 0.4 + Math.random() * 0.8,          // slower — was 2-5 rows/frame; now 0.4-1.2
+            length : 8 + Math.floor(Math.random() * 18), // trail length in cells
+            chars  : [],
+            hueBase: Math.random() * 360,
+            charTimer: 0,
+        });
+    }
+    return drops;
+}
+
+function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width  = W;
+    canvas.height = H;
+    COLS = Math.floor(W / FONT_SIZE);
+    columns = [];
+    for (let c = 0; c < COLS; c++) columns.push(makeDrops(c));
+}
+window.addEventListener('resize', resize);
+resize();
+
+/* ── Interaction — parallax + ripple (from ASCII Rainbow Grid) ── */
+let mouseX = W/2, mouseY = H/2;
+let smoothMX = W/2, smoothMY = H/2;
+let isDown = false, dragSurge = 0;
+let lastDragX = W/2, lastDragY = H/2;
+let dragVelX = 0, dragVelY = 0, surgeTimer = 0;
+
+const ripples = [];
+function spawnRipple(x, y, str) { ripples.push({ x, y, age:0, maxAge:1.1, strength:str }); }
+function getXY(cx, cy) {
+    const r = canvas.getBoundingClientRect();
+    return [(cx - r.left)*(W/r.width), (cy - r.top)*(H/r.height)];
+}
+
+canvas.addEventListener('mousemove', e => {
+    [mouseX, mouseY] = getXY(e.clientX, e.clientY);
+    if (isDown) { dragVelX = mouseX-lastDragX; dragVelY = mouseY-lastDragY; lastDragX=mouseX; lastDragY=mouseY; }
+});
+canvas.addEventListener('mousedown', e => {
+    [mouseX, mouseY] = getXY(e.clientX, e.clientY);
+    lastDragX=mouseX; lastDragY=mouseY; dragVelX=dragVelY=0;
+    isDown=true; dragSurge=0.2; spawnRipple(mouseX, mouseY, 28);
+});
+canvas.addEventListener('mouseup',    () => { isDown=false; dragVelX=dragVelY=0; });
+canvas.addEventListener('mouseleave', () => { isDown=false; });
+canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const [tx,ty] = getXY(e.touches[0].clientX, e.touches[0].clientY);
+    if (isDown) { dragVelX=tx-lastDragX; dragVelY=ty-lastDragY; lastDragX=tx; lastDragY=ty; }
+    mouseX=tx; mouseY=ty;
+}, { passive:false });
+canvas.addEventListener('touchstart', e => {
+    const [tx,ty] = getXY(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    mouseX=tx; mouseY=ty; lastDragX=tx; lastDragY=ty; dragVelX=dragVelY=0;
+    isDown=true; dragSurge=0.2; spawnRipple(tx, ty, 28);
+}, { passive:true });
+canvas.addEventListener('touchend', () => { isDown=false; dragVelX=dragVelY=0; });
+
+/* ── Animation constants ── */
+const HUE_SPEED       = 18;    // degrees/second hue drift per column
+const SMOOTH_FACTOR   = 0.07;
+const PARALLAX_STR    = 12;    // max px aberration from mouse
+const CHAR_REFRESH    = 0.06;  // seconds between random char swaps in trail
+
+let lastTime = 0, time = 0;
+
+function loop(ts) {
+    const delta = Math.min((ts - lastTime) / 1000, 0.1);
+    lastTime = ts;
+    time    += delta;
+
+    /* ── Fade trail (old-style ghosting with semi-transparent fill) ── */
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(0, 0, W, H);
+
+    /* ── Advance ripples ── */
+    for (let i = ripples.length-1; i >= 0; i--) {
+        ripples[i].age += delta;
+        if (ripples[i].age >= ripples[i].maxAge) ripples.splice(i, 1);
+    }
+
+    /* ── Drag surge ── */
+    if (isDown) {
+        dragSurge = Math.min(1, dragSurge + delta * 1.65);
+        const spd  = Math.hypot(dragVelX, dragVelY);
+        const rate = 0.08 + (1 - Math.min(1, spd/12)) * 0.18;
+        surgeTimer += delta;
+        if (surgeTimer >= rate) {
+            surgeTimer = 0;
+            spawnRipple(mouseX, mouseY, 14 + dragSurge*20 + Math.min(spd,20)*0.8);
+        }
+        dragVelX *= 0.75; dragVelY *= 0.75;
+    } else {
+        dragSurge  = Math.max(0, dragSurge - delta*3.5);
+        surgeTimer = 0;
+    }
+
+    /* ── Smooth mouse for parallax ── */
+    smoothMX += (mouseX - smoothMX) * SMOOTH_FACTOR;
+    smoothMY += (mouseY - smoothMY) * SMOOTH_FACTOR;
+    const ndx  = (smoothMX - W/2) / Math.max(W/2, 1);
+    const ndy  = (smoothMY - H/2) / Math.max(H/2, 1);
+    const parX = ndx * PARALLAX_STR;
+    const parY = ndy * PARALLAX_STR;
+
+    ctx.font = `${FONT_SIZE}px "Segoe UI","Arial Unicode MS","Noto Sans",monospace`;
+    ctx.textAlign    = 'left';
+    ctx.textBaseline = 'top';
+
+    /* ── Draw each column's drops ── */
+    for (let col = 0; col < COLS; col++) {
+        const drops = columns[col];
+        const x     = col * FONT_SIZE;
+
+        for (let d = 0; d < drops.length; d++) {
+            const drop = drops[d];
+
+            // Advance position
+            drop.y += drop.speed;
+
+            // Refresh trail characters occasionally
+            drop.charTimer += delta;
+            if (drop.charTimer >= CHAR_REFRESH) {
+                drop.charTimer = 0;
+                // Top of trail always gets a new char
+                drop.chars[0] = rndChar();
+                // Randomly mutate one other cell in the trail
+                const ri = 1 + Math.floor(Math.random() * (drop.length - 1));
+                drop.chars[ri] = rndChar();
+            }
+            // Fill any uninitialised char slots
+            while (drop.chars.length < drop.length) drop.chars.push(rndChar());
+
+            // Reset when fully off-screen
+            if ((drop.y - drop.length) * FONT_SIZE > H) {
+                drop.y      = -(2 + Math.random() * 12);
+                drop.speed  = 0.4 + Math.random() * 0.8;
+                drop.length = 8  + Math.floor(Math.random() * 18);
+                drop.hueBase= Math.random() * 360;
+                drop.chars  = [];
+            }
+
+            /* ── Ripple aberration for this drop's head position ── */
+            const headX = x + FONT_SIZE/2;
+            const headY = drop.y * FONT_SIZE;
+            let ripX = 0, ripY = 0;
+            for (let k = 0; k < ripples.length; k++) {
+                const rp   = ripples[k];
+                const rdx  = headX - rp.x, rdy = headY - rp.y;
+                const dist = Math.hypot(rdx, rdy) || 1;
+                const ring = Math.abs(dist - rp.age * 420);
+                const fall = Math.max(0, 1 - ring/55);
+                const amp  = rp.strength * fall * (1 - rp.age/rp.maxAge);
+                ripX += (rdx/dist)*amp;
+                ripY += (rdy/dist)*amp;
+            }
+            const boost = 1 + dragSurge * 2.8;
+            const aX = parX * boost + ripX;
+            const aY = parY * boost * 0.6 + ripY * 0.6;
+
+            /* ── Draw trail cells ── */
+            for (let t = 0; t < drop.length; t++) {
+                const cellY = (drop.y - t) * FONT_SIZE;
+                if (cellY < -FONT_SIZE || cellY > H) continue;
+
+                const ch = drop.chars[t] || rndChar();
+
+                // Brightness: head is brightest, fades toward tail
+                const brightness = Math.pow(1 - t / drop.length, 1.6);
+                const alpha      = 0.15 + brightness * 0.85;
+
+                // Hue: column base + time drift + slight per-row offset
+                const hue = (drop.hueBase + time * HUE_SPEED + t * 4) % 360;
+
+                // Aberration magnitude scales with proximity to head
+                const aberMag = (t === 0 ? 1 : Math.max(0, 1 - t / 6)) * brightness;
+                const ax = aX * aberMag;
+                const ay = aY * aberMag;
+
+                // Red/cyan channel offset — head cell only gets full split,
+                // tail fades the split out naturally
+                ctx.globalAlpha = alpha * 0.80;
+                ctx.fillStyle   = `hsl(${hue}, 80%, 55%)`;
+                ctx.fillText(ch, x + ax, cellY + ay);
+
+                ctx.globalAlpha = alpha * 0.92;
+                ctx.fillStyle   = `hsl(${hue}, 90%, ${t === 0 ? 80 : 55}%)`;
+                ctx.fillText(ch, x, cellY);
+
+                ctx.globalAlpha = alpha * 0.80;
+                ctx.fillStyle   = `hsl(${(hue+30)%360}, 80%, 55%)`;
+                ctx.fillText(ch, x - ax, cellY - ay);
+            }
+
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    requestAnimationFrame(loop);
+}
+
+requestAnimationFrame(loop);
+
+// Fix glitch pseudo-element text
+document.querySelectorAll('.glitch, #glitch').forEach(el => {
+    el.setAttribute('data-text', el.textContent.trim().replace(/\s+/g, ' '));
+});
+
+})();
+</script>
+</body>
+</html>

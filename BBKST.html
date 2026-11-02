@@ -1,0 +1,1404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>BloodBath Kavkaz Soundtrack</title>
+  <style>
+    :root {
+      --bg-0: #050608;
+      --bg-1: #0b0f14;
+      --panel: rgba(10, 13, 18, 0.78);
+      --panel-strong: rgba(11, 15, 22, 0.92);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #f1efe9;
+      --muted: rgba(241, 239, 233, 0.68);
+      --red: #ff3b2f;
+      --amber: #ff9b1f;
+      --gold: #ffd36a;
+      --green: #58ff9a;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.48);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(255, 59, 47, 0.22), transparent 32%),
+        radial-gradient(circle at 80% 12%, rgba(255, 155, 31, 0.16), transparent 24%),
+        radial-gradient(circle at 50% 50%, rgba(88, 255, 154, 0.07), transparent 30%),
+        linear-gradient(135deg, #040507 0%, #090c10 40%, #140909 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "Trebuchet MS", "Helvetica Neue", Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      background:
+        repeating-linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.025) 0,
+          rgba(255, 255, 255, 0.025) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      mix-blend-mode: screen;
+      opacity: 0.36;
+    }
+
+    body::after {
+      background:
+        linear-gradient(90deg, transparent 0, rgba(255, 59, 47, 0.08) 50%, transparent 100%);
+      mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 18%, rgba(0, 0, 0, 0.8) 82%, transparent 100%);
+      animation: sweep 14s linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes sweep {
+      from { transform: translateY(-20%); }
+      to { transform: translateY(20%); }
+    }
+
+    .frame {
+      position: relative;
+      z-index: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(280px, 460px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: stretch;
+      min-height: 320px;
+    }
+
+    .art-panel,
+    .control-panel,
+    .library-panel,
+    .section-panel {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(16, 20, 27, 0.9), rgba(7, 9, 13, 0.88));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .art-panel::before,
+    .control-panel::before,
+    .library-panel::before,
+    .section-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255, 59, 47, 0.1), transparent 22%, transparent 78%, rgba(255, 155, 31, 0.08));
+    }
+
+    .art-panel {
+      display: grid;
+      grid-template-rows: minmax(220px, 1fr) auto;
+    }
+
+    .art {
+      position: relative;
+      min-height: 280px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 211, 106, 0.26), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(255, 59, 47, 0.28), transparent 24%),
+        linear-gradient(135deg, rgba(17, 23, 31, 0.98), rgba(6, 8, 11, 0.72));
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    .art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.78;
+      mix-blend-mode: screen;
+      filter: saturate(1.08) contrast(1.1) brightness(0.72);
+    }
+
+    .art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.66)),
+        radial-gradient(circle at 50% 35%, transparent 0 24%, rgba(255, 59, 47, 0.08) 60%, transparent 72%);
+      mix-blend-mode: multiply;
+    }
+
+    .title-block {
+      padding: 18px 20px 20px;
+      display: grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--red), #8b0900);
+      box-shadow: 0 0 20px rgba(255, 59, 47, 0.8);
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 4.2rem);
+      line-height: 0.94;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      text-wrap: balance;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 48ch;
+      line-height: 1.5;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .chip strong {
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .control-panel {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+      align-content: space-between;
+    }
+
+    .now-playing {
+      display: grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .now-playing .label {
+      color: var(--green);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+    }
+
+    .track-name {
+      font-size: clamp(1.4rem, 2.2vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      text-wrap: balance;
+    }
+
+    .track-subtitle {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .transport {
+      display: grid;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress {
+      display: grid;
+      gap: 8px;
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(241, 239, 233, 0.72);
+      font-size: 0.85rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+      overflow: hidden;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff, var(--gold) 48%, #c36300 100%);
+      border: 0;
+      box-shadow: 0 0 0 8px rgba(255, 155, 31, 0.14);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 0;
+      background: radial-gradient(circle at 35% 35%, #fff, var(--gold) 48%, #c36300 100%);
+      box-shadow: 0 0 0 8px rgba(255, 155, 31, 0.14);
+      cursor: pointer;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 14px;
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+      user-select: none;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 155, 31, 0.5);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .primary {
+      background: linear-gradient(180deg, rgba(255, 59, 47, 0.92), rgba(165, 9, 0, 0.92));
+      border-color: rgba(255, 59, 47, 0.5);
+    }
+
+    .danger {
+      background: linear-gradient(180deg, rgba(35, 8, 7, 0.98), rgba(95, 16, 10, 0.96));
+      border-color: rgba(255, 85, 73, 0.45);
+    }
+
+    .toggle.active {
+      background: linear-gradient(180deg, rgba(88, 255, 154, 0.18), rgba(26, 62, 43, 0.9));
+      border-color: rgba(88, 255, 154, 0.5);
+    }
+
+    .audio-meter {
+      display: grid;
+      grid-template-columns: repeat(28, minmax(0, 1fr));
+      gap: 3px;
+      align-items: end;
+      height: 82px;
+      padding: 2px 0 0;
+    }
+
+    .viz-wrap {
+      margin-top: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(5, 8, 12, 0.78), rgba(2, 4, 6, 0.95));
+      overflow: hidden;
+    }
+
+    .viz-canvas {
+      width: 100%;
+      height: 96px;
+      display: block;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 45%),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 18px);
+    }
+
+    .viz-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(241, 239, 233, 0.55);
+      padding: 8px 12px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .bar {
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--gold), var(--red));
+      min-height: 7px;
+      transition: height 72ms linear, opacity 72ms linear;
+      opacity: 0.86;
+      box-shadow: 0 0 10px rgba(255, 100, 45, 0.28);
+    }
+
+    .library-panel {
+      margin-top: 20px;
+      padding: 18px;
+    }
+
+    .library-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .library-header h2 {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    .search {
+      min-width: min(100%, 360px);
+      display: grid;
+      gap: 8px;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(3, 4, 6, 0.76);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    .search input::placeholder {
+      color: rgba(241, 239, 233, 0.45);
+    }
+
+    .folder-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .section-panel {
+      padding: 16px;
+      border-radius: 20px;
+    }
+
+    .folder-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .folder-head h3 {
+      font-size: 1.05rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .folder-head span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .track-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .track-list li button {
+      width: 100%;
+      text-align: left;
+      min-height: 62px;
+      display: grid;
+      gap: 6px;
+      align-content: center;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .track-list li button .folder-name {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(241, 239, 233, 0.6);
+    }
+
+    .track-list li button .track-title {
+      font-size: 0.96rem;
+      line-height: 1.2;
+    }
+
+    .track-list li button.active {
+      background: linear-gradient(180deg, rgba(255, 155, 31, 0.16), rgba(255, 59, 47, 0.08));
+      border-color: rgba(255, 155, 31, 0.52);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .track-list li[hidden],
+    .section-panel[hidden] {
+      display: none !important;
+    }
+
+    .folder-accent-dlc { --folder-accent: #ff9b1f; }
+    .folder-accent-official { --folder-accent: #ff3b2f; }
+    .folder-accent-radio { --folder-accent: #58ff9a; }
+    .folder-accent-bonus { --folder-accent: #ffd36a; }
+
+    .section-panel {
+      --folder-accent: var(--gold);
+    }
+
+    .section-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto 14px 14px auto;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--folder-accent) 48%, transparent), transparent 68%);
+      filter: blur(2px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: rgba(241, 239, 233, 0.58);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(241, 239, 233, 0.8);
+      font-size: 0.86rem;
+      margin-top: 2px;
+    }
+
+    .status i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 14px rgba(255, 59, 47, 0.8);
+      display: inline-block;
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .art {
+        min-height: 250px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .frame {
+        padding: 14px;
+      }
+
+      .track-list {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row button {
+        flex: 1 1 calc(50% - 10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <section class="hero">
+      <div class="art-panel">
+        <div class="art">
+          <img id="artImage" src="Cover.jpg" alt="Bloodbath Kavkaz cover art">
+        </div>
+        <div class="title-block">
+          <div class="eyebrow">Soundtrack combat console</div>
+          <h1>BloodBath Kavkaz</h1>
+          <p class="subtitle">Single-page local MP3 commander for the full folder tree. Tracks are grouped by release, styled per collection, and start at a conservative volume so the system does not get blasted while everything is already under stress.</p>
+          <div class="meta-row">
+            <div class="chip"><strong id="totalTracks">0</strong> tracks loaded</div>
+            <div class="chip"><strong id="folderCount">0</strong> folders mapped</div>
+            <div class="chip"><strong id="currentFolderName">Ready</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-panel" id="appShell">
+        <div class="now-playing">
+          <div class="label">Now deploying</div>
+          <div class="track-name" id="trackName">Select a track</div>
+          <div class="track-subtitle" id="trackSubtitle">Use the playlist below to start playback. Volume defaults to safe mode.</div>
+          <div class="status"><i></i><span id="statusText">Safe volume armed. Autoplay is off.</span></div>
+        </div>
+
+        <div class="transport">
+          <div class="progress">
+            <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+            <input id="seek" type="range" min="0" max="1000" value="0" aria-label="Seek track">
+          </div>
+
+          <div class="button-row">
+            <button id="prevBtn" type="button">Prev</button>
+            <button id="playBtn" type="button" class="primary">Play</button>
+            <button id="nextBtn" type="button">Next</button>
+            <button id="shuffleBtn" type="button" class="toggle">Shuffle</button>
+            <button id="repeatBtn" type="button" class="toggle">Repeat</button>
+            <button id="muteBtn" type="button" class="danger">Panic Mute</button>
+          </div>
+
+          <div class="progress">
+            <div class="time-row"><span>Volume</span><span id="volumeLabel">18%</span></div>
+            <input id="volume" type="range" min="0" max="100" value="18" aria-label="Volume control">
+          </div>
+
+          <div class="audio-meter" id="meter" aria-hidden="true"></div>
+          <div class="viz-wrap" aria-hidden="true">
+            <canvas id="spectrumCanvas" class="viz-canvas"></canvas>
+            <div class="viz-labels"><span>20hz</span><span>1khz</span><span>20khz</span></div>
+          </div>
+        </div>
+
+        <audio id="audio" preload="auto"></audio>
+      </div>
+    </section>
+
+    <section class="library-panel">
+      <div class="library-header">
+        <h2>Playlist Array</h2>
+        <div class="search">
+          <input id="search" type="search" placeholder="Filter tracks or folders">
+        </div>
+      </div>
+
+      <div class="folder-grid" id="library"></div>
+
+      <p class="footer-note">If your audio system is being hammered, keep the volume low and use Panic Mute as the hard stop. Everything here stays local to this folder tree and does not rely on a remote server.</p>
+    </section>
+  </div>
+
+  <script>
+    const baseFolders = [
+      {
+        key: "official",
+        title: "Bloodbath Kavkaz Official Soundtrack",
+        subtitle: "Main release",
+        accentClass: "folder-accent-official",
+        tracks: [
+          "ALTWAVE - Burning September.mp3",
+          "ALTWAVE - Heart ♥.mp3",
+          "ALTWAVE - Incoming Transmission.mp3",
+          "ALTWAVE - Miami.mp3",
+          "ALTWAVE - Solitude.mp3",
+          "ALTWAVE - The Bloody Terek.mp3",
+          "E. Delta - Guitar Tears.mp3",
+          "E. Delta - Hipper.mp3",
+          "E. Delta - Pilot is Dead.mp3",
+          "E. Delta - Trip-Loop.mp3",
+          "E. Delta - Wind.mp3",
+          "E. Delta- TAABITSCC.mp3",
+          "GLWZBLL - 90 Sketch.mp3",
+          "GLWZBLL - Classic Masked Robbery.mp3",
+          "GLWZBLL - Cleaning Service.mp3",
+          "GLWZBLL - Fancy Way to Use the Butterfly Doors.mp3",
+          "GLWZBLL - Fear and Regreat.mp3",
+          "GLWZBLL - Filler Track.mp3",
+          "GLWZBLL - Friendly Fire.mp3",
+          "GLWZBLL - Genric Club Heis Song.mp3",
+          "GLWZBLL - Getaway Gone Bad.mp3",
+          "GLWZBLL - How to Hide a Knife.mp3",
+          "GLWZBLL - Infernus II.mp3",
+          "GLWZBLL - Lovers Gone.mp3",
+          "GLWZBLL - Me.mp3",
+          "GLWZBLL - Sleepy Lane.mp3",
+          "GLWZBLL - World Eater.mp3",
+          "GLWZBLL - You.mp3",
+          "Saiga - Ranch Hand.mp3",
+          "Vakhtang Zimmer - Vibrator.mp3",
+          "Vakhtang Zimmer - Blood Orgy.mp3",
+          "Vakhtang Zimmer - Credits.mp3",
+          "Vakhtang Zimmer - Hair.mp3",
+          "Vakhtang Zimmer - Hole Im A Brain.mp3",
+          "Vakhtang Zimmer - Menu Theme.mp3",
+          "Vakhtang Zimmer - Requem.mp3",
+          "Широкие Молнии - Анус с Блёстками.mp3",
+          "Широкие Молнии - Пластилиновый Ананас.mp3"
+        ]
+      },
+      {
+        key: "radio",
+        title: "Bloodbath Kavkaz Radio mix Vol.1",
+        subtitle: "Broadcast set",
+        accentClass: "folder-accent-radio",
+        tracks: [
+          "DelFine - Agony.mp3",
+          "DelFine - Dead Winter.mp3",
+          "DelFine - Metalophone.mp3",
+          "DelFine - Music of Mashine.mp3",
+          "DelFine - Need For Sweet.mp3",
+          "DelFine - Okinawa sun.mp3",
+          "DelFine - Orion.mp3",
+          "DelFine - Polar Lights.mp3",
+          "Delfine - The Wall.mp3",
+          "DelFine - Way Home.mp3",
+          "DelFine - Последний выдох Господина ПЖ.mp3",
+          "Eternity Vision - Flow.mp3"
+        ]
+      },
+      {
+        key: "dlc",
+        title: "Bloodbath Kavkaz DLC Soundtrack",
+        subtitle: "Expansion set",
+        accentClass: "folder-accent-dlc",
+        tracks: [
+          "GLWZBLL - I Know Better.mp3",
+          "GLWZBLL - Leaving Tokyo.mp3",
+          "GLWZBLL - Odd Pill.mp3",
+          "GLWZBLL - RUN sketch.mp3",
+          "GLWZBLL - Untitled 13.mp3"
+        ]
+      },
+      {
+        key: "bonus",
+        title: "Bonus Tracks",
+        subtitle: "Extra drops",
+        accentClass: "folder-accent-bonus",
+        tracks: [
+          "ALTWAVE - Can I talk to you (bonus track).mp3",
+          "ALTWAVE - The Retromobile (bonus track).mp3",
+          "GLWZBLL - I Know Better (bonus track).mp3",
+          "GLWZBLL - MIDI (bonus track).mp3"
+        ]
+      }
+    ];
+
+    const folderPaths = {
+      official: "Bloodbath Kavkaz Official Soundtrack",
+      radio: "Bloodbath Kavkaz Radio mix Vol.1",
+      dlc: "Bloodbath Kavkaz DLC Soundtrack",
+      bonus: "Bonus Tracks"
+    };
+
+    const folderArtworkCandidates = {
+      official: [
+        "Bloodbath Kavkaz Official Soundtrack/Folder.jpg",
+        "Bloodbath Kavkaz Official Soundtrack/AlbumArtSmall.jpg",
+        "Cover.jpg"
+      ],
+      radio: [
+        "Bloodbath Kavkaz Radio mix Vol.1/Folder.jpg",
+        "Bloodbath Kavkaz Radio mix Vol.1/AlbumArtSmall.jpg",
+        "Cover.jpg"
+      ],
+      dlc: [
+        "Bloodbath Kavkaz DLC Soundtrack/Cover.jpg",
+        "Bloodbath Kavkaz DLC Soundtrack/Folder.jpg",
+        "Bloodbath Kavkaz DLC Soundtrack/AlbumArtSmall.jpg",
+        "Cover.jpg"
+      ],
+      bonus: [
+        "Bonus Tracks/Folder.jpg",
+        "Bonus Tracks/AlbumArtSmall.jpg",
+        "Cover.jpg"
+      ]
+    };
+
+    const audio = document.getElementById("audio");
+    const artImage = document.getElementById("artImage");
+    const library = document.getElementById("library");
+    const meter = document.getElementById("meter");
+    const spectrumCanvas = document.getElementById("spectrumCanvas");
+    const appShell = document.getElementById("appShell");
+    const seek = document.getElementById("seek");
+    const volume = document.getElementById("volume");
+    const volumeLabel = document.getElementById("volumeLabel");
+    const playBtn = document.getElementById("playBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const repeatBtn = document.getElementById("repeatBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const search = document.getElementById("search");
+    const trackName = document.getElementById("trackName");
+    const trackSubtitle = document.getElementById("trackSubtitle");
+    const currentTime = document.getElementById("currentTime");
+    const duration = document.getElementById("duration");
+    const statusText = document.getElementById("statusText");
+    const currentFolderName = document.getElementById("currentFolderName");
+    const totalTracks = document.getElementById("totalTracks");
+    const folderCount = document.getElementById("folderCount");
+
+    const playlist = [];
+    const buttonRefs = new Map();
+    let currentIndex = -1;
+    let isShuffle = false;
+    let isRepeating = false;
+    let panicMuted = false;
+    let lastVolume = 0.18;
+    let playRequested = false;
+    let audioContext = null;
+    let sourceNode = null;
+    let analyserNode = null;
+    let frequencyData = null;
+    let visualizerFrame = 0;
+    let meterBars = [];
+    let eqBandEdges = [];
+    let eqLevels = [];
+    let eqPeaks = [];
+
+    function makeUrl(folderKey, fileName) {
+      const folder = folderPaths[folderKey];
+      return new URL(`${folder}/${fileName}`, window.location.href).toString();
+    }
+
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds) || seconds < 0) {
+        return "0:00";
+      }
+      const whole = Math.floor(seconds);
+      const minutes = Math.floor(whole / 60);
+      const remaining = String(whole % 60).padStart(2, "0");
+      return `${minutes}:${remaining}`;
+    }
+
+    function updateMeterState() {
+      appShell.classList.toggle("playing", !audio.paused && !audio.ended);
+    }
+
+    function setArtworkFromCandidates(candidates) {
+      if (!artImage || !Array.isArray(candidates) || !candidates.length) {
+        return;
+      }
+
+      let pointer = 0;
+      const tryNext = () => {
+        if (pointer >= candidates.length) {
+          return;
+        }
+        const nextSource = candidates[pointer];
+        pointer += 1;
+        artImage.src = new URL(nextSource, window.location.href).toString();
+      };
+
+      artImage.onerror = () => {
+        tryNext();
+      };
+
+      artImage.onload = () => {
+        artImage.onerror = null;
+      };
+
+      tryNext();
+    }
+
+    function updateArtwork(track) {
+      if (!track) {
+        setArtworkFromCandidates(["Cover.jpg"]);
+        return;
+      }
+
+      const folderCandidates = folderArtworkCandidates[track.folderKey] || ["Cover.jpg"];
+      setArtworkFromCandidates(folderCandidates);
+    }
+
+    function ensureAudioGraph() {
+      if (analyserNode) {
+        return true;
+      }
+
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        return false;
+      }
+
+      audioContext = new AudioCtx();
+      sourceNode = audioContext.createMediaElementSource(audio);
+      analyserNode = audioContext.createAnalyser();
+      analyserNode.fftSize = 2048;
+      analyserNode.smoothingTimeConstant = 0.82;
+      sourceNode.connect(analyserNode);
+      analyserNode.connect(audioContext.destination);
+      frequencyData = new Uint8Array(analyserNode.frequencyBinCount);
+      buildEqBandEdges();
+      return true;
+    }
+
+    function resizeSpectrumCanvas() {
+      if (!spectrumCanvas) {
+        return;
+      }
+      const dpr = window.devicePixelRatio || 1;
+      const width = Math.floor(spectrumCanvas.clientWidth);
+      const height = Math.floor(spectrumCanvas.clientHeight);
+      spectrumCanvas.width = Math.max(1, Math.floor(width * dpr));
+      spectrumCanvas.height = Math.max(1, Math.floor(height * dpr));
+    }
+
+    function buildEqBandEdges() {
+      const bandCount = Math.max(1, meterBars.length || 28);
+      const maxIndex = Math.max(1, frequencyData ? frequencyData.length - 1 : 1023);
+      const rawEdges = [];
+
+      for (let i = 0; i <= bandCount; i += 1) {
+        const t = i / bandCount;
+        const curved = Math.pow(t, 2.32);
+        rawEdges.push(Math.floor(curved * maxIndex));
+      }
+
+      rawEdges[0] = 0;
+      rawEdges[rawEdges.length - 1] = maxIndex;
+      for (let i = 1; i < rawEdges.length; i += 1) {
+        if (rawEdges[i] <= rawEdges[i - 1]) {
+          rawEdges[i] = Math.min(maxIndex, rawEdges[i - 1] + 1);
+        }
+      }
+
+      eqBandEdges = rawEdges;
+      eqLevels = new Array(bandCount).fill(0);
+      eqPeaks = new Array(bandCount).fill(0);
+    }
+
+    function resetVisualizer() {
+      meterBars.forEach((bar) => {
+        bar.style.height = "8px";
+        bar.style.opacity = "0.35";
+      });
+      eqLevels = meterBars.map(() => 0);
+      eqPeaks = meterBars.map(() => 0);
+
+      if (!spectrumCanvas) {
+        return;
+      }
+
+      const ctx = spectrumCanvas.getContext("2d");
+      if (!ctx) {
+        return;
+      }
+
+      const dpr = window.devicePixelRatio || 1;
+      const width = spectrumCanvas.width / dpr;
+      const height = spectrumCanvas.height / dpr;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+
+      const background = ctx.createLinearGradient(0, 0, 0, height);
+      background.addColorStop(0, "rgba(8, 14, 22, 0.95)");
+      background.addColorStop(1, "rgba(3, 6, 9, 0.98)");
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.07)";
+      for (let x = 0; x < width; x += 18) {
+        ctx.fillRect(x, 0, 1, height);
+      }
+      for (let y = 0; y < height; y += 16) {
+        ctx.fillRect(0, y, width, 1);
+      }
+
+      ctx.fillStyle = "rgba(241, 239, 233, 0.25)";
+      ctx.fillRect(0, height - 2, width, 2);
+    }
+
+    function drawVisualizer() {
+      if (!analyserNode || !frequencyData) {
+        return;
+      }
+
+      analyserNode.getByteFrequencyData(frequencyData);
+
+      const meterHeight = Math.max(40, meter.clientHeight || 82);
+      meterBars.forEach((bar, index) => {
+        const start = eqBandEdges[index] ?? 0;
+        const end = eqBandEdges[index + 1] ?? frequencyData.length;
+        let sum = 0;
+        for (let i = start; i < end; i += 1) {
+          sum += frequencyData[i];
+        }
+        const average = sum / Math.max(1, end - start);
+        const normalized = Math.pow(average / 255, 0.9);
+        const smoothed = Math.max(normalized, (eqLevels[index] || 0) * 0.82);
+        const peak = Math.max(smoothed, (eqPeaks[index] || 0) - 0.022);
+        eqLevels[index] = smoothed;
+        eqPeaks[index] = peak;
+
+        const levelPx = 7 + (smoothed * (meterHeight - 10));
+        const peakBoost = peak > smoothed ? Math.min(5, (peak - smoothed) * 18) : 0;
+        bar.style.height = `${Math.max(7, Math.round(levelPx + peakBoost))}px`;
+        bar.style.opacity = String(0.42 + smoothed * 0.58);
+      });
+
+      if (spectrumCanvas) {
+        const ctx = spectrumCanvas.getContext("2d");
+        if (ctx) {
+          const dpr = window.devicePixelRatio || 1;
+          const width = spectrumCanvas.width / dpr;
+          const height = spectrumCanvas.height / dpr;
+
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const sliceWidth = 2;
+          ctx.drawImage(spectrumCanvas, -sliceWidth, 0, width, height);
+          ctx.fillStyle = "rgba(3, 7, 11, 0.08)";
+          ctx.fillRect(0, 0, width, height);
+
+          const rightEdge = width - sliceWidth;
+          for (let y = 0; y < height; y += 1) {
+            const fromBottom = 1 - (y / Math.max(1, height - 1));
+            const frequencyIndex = Math.floor(Math.pow(fromBottom, 2.28) * (frequencyData.length - 1));
+            const energy = frequencyData[frequencyIndex] / 255;
+            const compressed = Math.pow(energy, 0.78);
+            const hue = 226 - (compressed * 230);
+            const lightness = 8 + (compressed * 60);
+            const alpha = 0.14 + (compressed * 0.92);
+            ctx.fillStyle = `hsla(${hue}, 98%, ${lightness}%, ${alpha})`;
+            ctx.fillRect(rightEdge, y, sliceWidth, 1);
+
+            if (compressed > 0.68 && y > 0) {
+              ctx.fillStyle = `hsla(${Math.max(0, hue - 28)}, 96%, ${Math.min(85, lightness + 16)}%, 0.24)`;
+              ctx.fillRect(rightEdge, y - 1, sliceWidth, 1);
+            }
+          }
+
+          ctx.fillStyle = "rgba(241, 239, 233, 0.12)";
+          for (let y = 0; y < height; y += 16) {
+            ctx.fillRect(0, y, width, 1);
+          }
+
+          ctx.fillStyle = "rgba(241, 239, 233, 0.24)";
+          ctx.fillRect(0, height - 2, width, 2);
+        }
+      }
+
+      if (!audio.paused && !audio.ended) {
+        visualizerFrame = window.requestAnimationFrame(drawVisualizer);
+      }
+    }
+
+    async function startVisualizer() {
+      const canAnalyze = ensureAudioGraph();
+      if (!canAnalyze) {
+        return;
+      }
+
+      if (audioContext && audioContext.state === "suspended") {
+        try {
+          await audioContext.resume();
+        } catch (error) {
+          return;
+        }
+      }
+
+      if (visualizerFrame) {
+        window.cancelAnimationFrame(visualizerFrame);
+      }
+      drawVisualizer();
+    }
+
+    function stopVisualizer() {
+      if (visualizerFrame) {
+        window.cancelAnimationFrame(visualizerFrame);
+        visualizerFrame = 0;
+      }
+      resetVisualizer();
+    }
+
+    function updateMetaDisplay(track) {
+      if (!track) {
+        trackName.textContent = "Select a track";
+        trackSubtitle.textContent = "Use the playlist below to start playback. Volume defaults to safe mode.";
+        currentFolderName.textContent = "Ready";
+        statusText.textContent = "Safe volume armed. Autoplay is off.";
+        updateArtwork(null);
+        return;
+      }
+
+      trackName.textContent = track.title;
+      trackSubtitle.textContent = `${track.folderTitle} · ${track.indexInFolder + 1} / ${track.folderTotal}`;
+      currentFolderName.textContent = track.folderTitle;
+      statusText.textContent = audio.muted ? "Muted. Press Play when you are ready." : "Audio armed.";
+      updateArtwork(track);
+    }
+
+    function setActiveButton(index) {
+      buttonRefs.forEach((button) => button.classList.remove("active"));
+      const active = buttonRefs.get(index);
+      if (active) {
+        active.classList.add("active");
+      }
+    }
+
+    function selectTrack(index, shouldPlay = true) {
+      if (index < 0 || index >= playlist.length) {
+        return;
+      }
+
+      currentIndex = index;
+      const track = playlist[currentIndex];
+      audio.pause();
+      audio.currentTime = 0;
+      audio.src = track.url;
+      updateMetaDisplay(track);
+      setActiveButton(index);
+      seek.value = 0;
+      currentTime.textContent = "0:00";
+      duration.textContent = "0:00";
+
+      if (shouldPlay) {
+        window.setTimeout(() => playCurrent(), 0);
+      }
+    }
+
+    async function playCurrent() {
+      if (currentIndex < 0 && playlist.length) {
+        selectTrack(0, false);
+      }
+
+      if (!audio.src && currentIndex >= 0) {
+        audio.src = playlist[currentIndex].url;
+      }
+
+      if (!audio.src) {
+        statusText.textContent = "Select a track to begin playback.";
+        return;
+      }
+
+      try {
+        if (audio.readyState < 2) {
+          audio.load();
+          await Promise.race([
+            new Promise((resolve) => {
+              const onReady = () => {
+                audio.removeEventListener("canplay", onReady);
+                audio.removeEventListener("loadedmetadata", onReady);
+                resolve();
+              };
+              audio.addEventListener("canplay", onReady, { once: true });
+              audio.addEventListener("loadedmetadata", onReady, { once: true });
+            }),
+            new Promise((resolve) => window.setTimeout(resolve, 1200))
+          ]);
+        }
+
+        playRequested = true;
+        await audio.play();
+        await startVisualizer();
+        playBtn.textContent = "Pause";
+        statusText.textContent = audio.muted ? "Playback live, muted." : "Playback live. Use the mute button if the system gets overloaded.";
+      } catch (error) {
+        playRequested = false;
+        statusText.textContent = "Playback blocked until the browser grants audio permission.";
+      }
+      updateMeterState();
+    }
+
+    function pauseCurrent() {
+      audio.pause();
+      playBtn.textContent = "Play";
+      statusText.textContent = "Paused.";
+      updateMeterState();
+    }
+
+    function nextTrack() {
+      if (!playlist.length) {
+        return;
+      }
+
+      if (isShuffle) {
+        if (playlist.length === 1) {
+          selectTrack(0);
+          return;
+        }
+        let nextIndex = currentIndex;
+        while (nextIndex === currentIndex) {
+          nextIndex = Math.floor(Math.random() * playlist.length);
+        }
+        selectTrack(nextIndex);
+        return;
+      }
+
+      const nextIndex = currentIndex + 1 < playlist.length ? currentIndex + 1 : (isRepeating ? 0 : currentIndex);
+      if (nextIndex !== currentIndex) {
+        selectTrack(nextIndex);
+      } else if (!isRepeating) {
+        pauseCurrent();
+        audio.currentTime = 0;
+      }
+    }
+
+    function previousTrack() {
+      if (!playlist.length) {
+        return;
+      }
+
+      if (audio.currentTime > 3) {
+        audio.currentTime = 0;
+        return;
+      }
+
+      const previousIndex = currentIndex > 0 ? currentIndex - 1 : (isRepeating ? playlist.length - 1 : 0);
+      selectTrack(previousIndex);
+    }
+
+    function applySearch() {
+      const term = search.value.trim().toLowerCase();
+      document.querySelectorAll(".section-panel").forEach(section => {
+        let visibleCount = 0;
+        const sectionMatches = section.dataset.folderTitle.toLowerCase().includes(term);
+        section.querySelectorAll("li").forEach(item => {
+          const button = item.querySelector("button");
+          const match = !term || sectionMatches || button.dataset.search.includes(term);
+          item.hidden = !match;
+          if (match) {
+            visibleCount += 1;
+          }
+        });
+        section.hidden = visibleCount === 0;
+      });
+    }
+
+    function buildLibrary() {
+      let totalCount = 0;
+
+      baseFolders.forEach(folder => {
+        const section = document.createElement("section");
+        section.className = `section-panel ${folder.accentClass}`;
+        section.dataset.folderTitle = folder.title;
+
+        const header = document.createElement("div");
+        header.className = "folder-head";
+        header.innerHTML = `<h3>${folder.title}</h3><span>${folder.subtitle}</span>`;
+
+        const list = document.createElement("ul");
+        list.className = "track-list";
+
+        folder.tracks.forEach((fileName, folderIndex) => {
+          const track = {
+            title: fileName.replace(/\.mp3$/i, ""),
+            fileName,
+            folderKey: folder.key,
+            folderTitle: folder.title,
+            indexInFolder: folderIndex,
+            folderTotal: folder.tracks.length,
+            url: makeUrl(folder.key, fileName)
+          };
+
+          const index = playlist.push(track) - 1;
+          totalCount += 1;
+
+          const listItem = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.dataset.search = `${track.title} ${track.folderTitle}`.toLowerCase();
+          button.innerHTML = `<span class="folder-name">${folder.subtitle}</span><span class="track-title">${track.title}</span>`;
+          button.addEventListener("click", () => selectTrack(index));
+
+          buttonRefs.set(index, button);
+          listItem.appendChild(button);
+          list.appendChild(listItem);
+        });
+
+        section.appendChild(header);
+        section.appendChild(list);
+        library.appendChild(section);
+      });
+
+      totalTracks.textContent = String(totalCount);
+      folderCount.textContent = String(baseFolders.length);
+    }
+
+    function buildMeter() {
+      const barHeights = [16, 20, 24, 28, 34, 38, 44, 50, 56, 62, 58, 54, 48, 44, 42, 46, 50, 55, 60, 56, 50, 45, 40, 36, 30, 24, 20, 16];
+      meter.innerHTML = barHeights.map((height) => `<span class="bar" style="height:${height}px"></span>`).join("");
+      meterBars = Array.from(meter.querySelectorAll(".bar"));
+      buildEqBandEdges();
+      resetVisualizer();
+    }
+
+    function syncControls() {
+      seek.addEventListener("input", () => {
+        if (!audio.duration) {
+          return;
+        }
+        audio.currentTime = (seek.value / 1000) * audio.duration;
+      });
+
+      volume.addEventListener("input", () => {
+        const value = Number(volume.value) / 100;
+        audio.volume = value;
+        audio.muted = false;
+        panicMuted = false;
+        muteBtn.textContent = "Panic Mute";
+        lastVolume = value;
+        volumeLabel.textContent = `${Math.round(value * 100)}%`;
+      });
+
+      playBtn.addEventListener("click", () => {
+        if (audio.paused) {
+          playCurrent();
+        } else {
+          pauseCurrent();
+        }
+      });
+
+      nextBtn.addEventListener("click", nextTrack);
+      prevBtn.addEventListener("click", previousTrack);
+
+      shuffleBtn.addEventListener("click", () => {
+        isShuffle = !isShuffle;
+        shuffleBtn.classList.toggle("active", isShuffle);
+      });
+
+      repeatBtn.addEventListener("click", () => {
+        isRepeating = !isRepeating;
+        repeatBtn.classList.toggle("active", isRepeating);
+      });
+
+      muteBtn.addEventListener("click", () => {
+        audio.muted = !audio.muted;
+        panicMuted = audio.muted;
+        muteBtn.textContent = audio.muted ? "Restore Audio" : "Panic Mute";
+        statusText.textContent = audio.muted ? "Emergency mute engaged." : "Audio restored.";
+      });
+
+      search.addEventListener("input", applySearch);
+
+      audio.addEventListener("timeupdate", () => {
+        if (!audio.duration) {
+          return;
+        }
+        seek.value = String(Math.floor((audio.currentTime / audio.duration) * 1000));
+        currentTime.textContent = formatTime(audio.currentTime);
+      });
+
+      audio.addEventListener("loadedmetadata", () => {
+        duration.textContent = formatTime(audio.duration);
+      });
+
+      audio.addEventListener("ended", () => {
+        if (isRepeating) {
+          audio.currentTime = 0;
+          playCurrent();
+          return;
+        }
+        nextTrack();
+      });
+
+      audio.addEventListener("play", () => {
+        playBtn.textContent = "Pause";
+        updateMeterState();
+        startVisualizer();
+      });
+
+      audio.addEventListener("pause", () => {
+        playBtn.textContent = "Play";
+        updateMeterState();
+        stopVisualizer();
+      });
+
+      audio.addEventListener("volumechange", () => {
+        if (!audio.muted) {
+          lastVolume = audio.volume;
+        }
+      });
+    }
+
+    buildLibrary();
+    buildMeter();
+    resizeSpectrumCanvas();
+    window.addEventListener("resize", resizeSpectrumCanvas);
+    syncControls();
+    updateMetaDisplay(null);
+    audio.volume = lastVolume;
+    audio.muted = false;
+    volume.value = String(Math.round(lastVolume * 100));
+    volumeLabel.textContent = `${Math.round(lastVolume * 100)}%`;
+    muteBtn.textContent = "Panic Mute";
+    applySearch();
+  </script>
+</body>
+</html>

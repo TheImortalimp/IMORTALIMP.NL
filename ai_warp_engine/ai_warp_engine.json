@@ -1,0 +1,892 @@
+{
+  "engine": {
+    "name": "AI Warp Engine — R3 Canvas Edition",
+    "version": "6.4.36-raum-xr",
+    "author": "IMORTALIMP.NL & Arena AI",
+    "ghostKey": "Gh0sTs 1n Th3 Sh3lLs - D1giTaL R3BiRtHs - f34Rd0t.C0mM4",
+    "ghostKeyStanzas": [
+      "Gh0sTs 1n Th3 Sh3lLs",
+      "D1giTaL R3BiRtHs",
+      "f34Rd0t.C0mM4"
+    ],
+    "landmarks": [
+      0,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "releaseNotes": "34 voices; R3 Ghost Protocol and V-Sync v11; YouTube Warp Bus routes the live YouTube feed through all 29 warp modes and 34 voices; v6.3.1 adds the SVG Warp Lens (feTurbulence→feDisplacementMap) for per-pixel YouTube displacement; playback body classes now toggled; v6.4 adds getDisplayMedia Tab Capture — real pixels + real tab audio through the full Canvas engine; v6.4.17 explicitly routes YouTube full-effects use through capture of a separate source tab/window and restores the original Canvas FX path. v6.4.20: original AI Warp modes run on active voice-canvas graphics in-page without capture; capture applies them to actual YouTube frames. v6.4.21 softens Ghost/V-Sync channel and scanline intensity and cycles RGB hues across the full spectrum. v6.4.21 improves Ghost/V-Sync with reduced split/scan heaviness and flowing RGB spectrum coloring. v6.4.22 replaces single-hue Ghost/V-Sync scan lines with softer five-hue spectral ghost echoes and animated RGB-spectrum V-Sync beams. v6.4.23 keeps spectral Ghost/V-Sync line accents at 20% opacity while increasing the surrounding channel split, warp and scanphasing strength. v6.4.24 sets the multicolor Ghost and V-Sync line strokes to 5% opacity while preserving the strengthened surrounding screen-phasing effects. v6.4.25 sets the visible Ghost horizontal sweep stroke to 5% opacity; multicolor Ghost/V-Sync lines remain at 5%, while broader screen-phase effect strengths are unchanged. v6.4.26 removes luminous Ghost sweep and V-Sync scan-head/beam line accents (zero alpha) while preserving surrounding screen phasing and image tears. v6.4.27 limits only the one-shot Ghost/V-Sync mode-change sweeps to 5% opacity; steady-state Ghost/V-Sync processing remains active. v6.4.28 applies 5% opacity only to the initial Ghost/V-Sync mode-change pulse; steady-state RGB Ghost and V-Sync effects retain their stronger 6.4.22 levels. v6.4.29 gives all 29 AI Warp modes explicit deterministic Ghost/V-Sync blend profiles, including per-mode RGB hue phase, split, warp, scan, tear, and roll tuning; rendered scan noise is repeatable. v6.4.30 adds per-warp Hard Light, Soft-Eye, audio-ear, canvas-response, and automation blend tuning for all 29 modes. Crescendo/burst and auto-voice choices use a seeded deterministic sequence; automation rails are mode-aware. v6.4.31 adds DROP THE MILK?, an original Milkdrop/projectM-inspired Canvas FX automation with feedback zoom/rotation, audio-reactive polar waveforms, soft liquid colour blooms, and six timed blend presets; includes toolbar button and D shortcut. v6.4.32 expands DROP THE MILK? to 80 uniquely parameterized Milkdrop-inspired presets, shuffled on each page load and auto-advanced every 14 seconds; the button displays the active preset position/name. v6.4.33 reshuffles the 80-preset Milkdrop deck on each activation and cross-blends feedback, waves, colour, blooms, and cadence with all 29 AI Warp profiles and all active FX voice levels. v6.4.34 adds a Drop the Milk opacity slider and lock control after the V-Sync slider; unlocked preset automation crossfades to preset opacity, while lock holds the chosen value. Opacity and lock preference persist across reloads. v6.4.35 reduces Milkdrop opacity targets, feedback alpha, waveform/bloom intensity and additive blending to prevent white-out; default opacity is 30%, preset opacity tops at 37%, legacy saved levels are capped at 38%, and feedback uses soft-light. v6.4.36 (web) replaces the Pole - R showcase with four original synthesized Raum X-R tracks hosted in ai_warp_engine/audio/, adds an artwork slideshow and exclusive audio-aware glitch sequences on the main canvas while they play, and credits Stefan Betke (Pole), GitHub Copilot and River Lyle Reuveni."
+  },
+  "tracks": [
+    {
+      "n": 1,
+      "t": "pole - Я - raum 1 - variant X-R",
+      "s": "R1·XR",
+      "d": 435,
+      "r": 1,
+      "c": "original synthesized work by GitHub Copilot, prompted by River Lyle Reuveni · dedicated to Stefan Betke (Pole)",
+      "file": "audio/pole - Я - raum 1 - variant X-R.mp3"
+    },
+    {
+      "n": 2,
+      "t": "pole - Я - raum 2 - variant X-R",
+      "s": "R2·XR",
+      "d": 485,
+      "r": 2,
+      "c": "original synthesized work by GitHub Copilot, prompted by River Lyle Reuveni · dedicated to Stefan Betke (Pole)",
+      "file": "audio/pole - Я - raum 2 - variant X-R.mp3"
+    },
+    {
+      "n": 3,
+      "t": "pole - Я - raum 3 - variant X-R",
+      "s": "R3·XR",
+      "d": 543,
+      "r": 3,
+      "c": "original ambient synthesized work by GitHub Copilot, prompted by River Lyle Reuveni · dedicated to Stefan Betke (Pole)",
+      "file": "audio/pole - Я - raum 3 - variant X-R.mp3"
+    },
+    {
+      "n": 4,
+      "t": "pole - Я - raum 4 - variant X-R",
+      "s": "R4·XR",
+      "d": 543,
+      "r": 4,
+      "c": "original ambient synthesized work by GitHub Copilot, prompted by River Lyle Reuveni · dedicated to Stefan Betke (Pole)",
+      "file": "audio/pole - Я - raum 4 - variant X-R.mp3"
+    }
+  ],
+  "warpModes": {
+    "liquid": {
+      "label": "LIQUID FLUID",
+      "baseFreq": 0.0009,
+      "dispScale": 3.8,
+      "amp": 28,
+      "cols": 22,
+      "chroma": 8,
+      "description": "Undulating hydrodynamic fluid waves with dual-axis frequency modulation and fluid drag."
+    },
+    "prism": {
+      "label": "PRISM CRYSTAL",
+      "baseFreq": 0.0013,
+      "dispScale": 4.2,
+      "amp": 34,
+      "cols": 20,
+      "chroma": 16,
+      "description": "Spectral chromatic dispersion with multi-angle crystal refraction and specular flares."
+    },
+    "breathe": {
+      "label": "ORGANIC BREATH",
+      "baseFreq": 0.0006,
+      "dispScale": 2.4,
+      "amp": 18,
+      "cols": 14,
+      "chroma": 4,
+      "description": "Respiratory dilation, spherical radial expansion, and bass-driven luma center bloom."
+    },
+    "fold": {
+      "label": "ORIGAMI FOLD",
+      "baseFreq": 0.0016,
+      "dispScale": 5.5,
+      "amp": 45,
+      "cols": 28,
+      "chroma": 10,
+      "description": "Dimensional accordion pleating with alternating inverted vectors and crease line shadows."
+    },
+    "aurora": {
+      "label": "NEON AURORA",
+      "baseFreq": 0.001,
+      "dispScale": 3.5,
+      "amp": 30,
+      "cols": 16,
+      "chroma": 12,
+      "description": "Cascading undulating neon ribbon curtains with northern lights emerald/violet luminous wash."
+    },
+    "vortex": {
+      "label": "CENTRIFUGAL VORTEX",
+      "baseFreq": 0.0012,
+      "dispScale": 4.0,
+      "amp": 36,
+      "cols": 20,
+      "chroma": 9,
+      "description": "Rotational spiral black hole warp with core twist and event horizon accretion compression."
+    },
+    "cybergrid": {
+      "label": "CYBER MATRIX GRID",
+      "baseFreq": 0.0015,
+      "dispScale": 4.8,
+      "amp": 38,
+      "cols": 24,
+      "chroma": 11,
+      "description": "Quantized digital tile displacement with isometric block shifts and matrix wire grid lines."
+    },
+    "hyperdrive": {
+      "label": "HYPERDRIVE STREAK",
+      "baseFreq": 0.0018,
+      "dispScale": 5.2,
+      "amp": 42,
+      "cols": 18,
+      "chroma": 15,
+      "description": "Relativistic hyperspace starburst zoom with directional radial streaks and corner chromatic stretch."
+    },
+    "kaleidoscope": {
+      "label": "CRYSTAL KALEIDOSCOPE",
+      "baseFreq": 0.0008,
+      "dispScale": 3.0,
+      "amp": 22,
+      "cols": 16,
+      "chroma": 8,
+      "description": "4-way and 8-way quadrant mandala symmetry reflection with mesmerizing rotational phase."
+    },
+    "quantum": {
+      "label": "QUANTUM FOAM",
+      "baseFreq": 0.0022,
+      "dispScale": 6.0,
+      "amp": 48,
+      "cols": 45,
+      "chroma": 18,
+      "description": "Micro-sliver probabilistic quantum teleportation with sub-pixel phase jitters."
+    },
+    "ripple": {
+      "label": "CONCENTRIC RIPPLE",
+      "baseFreq": 0.0011,
+      "dispScale": 3.6,
+      "amp": 26,
+      "cols": 18,
+      "chroma": 7,
+      "description": "Propagating circular water droplet impact shockwaves radiating outward with refractive lensing."
+    },
+    "analog_crt": {
+      "label": "ANALOG CRT TUBE",
+      "baseFreq": 0.0014,
+      "dispScale": 4.5,
+      "amp": 32,
+      "cols": 20,
+      "chroma": 10,
+      "description": "Curved spherical glass cathode tube pincushion warp with horizontal phosphor retrace jitter."
+    },
+    "newblue_roll": {
+      "label": "ROLL · Shutter Roll",
+      "baseFreq": 0.0011,
+      "dispScale": 3.9,
+      "amp": 32,
+      "cols": 24,
+      "chroma": 12,
+      "description": "NewBlueFX Rolling Shutter & film frame roll with vertical seam wrapping and edge chromatic slip."
+    },
+    "newblue_active_cam": {
+      "label": "ACTIVE CAM · Handheld Shake",
+      "baseFreq": 0.0014,
+      "dispScale": 4.1,
+      "amp": 26,
+      "cols": 20,
+      "chroma": 10,
+      "description": "NewBlueFX Active Camera organic handheld gimbal shake, lens tremor, and focal breathing."
+    },
+    "newblue_shear": {
+      "label": "SHEAR · Vector Slant",
+      "baseFreq": 0.0016,
+      "dispScale": 4.5,
+      "amp": 38,
+      "cols": 26,
+      "chroma": 14,
+      "description": "NewBlueFX Shear Energy directional angular displacement and vector slant motion streaks."
+    },
+    "newblue_wiggle": {
+      "label": "WIGGLE · Micro Jitter",
+      "baseFreq": 0.0022,
+      "dispScale": 3.6,
+      "amp": 22,
+      "cols": 32,
+      "chroma": 16,
+      "description": "NewBlueFX Micro Wiggle rapid coordinate tremor, sub-pixel vibration, and phase trembling."
+    },
+    "newblue_zoom_blur": {
+      "label": "ZOOM BLAST · Velocity Streaks",
+      "baseFreq": 0.0018,
+      "dispScale": 4.8,
+      "amp": 40,
+      "cols": 22,
+      "chroma": 18,
+      "description": "NewBlueFX Zoom Blast explosive multi-pass radial zoom with optical acceleration streaks."
+    },
+    "newblue_video_tile": {
+      "label": "VIDEO TILE · Multi-pane Grid",
+      "baseFreq": 0.0012,
+      "dispScale": 3.4,
+      "amp": 24,
+      "cols": 16,
+      "chroma": 8,
+      "description": "NewBlueFX Video Tile repeating mosaic matrix with staggered phase modulation and tile borders."
+    },
+    "newblue_twirl": {
+      "label": "TWIRL · Vortex Spiral",
+      "baseFreq": 0.0015,
+      "dispScale": 4.6,
+      "amp": 36,
+      "cols": 28,
+      "chroma": 14,
+      "description": "NewBlueFX Polar Twirl continuous vortex spiral twisting canvas pixels into a fluid corkscrew."
+    },
+    "newblue_light_ring": {
+      "label": "LIGHT RING · Optical Flare",
+      "baseFreq": 0.0017,
+      "dispScale": 4.0,
+      "amp": 30,
+      "cols": 20,
+      "chroma": 22,
+      "description": "NewBlueFX Anamorphic optical lens flare with glowing chromatic light rings and horizontal flare streaks."
+    },
+    "newblue_earthquake": {
+      "label": "EARTHQUAKE · Seismic Shockwave",
+      "baseFreq": 0.002,
+      "dispScale": 5.0,
+      "amp": 45,
+      "cols": 26,
+      "chroma": 20,
+      "description": "NewBlueFX Seismic Earthquake shockwave pulses with dual-axis tectonic jolts and screen clamping."
+    },
+    "newblue_water_drop": {
+      "label": "WATER DROP · Caustic Lens",
+      "baseFreq": 0.0013,
+      "dispScale": 3.7,
+      "amp": 28,
+      "cols": 22,
+      "chroma": 12,
+      "description": "NewBlueFX Caustic Water Droplet refraction lens with concentric ripple shockwaves and luma shine."
+    },
+    "newblue_rgb_shift": {
+      "label": "RGB FAST SHIFT · Prism Split",
+      "baseFreq": 0.0019,
+      "dispScale": 4.4,
+      "amp": 35,
+      "cols": 24,
+      "chroma": 24,
+      "description": "NewBlueFX 3-Axis Directional RGB Prism Dispersion splitting red, green, and blue planes independently."
+    },
+    "newblue_quad_mirror": {
+      "label": "QUAD MIRROR · 4-Way Symmetry",
+      "baseFreq": 0.001,
+      "dispScale": 3.2,
+      "amp": 20,
+      "cols": 18,
+      "chroma": 10,
+      "description": "NewBlueFX 4-Quadrant Bilateral Mirror reflection folding along horizontal and vertical axes."
+    },
+    "newblue_fish_eye": {
+      "label": "FISH EYE · Convex Bulge",
+      "baseFreq": 0.0015,
+      "dispScale": 4.7,
+      "amp": 42,
+      "cols": 24,
+      "chroma": 14,
+      "description": "NewBlueFX Fisheye Lens ultra-wide spherical convex barrel distortion and edge compression."
+    },
+    "newblue_pinch": {
+      "label": "PINCH · Optical Singularity",
+      "baseFreq": 0.0014,
+      "dispScale": 4.3,
+      "amp": 38,
+      "cols": 24,
+      "chroma": 12,
+      "description": "NewBlueFX Pincushion optical vacuum contraction pulling pixels inward toward an event horizon."
+    },
+    "newblue_solarize": {
+      "label": "SOLARIZE · Sabattier Wash",
+      "baseFreq": 0.0016,
+      "dispScale": 3.8,
+      "amp": 30,
+      "cols": 22,
+      "chroma": 26,
+      "description": "NewBlueFX Luma Solarization & Sabattier inversion wash with glowing neon phosphor halos."
+    },
+    "newblue_cathode_beam": {
+      "label": "CATHODE BEAM · Raster Deflection",
+      "baseFreq": 0.0021,
+      "dispScale": 4.6,
+      "amp": 44,
+      "cols": 36,
+      "chroma": 18,
+      "description": "NewBlueFX Cathode Ray Tube electron beam deflection with raster scan displacement and flyback glow."
+    },
+    "newblue_neon_edges": {
+      "label": "NEON EDGES · Electric Outlines",
+      "baseFreq": 0.0018,
+      "dispScale": 4.2,
+      "amp": 34,
+      "cols": 24,
+      "chroma": 28,
+      "description": "NewBlueFX High-contrast Sobel gradient edge detection with pulsating electric neon outlines."
+    }
+  },
+  "ghostProfiles": {
+    "OFF": {
+      "realm": "off",
+      "split": 0,
+      "chan": 0,
+      "lines": 0,
+      "glow": 0,
+      "warp": 0,
+      "blur": 0,
+      "hueA": 0,
+      "hueB": 0,
+      "sat": 1.0,
+      "gray": 0,
+      "crt": 0,
+      "led": 0,
+      "dia": 0
+    },
+    "DIA": {
+      "realm": "reality",
+      "split": 0.88,
+      "chan": 0.72,
+      "lines": 0.5,
+      "glow": 0.22,
+      "warp": 0.38,
+      "blur": 0.35,
+      "hueA": 313,
+      "hueB": 145,
+      "sat": 1.22,
+      "gray": 0.06,
+      "crt": 0,
+      "led": 0,
+      "dia": 1
+    },
+    "SPECTRUM": {
+      "realm": "mix",
+      "split": 1.0,
+      "chan": 0.9,
+      "lines": 1.0,
+      "glow": 0.45,
+      "warp": 0.7,
+      "blur": 1.0,
+      "hueA": 135,
+      "hueB": 75,
+      "sat": 1.45,
+      "gray": 0.3,
+      "crt": 0,
+      "led": 0,
+      "dia": 0
+    },
+    "CRT": {
+      "realm": "reality",
+      "split": 0.7,
+      "chan": 0.65,
+      "lines": 1.65,
+      "glow": 0.3,
+      "warp": 0.45,
+      "blur": 0.8,
+      "hueA": 55,
+      "hueB": 25,
+      "sat": 0.85,
+      "gray": 0.74,
+      "crt": 1,
+      "led": 0,
+      "dia": 0
+    },
+    "PLASMA": {
+      "realm": "virtual",
+      "split": 1.15,
+      "chan": 1.0,
+      "lines": 0.8,
+      "glow": 0.6,
+      "warp": 0.95,
+      "blur": 1.25,
+      "hueA": 195,
+      "hueB": 100,
+      "sat": 1.85,
+      "gray": 0.16,
+      "crt": 0,
+      "led": 0,
+      "dia": 0
+    },
+    "LED": {
+      "realm": "virtual",
+      "split": 1.38,
+      "chan": 1.22,
+      "lines": 0.22,
+      "glow": 0.9,
+      "warp": 1.12,
+      "blur": 0.12,
+      "hueA": 0,
+      "hueB": 120,
+      "sat": 2.05,
+      "gray": 0.0,
+      "crt": 0,
+      "led": 1,
+      "dia": 0
+    }
+  },
+  "vsyncMethods": {
+    "OFF": {
+      "label": "V-Sync: OFF",
+      "bar": 0,
+      "tears": 0,
+      "roll": 0,
+      "hum": 0,
+      "snap": 0,
+      "sharp": 0,
+      "scanphase": 0,
+      "harmony": 0
+    },
+    "ON": {
+      "label": "V-Sync: SCANPHASING",
+      "bar": 1.0,
+      "tears": 0.55,
+      "roll": 0,
+      "hum": 0.35,
+      "snap": 0,
+      "sharp": 0.62,
+      "scanphase": 1.0,
+      "harmony": 0.28
+    },
+    "GHOST_OFF": {
+      "label": "V-Sync: VERTICAL COLOR HARMONY",
+      "bar": 0.35,
+      "tears": 0.12,
+      "roll": 0.14,
+      "hum": 0.18,
+      "snap": 0,
+      "sharp": 0.4,
+      "scanphase": 0.32,
+      "harmony": 1.0
+    },
+    "FULL": {
+      "label": "V-Sync: SHARP",
+      "bar": 1.15,
+      "tears": 1.0,
+      "roll": 0.85,
+      "hum": 0.85,
+      "snap": 1,
+      "sharp": 1.0,
+      "scanphase": 0.88,
+      "harmony": 0.55
+    }
+  },
+  "themes": {
+    "cyber": {
+      "name": "Cyber Matrix",
+      "bg": "#04070a",
+      "card": "#0c1218",
+      "accent": "#00ffaa",
+      "sub": "#00d084",
+      "line": "rgba(0, 255, 170, 0.32)",
+      "glow": "rgba(0, 255, 170, 0.45)",
+      "text": "#e0fff4"
+    },
+    "neon": {
+      "name": "Neon Pulse",
+      "bg": "#090314",
+      "card": "#140824",
+      "accent": "#ff007f",
+      "sub": "#00e5ff",
+      "line": "rgba(255, 0, 127, 0.36)",
+      "glow": "rgba(255, 0, 127, 0.50)",
+      "text": "#ffe0f0"
+    },
+    "gold": {
+      "name": "Void Gold",
+      "bg": "#0d0904",
+      "card": "#191309",
+      "accent": "#ffb703",
+      "sub": "#fb8500",
+      "line": "rgba(255, 183, 3, 0.34)",
+      "glow": "rgba(255, 183, 3, 0.45)",
+      "text": "#fff5d6"
+    },
+    "cyan": {
+      "name": "Terminal Cyan",
+      "bg": "#030a10",
+      "card": "#081724",
+      "accent": "#00e5ff",
+      "sub": "#0090ff",
+      "line": "rgba(0, 229, 255, 0.35)",
+      "glow": "rgba(0, 229, 255, 0.48)",
+      "text": "#d6f8ff"
+    },
+    "white": {
+      "name": "CRT Monochrome",
+      "bg": "#121214",
+      "card": "#1e1e22",
+      "accent": "#ffffff",
+      "sub": "#a0a0a8",
+      "line": "rgba(255, 255, 255, 0.28)",
+      "glow": "rgba(255, 255, 255, 0.35)",
+      "text": "#f4f4f6"
+    },
+    "retro": {
+      "name": "Retro HUD Violet",
+      "bg": "#080512",
+      "card": "#140e2b",
+      "accent": "#bb86fc",
+      "sub": "#03dac6",
+      "line": "rgba(187, 134, 252, 0.32)",
+      "glow": "rgba(187, 134, 252, 0.45)",
+      "text": "#f0e6ff"
+    }
+  },
+  "effects": [
+    {
+      "name": "Neon Grad",
+      "realm": "mix",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Dual neon color wash with additive ribbon blooming"
+    },
+    {
+      "name": "Scanlines",
+      "realm": "reality",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Interlaced CRT phosphor scanlines with roll and hum"
+    },
+    {
+      "name": "Data Bands",
+      "realm": "reality",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Horizontal VHS tracking band displacements"
+    },
+    {
+      "name": "Flash",
+      "realm": "reality",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "High-gamma exposure burst with soft-knee shoulder decay"
+    },
+    {
+      "name": "HSL Rainbow",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Full spectral hue rainbow phase cycling"
+    },
+    {
+      "name": "ASCII",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Cached density-sampled multi-script ASCII art matrix"
+    },
+    {
+      "name": "Font Burn",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Phosphor burn-in text degradation and glowing glyph trails"
+    },
+    {
+      "name": "Strobe",
+      "realm": "reality",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Frequency-limited strobe flashes with Soft-Eye gate"
+    },
+    {
+      "name": "Gemini Bomb",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Explosive radial chromatic particle shockwaves"
+    },
+    {
+      "name": "Tech Artist",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Three.js / WebGL raymarched fractal shader with mouse interaction"
+    },
+    {
+      "name": "VHS Glitch",
+      "realm": "reality",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Head-switching noise flutter, scan jitter and RGB fringing"
+    },
+    {
+      "name": "Data Bomb",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Block compression byte slices and corrupted macroblocks"
+    },
+    {
+      "name": "Ink Glyphs",
+      "realm": "mix",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Fluid organic ink bleeding and calligraphy spreading"
+    },
+    {
+      "name": "Matrix ASCII",
+      "realm": "mix",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Wachowski vertical digital rain in 15 global typesets"
+    },
+    {
+      "name": "Matrix Chord",
+      "realm": "mix",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Harmonic polyphonic matrix chords on Ghost-Key rails"
+    },
+    {
+      "name": "B&W Invert",
+      "realm": "mix",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Landmark-based greyscale and negative light emission (0, 50, 75, 100)"
+    },
+    {
+      "name": "Hue/Color Cycle",
+      "realm": "virtual",
+      "defaultAlpha": 0.0,
+      "size": 1.0,
+      "depth": 0.62,
+      "desc": "Continuous wheel hue shifting with harmonic confluence"
+    }
+  ],
+  "youtubePool": [
+    {
+      "id": "u4TPBkN0vIc",
+      "title": "4K 60FPS Fractal Journey & Cosmic Geometry",
+      "tags": [
+        "fractal",
+        "geometry",
+        "4k"
+      ]
+    },
+    {
+      "id": "gopYmb38DgM",
+      "title": "Cyberpunk Neon Metropolis Synthwave Drift",
+      "tags": [
+        "cyberpunk",
+        "synthwave",
+        "neon"
+      ]
+    },
+    {
+      "id": "jmEAP7aGo0o",
+      "title": "DEFCON 1 Visualizer — Glitch Matrix Overdrive",
+      "tags": [
+        "defcon",
+        "glitch",
+        "matrix"
+      ]
+    },
+    {
+      "id": "uvSXL6ypLlw",
+      "title": "Darksynth Cybernetic Glitch Protocol",
+      "tags": [
+        "darksynth",
+        "cyber",
+        "glitch"
+      ]
+    },
+    {
+      "id": "NpSTV8WJATc",
+      "title": "Retrowave Analog Dreams & Midnight Horizon",
+      "tags": [
+        "retrowave",
+        "vaporwave",
+        "chill"
+      ]
+    },
+    {
+      "id": "8o6bdTOhIyE",
+      "title": "Ambient Tape Decay & Lo-Fi Memory Loop",
+      "tags": [
+        "ambient",
+        "tape",
+        "lofi"
+      ]
+    },
+    {
+      "id": "KlcsGjI6Jms",
+      "title": "Night City Cyber Grid & Hologram Stream",
+      "tags": [
+        "nightcity",
+        "grid",
+        "hologram"
+      ]
+    },
+    {
+      "id": "B1CL4PqHh9k",
+      "title": "Moonlight Sonata Synthesized Tape Artifacts",
+      "tags": [
+        "classical",
+        "synthesizer",
+        "tape"
+      ]
+    },
+    {
+      "id": "QsUmvGkXhnk",
+      "title": "8-Bit Chiptune Glitch Dimension",
+      "tags": [
+        "chiptune",
+        "8bit",
+        "arcade"
+      ]
+    },
+    {
+      "id": "RgFaK6ZQifE",
+      "title": "Electronic Warp Dimension & Prism Spectrum",
+      "tags": [
+        "warp",
+        "prism",
+        "electronic"
+      ]
+    },
+    {
+      "id": "kCP2xZvhJk0",
+      "title": "Abstract Hyperspace Topological Distortion",
+      "tags": [
+        "hyperspace",
+        "abstract",
+        "topology"
+      ]
+    },
+    {
+      "id": "DmStNF35o1w",
+      "title": "Underground Berlin Acid Techno Visuals",
+      "tags": [
+        "acid",
+        "techno",
+        "rave"
+      ]
+    },
+    {
+      "id": "SP2MeG95-Ko",
+      "title": "Amiga Demoscene Realtime Shaders",
+      "tags": [
+        "demoscene",
+        "amiga",
+        "shader"
+      ]
+    },
+    {
+      "id": "fzTOv2R9jBw",
+      "title": "VHS Aesthetic Tracking Tape Glitch",
+      "tags": [
+        "vhs",
+        "tracking",
+        "analog"
+      ]
+    },
+    {
+      "id": "vnyLtdufSbE",
+      "title": "Lofi Cyber Beats & Tokyo Rain Neon",
+      "tags": [
+        "lofi",
+        "beats",
+        "tokyo"
+      ]
+    },
+    {
+      "id": "R1UlclDAmwg",
+      "title": "Glitch Core Cybernetic Breakcore Sync",
+      "tags": [
+        "breakcore",
+        "glitchcore",
+        "kinetic"
+      ]
+    },
+    {
+      "id": "m8FupqTNT-c",
+      "title": "The Psycho Realm — La Conecta Street Archive",
+      "tags": [
+        "hiphop",
+        "classic",
+        "archive"
+      ]
+    },
+    {
+      "id": "ViDhJqomPks",
+      "title": "Deep Spatial Ambient & Drone Resonance",
+      "tags": [
+        "drone",
+        "space",
+        "ambient"
+      ]
+    },
+    {
+      "id": "KqYMg9oQVsE",
+      "title": "Industrial Dark Electro Pulse",
+      "tags": [
+        "industrial",
+        "electro",
+        "pulse"
+      ]
+    },
+    {
+      "id": "Aby5g6QtyLc",
+      "title": "CRT Scanline Phosphor Dream Sequence",
+      "tags": [
+        "crt",
+        "phosphor",
+        "dream"
+      ]
+    },
+    {
+      "id": "uYczs_ACWTs",
+      "title": "Hyper-Speed Cyberpunk Freeway Velocity",
+      "tags": [
+        "freeway",
+        "speed",
+        "velocity"
+      ]
+    },
+    {
+      "id": "Quzsv6ekcPQ",
+      "title": "Analog Glitch Symphony & Cathode Rays",
+      "tags": [
+        "cathode",
+        "analog",
+        "glitch"
+      ]
+    }
+  ],
+  "localMediaFormats": {
+    "video": [
+      ".mp4",
+      ".avi",
+      ".mkv",
+      ".mov",
+      ".webm",
+      ".m4v"
+    ],
+    "audio": [
+      ".mp3",
+      ".m4a",
+      ".wav",
+      ".ogg",
+      ".flac",
+      ".aac"
+    ],
+    "image": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".webp",
+      ".bmp",
+      ".svg"
+    ]
+  }
+}

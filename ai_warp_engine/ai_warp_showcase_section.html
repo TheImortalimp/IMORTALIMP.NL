@@ -1,0 +1,583 @@
+<!-- ===== IMORTALIMP — AI WARP ENGINE (v6.4.38.21 ULTIMATE) Spotlight Showcase & Documentation Panel =====
+     Placed directly BELOW the Flamable Camping Gas SID panel and ABOVE Manifest van Wederkerigheid.
+     Redirects to subfolder: ai_warp_engine/ on imortalimp.nl root.
+     Public Domain (CC0 1.0 Universal / Unlicense) — Created by River Lyle Reuveni (imortalimp.nl), Arena.ai Agent (arena.ai) & AI in general.
+-->
+<style>
+  #ai-warp-engine-showcase {
+    width: 90vw;
+    max-width: 90%;
+    margin: 26px auto 34px auto;
+    background: linear-gradient(180deg, #09131d 0%, #05080e 100%);
+    border: 1px solid #16324a;
+    border-top: 3px solid #00ffaa;
+    border-radius: 14px;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 255, 170, 0.16);
+    overflow: hidden;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #e2f1ea;
+    position: relative;
+    z-index: 10;
+  }
+  #ai-warp-engine-showcase * {
+    box-sizing: border-box;
+  }
+  #ai-warp-engine-showcase .ai-warp-top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #0d1e2e 0%, #070e17 100%);
+    border-bottom: 1px solid #162b3d;
+  }
+  #ai-warp-engine-showcase .ai-warp-path-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  #ai-warp-engine-showcase .ai-warp-folder-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  #ai-warp-engine-showcase .ai-warp-folder-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 255, 170, 0.12);
+    border: 1px solid rgba(0, 255, 170, 0.45);
+    color: #00ffaa;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+  }
+  #ai-warp-engine-showcase .ai-warp-app-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 229, 255, 0.14);
+    border: 1px solid rgba(0, 229, 255, 0.55);
+    color: #00e5ff;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+  }
+  #ai-warp-engine-showcase .ai-warp-license-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255, 215, 0, 0.12);
+    border: 1px solid rgba(255, 215, 0, 0.45);
+    color: #ffd700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+  }
+  #ai-warp-engine-showcase .ai-warp-sub-credit {
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+  #ai-warp-engine-showcase .ai-warp-sub-credit a {
+    color: #00ffaa;
+    text-decoration: none;
+    font-weight: 700;
+  }
+  #ai-warp-engine-showcase .ai-warp-sub-credit a:hover {
+    text-decoration: underline;
+  }
+  #ai-warp-engine-showcase .ai-warp-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  #ai-warp-engine-showcase .ai-warp-playlist {
+    padding: 18px;
+    border-top: 1px solid #162b3d;
+    background: rgba(0, 0, 0, 0.22);
+  }
+  #ai-warp-engine-showcase .ai-warp-playlist h3 {
+    margin: 0 0 10px;
+    color: #00ffaa;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+  #ai-warp-engine-showcase .ai-warp-playlist iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid #16324a;
+    border-radius: 8px;
+    background: #000;
+  }
+  #ai-warp-engine-showcase .ai-warp-playlist a {
+    display: inline-block;
+    margin-top: 9px;
+    color: #00ffaa;
+    font-size: 11px;
+  }
+  #ai-warp-engine-showcase .ai-warp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.14s ease, border-color 0.14s ease;
+    white-space: nowrap;
+  }
+  #ai-warp-engine-showcase .ai-warp-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.12);
+  }
+  #ai-warp-engine-showcase .ai-warp-btn-full {
+    background: linear-gradient(135deg, #00ffaa 0%, #00d084 60%, #00a86b 100%);
+    color: #04080d;
+    border: 1px solid #70ffcf;
+    box-shadow: 0 0 16px rgba(0, 255, 170, 0.45);
+  }
+  #ai-warp-engine-showcase .ai-warp-btn-zip {
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.22) 0%, rgba(14, 165, 233, 0.16) 100%);
+    color: #00e5ff;
+    border: 1px solid rgba(0, 229, 255, 0.65);
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.22);
+  }
+  #ai-warp-engine-showcase .ai-warp-btn-zip:hover {
+    background: rgba(0, 229, 255, 0.32);
+    color: #ffffff;
+  }
+  #ai-warp-engine-showcase .ai-warp-btn-readme {
+    background: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.55);
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+  }
+  #ai-warp-engine-showcase .ai-warp-btn-readme:hover {
+    background: rgba(255, 215, 0, 0.28);
+    color: #ffffff;
+  }
+
+  /* 10-Line Dedicated Description Box */
+  #ai-warp-engine-showcase .ai-warp-desc-box {
+    padding: 14px 18px;
+    background: rgba(6, 11, 18, 0.85);
+    border-bottom: 1px solid #142436;
+    font-size: 11.5px;
+    line-height: 1.65;
+  }
+  #ai-warp-engine-showcase .ai-warp-desc-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #00ffaa;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #ai-warp-engine-showcase .ai-warp-desc-list {
+    margin: 0;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #cbd5e1;
+  }
+  #ai-warp-engine-showcase .ai-warp-desc-list li {
+    padding-left: 4px;
+  }
+  #ai-warp-engine-showcase .ai-warp-desc-list strong {
+    color: #00e5ff;
+  }
+  #ai-warp-engine-showcase .ai-warp-desc-list a {
+    color: #00ffaa;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  /* Folder tree strip */
+  #ai-warp-engine-showcase .ai-warp-tree-strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: #06090f;
+    font-size: 11px;
+    color: #64748b;
+    border-bottom: 1px solid #121c29;
+  }
+  #ai-warp-engine-showcase .ai-warp-tree-label {
+    color: #94a3b8;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  #ai-warp-engine-showcase .ai-warp-file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    background: #0f1724;
+    border: 1px solid #1e2c40;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.12s ease;
+  }
+  #ai-warp-engine-showcase .ai-warp-file-chip:hover {
+    border-color: #00ffaa;
+    color: #00ffaa;
+    background: #142338;
+  }
+  #ai-warp-engine-showcase .ai-warp-file-chip.active-app {
+    border-color: rgba(0, 255, 170, 0.6);
+    color: #00ffaa;
+    background: rgba(0, 255, 170, 0.12);
+  }
+
+  /* Dropout / Dropdown Window Pane for README.md */
+  #ai-warp-engine-showcase .ai-warp-readme-dropdown {
+    background: #04070c;
+    border-top: 1px solid #152233;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-dropdown summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 18px;
+    background: linear-gradient(135deg, #09131e 0%, #05090f 100%);
+    color: #ffd700;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.04em;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-dropdown summary:hover {
+    background: #0e1e2f;
+    color: #ffffff;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane {
+    max-height: 480px;
+    overflow-y: auto;
+    padding: 18px 22px;
+    background: #04060a;
+    color: #e2f1ea;
+    font-size: 11px;
+    line-height: 1.6;
+    border-top: 1px solid #162638;
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+    word-break: break-word;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane::-webkit-scrollbar {
+    width: 8px;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane::-webkit-scrollbar-thumb {
+    background: #00ffaa;
+    border-radius: 4px;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane h1 {
+    color: #00ffaa;
+    font-size: 15px;
+    margin: 12px 0 8px 0;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane h2 {
+    color: #00e5ff;
+    font-size: 13px;
+    margin: 14px 0 6px 0;
+    font-weight: 700;
+    border-bottom: 1px solid #152436;
+    padding-bottom: 4px;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane h3 {
+    color: #ffd700;
+    font-size: 12px;
+    margin: 10px 0 4px 0;
+    font-weight: 700;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane a {
+    color: #00ffaa;
+    text-decoration: underline;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 10.5px;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane th,
+  #ai-warp-engine-showcase .ai-warp-readme-pane td {
+    border: 1px solid #1f334a;
+    padding: 6px 10px;
+    text-align: left;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane th {
+    background: rgba(0, 255, 170, 0.12);
+    color: #00ffaa;
+  }
+  #ai-warp-engine-showcase .ai-warp-readme-pane blockquote {
+    margin: 8px 0;
+    padding: 6px 12px;
+    background: rgba(0, 229, 255, 0.08);
+    border-left: 3px solid #00e5ff;
+    color: #cbd5e1;
+  }
+
+  @media (max-width: 768px) {
+    #ai-warp-engine-showcase {
+      width: 96vw;
+      max-width: 96%;
+      margin: 20px auto 24px auto;
+    }
+  }
+</style>
+
+<section id="ai-warp-engine-showcase" aria-label="AI WARP ENGINE — Spotlight Showcase &amp; Documentation Panel">
+  <div class="ai-warp-top-bar">
+    <div class="ai-warp-path-group">
+      <div class="ai-warp-folder-line">
+        <span class="ai-warp-folder-pill" id="ai-warp-folder-badge" title="Unpacked Subfolder on imortalimp.nl">
+          📁 ai_warp_engine/
+        </span>
+        <span style="color: #64748b; font-weight: 900;">▸</span>
+        <span class="ai-warp-app-pill" title="AI WARP ENGINE 6.4.38.21 ULTIMATE · R3 Canvas Edition">
+          ⚡ ai_warp_engine.html
+        </span>
+        <span class="ai-warp-license-pill" title="Dedicated 100% to the Public Domain (CC0 / Unlicense)">
+          ⚖️ Public Domain (CC0 / Free &amp; Open Source)
+        </span>
+      </div>
+      <div class="ai-warp-sub-credit">
+        <strong>"AI WARP ENGINE" (6.4.38.21 ULTIMATE)</strong> — adjustable grayscale/inversion and Hue rotation cover the complete viewport, including captured LENS video, initialization artwork, RAUM · X-R slides, visual easter eggs, HUD and controls; includes automated playlist extraction, 29 Warp Modes, 34 independent glitch voices, R3 Ghost Protocol/V-Sync, and Web Audio synth ·
+        <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="license noopener">Public Domain / CC0</a>:
+        Created through synergy between
+        <a href="https://imortalimp.nl" target="_blank" rel="author noopener">River Lyle Reuveni (imortalimp.nl)</a>,
+        <a href="https://arena.ai" target="_blank" rel="author noopener">Arena.ai Agent</a> &amp;
+        <span style="color:#00e5ff; font-weight:700;">Artificial Intelligence</span>
+      </div>
+    </div>
+
+    <div class="ai-warp-actions">
+      <a id="ai-warp-open-full" class="ai-warp-btn ai-warp-btn-full" href="ai_warp_engine/ai_warp_engine.html?v=6.4.38.21" rel="noopener" title="Open the app-matched AI WARP ENGINE v6.4.38.21 browser edition">
+        ⚡🚀 Launch AI Warp Engine
+      </a>
+      <a id="ai-warp-download-zip" class="ai-warp-btn ai-warp-btn-zip" href="https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-x64-setup.exe" title="Native Windows 6.4.38.21 ULTIMATE; requires installed OS codecs and WebView2">
+        🪟 Native Windows App v6.4.38.21
+      </a>
+      <a class="ai-warp-btn ai-warp-btn-readme" href="https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/tag/v6.4.38.21" target="_blank" rel="noopener noreferrer" title="Published release v6.4.38.21">↗ GitHub release v6.4.38.21</a>
+      <button id="ai-warp-toggle-readme-btn" class="ai-warp-btn ai-warp-btn-readme" type="button" title="Open/Close interactive README.md documentation dropdown pane">
+        📖 Read README.md (Drop-down Pane) ▾
+      </button>
+    </div>
+  </div>
+
+  <div class="ai-warp-playlist">
+    <h3>🎵 Featured YouTube Playlist</h3>
+    <iframe src="https://www.youtube-nocookie.com/embed/videoseries?list=PLGQdK_CU4B7w"
+            title="Featured YouTube Playlist Player"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+    <a href="https://www.youtube.com/playlist?list=PLGQdK_CU4B7w" target="_blank" rel="noopener noreferrer">Open playlist directly on YouTube</a>
+  </div>
+
+  <!-- Dedicated 11-Line Description of the AI WARP ENGINE -->
+  <div class="ai-warp-desc-box">
+    <p class="ai-warp-release-status"><strong>6.4.38.21 ULTIMATE.</strong> All 34 voices, 29 warp modes, R3 Ghost/V-Sync and 80 Milkdrop presets are the hardcoded 6.4.36 set: a frozen manifest is checked at start-up and the effect banks are SHA-256 pinned. Freeze frames capture the full LENS, CRT/vignette and page filters with the whole HUD hidden, and every canvas layer shares one aligned size. HUD notifications now show above the control bars. The Windows app converts local media with installed Windows codecs (Media Foundation); WebView2 and media components must be installed. .NET is bundled with a tribute and runtime licensing in the installer. Browser AVI requires local conversion; automatic native conversion and desktop LENS capture are Windows-only. Crisp gold reversed-R icon retained.</p>
+    <div class="ai-warp-desc-title">⚡ RELEASE SPECIFICATION — AI WARP ENGINE (6.4.38.21 ULTIMATE):</div>
+    <ol class="ai-warp-desc-list">
+      <li><strong>ULTIMATE confluence (6.4.38.21):</strong> the four 6.4.36 effect banks ship byte-identical and SHA-256 pinned (re-hash them any time with <code>aiWarpEngine.attestEffectBanks()</code>); a frozen manifest lists every voice, warp mode, Ghost/V-Sync rail and Milkdrop preset and is checked at start-up. Effects are plain in-page Canvas/WebGL code.</li>
+      <li><strong>Aligned canvases:</strong> every effect buffer, including the Tech Artist raymarcher at any display scale, shares one coordinate space, and resizing keeps the last picture instead of flashing blank.</li>
+      <li><strong>Crisp gold reversed-R:</strong> vector-master artwork, ten Windows/DPI icon sizes; the native installer retains the .NET tribute and has unclipped finish/launch text. The browser HUD wraps on smaller viewports.</li>
+      <li><strong>Full FX Freeze Frame (6.4.38.21):</strong> screenshots include completed LENS/local-media effects, fullscreen CRT scanlines, vignette and final page filters. The whole HUD, including fading badges, tabs and menus, is hidden first. Browser YouTube requires tab/screen capture; Windows uses compositor capture.</li>
+      <li><strong>HUD notifications you can see (6.4.38.21):</strong> blocked-link, copy/export, playlist and LENS messages now appear above the control bars instead of underneath them. They still hide with the collapsed HUD and never appear in Freeze Frame.</li>
+      <li><strong>One native media pipeline:</strong> the Windows app converts local media only with Windows <code>MediaTranscoder</code> and the codecs installed on the PC; nothing else is bundled, installed or launched, and a repository test enforces it. Files without a matching Windows decoder fail with a plain-language error and the original is never changed.</li>
+      <li><strong>Proven inside the Windows app:</strong> host proofs cover the effect banks, continuous FX, canvas alignment at every display scale, HUD-free Freeze Frame (the same proof fails on the previous build) and native media playback. Per-build counts and logs are in the <a href="https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-VERIFICATION.md" target="_blank" rel="noopener noreferrer">verification report</a>.</li>
+      <li><strong>v6.4.38.21 continuous FX:</strong> completed frames, gap coverage, continuous timing and clean source caching during local-video buffering.</li>
+      <li><strong>Web control boundary:</strong> same-origin scripts, bundled Three.js, no external-browser/new-window launches inside the app. Accessibility remains; no physical-input-only guarantee.</li>
+        <li><strong>Glitch Hardened &amp; FX Fixed (retained in v6.4.38.21):</strong> synchronized FX, 240 ms transitions and frame recovery; local-only app scripts and blocked browser launches.</li>
+      <li><strong>34 independently controllable glitch voices:</strong> the original 17 plus 17 isolated <code>GC#(3)</code> R3 rails.</li>
+      <li><strong>29 Canvas AI Warp modes</strong>, including the 17 NewBlue-inspired modes, with live 3D skewing and media-reactive motion.</li>
+      <li><strong>YouTube Warp Bus (new in v6.3):</strong> the live YouTube feed — unreadable by Canvas due to cross-origin isolation — is drawn onto the effects pipeline. Every warp mode deforms the real video picture on <code>#ytWarpShell</code>. <strong>v6.4 adds browser display capture:</strong> share a tab, window, or full screen; real frames enter the Canvas pipeline and optional shared audio feeds the analyser. The independent microphone monitor and original YouTube iframe/Canvas feed remain available; stop sharing to restore a previously active YouTube feed. Hotkeys: <code>N</code> display capture, <code>M</code> microphone, <code>Y</code> featured YouTube playlist, and <code>E</code> Ear mode cycle. <strong>v6.3.1 adds the SVG Warp Lens:</strong> the shell's actual pixels are rasterized through an inline <code>feTurbulence → feDisplacementMap</code> graph for display-only per-pixel warping.</li>
+      <li><strong>All 34 voices now reach the YouTube video:</strong> HSL Rainbow / Hue-Color cycles, B&amp;W Invert, Flash &amp; Strobe, Neon Grad / Gemini chroma-split echoes, VHS tracking jitter + luma shimmer, Data Bands clip-path tears, Data Bomb hits, and Scanline contrast coupling — shaped live by each voice's LEVEL / SIZE / DEPTH sliders — while ASCII, Matrix and glyph voices keep overlaying the stacked glitch canvas above the feed.</li>
+      <li><strong>Hard locks &amp; true LENS shots (v6.4.27):</strong> voice locks plus Speed, Opacity, Ghost and V-Sync locks hold against Automated Masters, Continual Randomization, Timed Auto and presets; Freeze Frame saves the full LENS canvas as a HUD-free PNG; stronger Neon Gradient, continual ASCII GC#(3) stream, smoother Twirl.</li>
+      <li><strong>Full app-frame LENS FX (v6.4.26):</strong> B&amp;W converts the completed page to grayscale and truly inverts it; Hue rotates the complete rendered spectrum. The final pass includes captured LENS frames, initialization art, RAUM · X-R artwork, captions, easter eggs, HUD, controls and overlays in both web and Windows WebView2 editions. Hard Light stays canvas-only; freeze-frame exports preserve the viewport filter.</li>
+      <li><strong>Playlist extraction (v6.4.23–6.4.24):</strong> protected featured playlists remain visible and playable, with automatic background extraction when saved playlists are played or imported.</li>
+      <li><strong>Ghost Protocol R3/v11:</strong> DIA, SPECTRUM, CRT, PLASMA, and LED channel-split, echo, scan, CRT, LED, and confluence treatments.</li>
+      <li><strong>V-Sync R3/v11:</strong> Scanphasing, Color Harmony, and Sharp modes with tracked scan bands, tears, roll, retained per-mode rails, and locking.</li>
+      <li><strong>R3 automation confluence:</strong> Auto Glitch, Continual Randomization, Timed Automation, Automated Masters, Soft-Eye/Crescendo, and the visual/audio ear select paired core + GC#(3) factories while driving synchronized Ghost/V-Sync bursts.</li>
+      <li><strong>Canvas/WebGL effect pipeline:</strong> all 34 voices render on Canvas/WebGL; the single sanctioned SVG usage is the compositor-level Warp Lens displacing the YouTube shell per-pixel (no JS readback). Live playback body classes (<code>playback-on</code> / <code>local-video</code> / <code>youtube-feed</code>) now toggle from every media transition, activating the R3 factories' live-feed film-grain and roll-bar branches.</li>
+      <li>Local image/video/audio, YouTube knowledgebase, microphone monitoring, procedural synth, machine presets, user presets, and high-resolution frame export.</li>
+      <li>Released 100% into the <strong>Public Domain (CC0 1.0 / Unlicense)</strong> for artists, VJs, developers, and educators.</li>
+    </ol>
+  </div>
+
+  <!-- Unpacked Folder Structure & All File Chips Strip with ai_warp_engine/ subfolder redirect -->
+  <div class="ai-warp-tree-strip" aria-label="AI WARP ENGINE v6.4.38.21 app files and release in ai_warp_engine/">
+    <span class="ai-warp-tree-label">📂 v6.4.38.21 App Files:</span>
+    <a id="ai-warp-chip-app" class="ai-warp-file-chip active-app" href="ai_warp_engine/ai_warp_engine.html?v=6.4.38.21" rel="noopener" title="Launch the app-matched v6.4.38.21 browser edition">⚡ ai_warp_engine.html · v6.4.38.21</a>
+    <a id="ai-warp-chip-index" class="ai-warp-file-chip" href="ai_warp_engine/index.html?v=6.4.38.21" rel="noopener" title="Open the index.html application alias">🏠 index.html</a>
+    <a id="ai-warp-chip-media" class="ai-warp-file-chip" href="ai_warp_engine/media_page.html?v=6.4.38.21" rel="noopener" title="Open the media studio alias">🎛 media_page.html</a>
+    <a id="ai-warp-chip-engine-js" class="ai-warp-file-chip" href="ai_warp_engine/ai_warp_engine.js" target="_blank" rel="noopener" title="View the main rendering engine — incl. the YouTube Warp Bus">📄 ai_warp_engine.js</a>
+    <a id="ai-warp-chip-gc3-js" class="ai-warp-file-chip" href="ai_warp_engine/r3_gc3_factories.js" target="_blank" rel="noopener" title="View the isolated GC#(3) factory bank">📄 r3_gc3_factories.js</a>
+    <a id="ai-warp-chip-r3-system" class="ai-warp-file-chip" href="ai_warp_engine/r3_ghost_vsync.js" target="_blank" rel="noopener" title="View the Canvas-only R3 Ghost/V-Sync system">📄 r3_ghost_vsync.js</a>
+    <a id="ai-warp-chip-glitch-js" class="ai-warp-file-chip" href="ai_warp_engine/glitch_engine.js" target="_blank" rel="noopener" title="View shared R3 and automation utilities">📄 glitch_engine.js</a>
+    <a id="ai-warp-chip-media-js" class="ai-warp-file-chip" href="ai_warp_engine/media_page.js" target="_blank" rel="noopener" title="View media and UI controller — incl. playback body-class syncing">📄 media_page.js</a>
+    <a class="ai-warp-file-chip" href="ai_warp_engine/freeze_frame.js" title="Full-scope screenshot compositor">freeze_frame.js</a>
+    <a id="ai-warp-chip-css" class="ai-warp-file-chip" href="ai_warp_engine/media_page.css" target="_blank" rel="noopener" title="View the HUD stylesheet — incl. #ytWarpShell Warp Bus hints">🎨 media_page.css</a>
+    <a id="ai-warp-chip-json" class="ai-warp-file-chip" href="ai_warp_engine/media_page.json" target="_blank" rel="noopener" title="View profiles and machine data">📋 media_page.json</a>
+    <a id="ai-warp-chip-showcase" class="ai-warp-file-chip" href="ai_warp_engine/ai_warp_showcase_section.html" target="_blank" rel="noopener" title="View the homepage showcase section fragment">🧩 ai_warp_showcase_section.html</a>
+    <a id="ai-warp-chip-readme" class="ai-warp-file-chip" href="ai_warp_engine/README.md" target="_blank" rel="noopener" title="Read the v6.4.38.21 documentation">📖 README.md · v6.4.38.21</a>
+    <a id="ai-warp-chip-notes" class="ai-warp-file-chip" href="ai_warp_engine/REVISION_NOTES.md" target="_blank" rel="noopener" title="Read the R3 + Warp Bus revision notes">📝 REVISION_NOTES.md</a>
+    <a id="ai-warp-chip-zip" class="ai-warp-file-chip" href="https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-x64-setup.exe" title="Native Windows 6.4.38.21 ULTIMATE; requires installed OS codecs and WebView2">🪟 Native installer · v6.4.38.21</a>
+    <a class="ai-warp-file-chip" href="https://github.com/TheImortalimp/AI-WARP-ENGINE/blob/v6.4.38.21/MANUAL.md" target="_blank" rel="noopener noreferrer" title="Read the 6.4.38.21 user manual">📘 MANUAL.md · v6.4.38.21</a>
+    <a class="ai-warp-file-chip" href="https://github.com/TheImortalimp/AI-WARP-ENGINE/blob/v6.4.38.21/RELEASE_NOTES_6.4.38.21.md" target="_blank" rel="noopener noreferrer" title="Read the 6.4.38.21 ULTIMATE release notes">📝 Release notes · v6.4.38.21</a>
+    <a class="ai-warp-file-chip" href="https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-VERIFICATION.md" target="_blank" rel="noopener noreferrer" title="Download the 6.4.38.21 verification report">🧪 Verification report · v6.4.38.21</a>
+  </div>
+
+  <!-- Interactive Dropout / Dropdown Window Pane for README.md -->
+    <details id="ai-warp-readme-dropdown" class="ai-warp-readme-dropdown" open>
+    <summary title="Click to collapse or expand the README.md terminal reader window pane">
+      <span>📖 README.MD — AI WARP ENGINE 6.4.38.21 ULTIMATE</span>
+      <span style="font-size:11px; opacity:0.8;">[ CLICK TO TOGGLE PANE ▾ ]</span>
+    </summary>
+    <div class="ai-warp-readme-pane" id="ai-warp-readme-pane-content">
+      <h1>⚡ AI WARP ENGINE — 6.4.38.21 ULTIMATE</h1>
+      <blockquote><strong>Public-domain visual synthesizer and audio-reactive Canvas effects suite.</strong> The app-matched browser edition and Windows release share the v6.4.38.21 hard-lock and full-viewport FX pipeline.</blockquote>
+      <h2>Release highlights</h2>
+      <p>6.4.38.21 ULTIMATE: hash-pinned 6.4.36 effects, aligned canvases, HUD-free full-scope freeze frames, HUD notifications above the control bars and one native Windows media pipeline, each proven inside the Windows app. Read the <a href="https://github.com/TheImortalimp/AI-WARP-ENGINE/blob/v6.4.38.21/RELEASE_NOTES_6.4.38.21.md" target="_blank" rel="noopener noreferrer">release notes</a>, the <a href="https://github.com/TheImortalimp/AI-WARP-ENGINE/blob/v6.4.38.21/MANUAL.md" target="_blank" rel="noopener noreferrer">user manual</a> and the <a href="https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-VERIFICATION.md" target="_blank" rel="noopener noreferrer">verification report</a>.</p>
+      <ol>
+        <li><strong>Glitch Hardened &amp; FX Fixed (retained in v6.4.38.21):</strong> synchronized FX, 240 ms transitions and frame recovery; local-only app scripts and blocked browser launches.</li>
+        <li><strong>Hard locks &amp; true LENS shots (v6.4.27):</strong> voice locks plus Speed, Opacity, Ghost and V-Sync locks hold against Automated Masters, Continual Randomization, Timed Auto and presets; Freeze Frame saves the full LENS canvas as a HUD-free PNG; stronger Neon Gradient, continual ASCII GC#(3) stream, smoother Twirl.</li>
+      <li><strong>v6.4.26 — Full app-frame FX:</strong> adjustable grayscale/inversion and Hue rotation run over the finished viewport, including the LENS picture, init art, RAUM · X-R showcase, HUD, buttons and dialogs. Freeze-frame exports preserve the page filter; Hard Light remains canvas-only.</li>
+        <li><strong>v6.4.25 — Full-canvas inversion:</strong> grayscale plus true inversion and Hue rotation run after the complete composition, including LENS frames, init artwork, RAUM · X-R showcase slides and easter eggs. Freeze-frame exports preserve the live canvas filters.</li>
+        <li><strong>v6.4.24 — LENS controls and playlist automation:</strong> bottom-dock B&amp;W/Hue sliders activate paired voices with live previews; playing or importing saved playlists starts background extraction.</li>
+        <li><strong>v6.4.23 — Playlist vault:</strong> protected featured playlist, visible playable entries, resilient XML feed extraction and direct-playback fallback.</li>
+        <li><strong>34 independent voices:</strong> 17 retained core rails plus 17 isolated <code>GC#(3)</code> R3 rails; machine presets guarantee coverage of every R3 factory.</li>
+        <li><strong>YouTube Warp Bus (new):</strong> the live YouTube feed is drawn directly onto the effects pipeline — all 29 warp modes deform <code>#ytWarpShell</code> and all 34 voices feed a cumulative on-video filter chain. v6.4 browser display capture also accepts a tab, app window, or full screen; the independent microphone input and YouTube iframe/Canvas feed stay available. Hotkeys: <code>M</code> mic, <code>Y</code> featured playlist, <code>E</code> Ear mode, and <code>N</code> display capture.</li>
+        <li><strong>Ghost Protocol R3/v11:</strong> DIA, SPECTRUM, CRT, PLASMA, LED; channel splits, Old-Soul echo, scan/warp, CRT/LED texture, and confluence bursts.</li>
+        <li><strong>V-Sync R3/v11:</strong> Scanphasing, Color Harmony, Sharp; tracking, tears, roll, phosphor texture, held OFF rails, mode-specific levels, and a lock.</li>
+        <li><strong>Automation:</strong> Auto Glitch, Continual Rand, Timed Auto, Auto Masters, Soft-Eye/Crescendo, and visual/audio ear integration select core/R3 factory confluence pairs and drive R3 targets and bursts.</li>
+        <li><strong>Canvas/WebGL core:</strong> voices render on Canvas/WebGL; the lone SVG usage is the compositor-level Warp Lens (<code>feTurbulence → feDisplacementMap</code>) displacing YouTube pixels per-frame — display-only, no JS readback.</li>
+        <li><strong>29 Warp modes</strong>, media studio controls, YouTube knowledgebase, local media, microphone input, procedural synth, presets, and frame export.</li>
+      </ol>
+      <h2>R3 controls</h2>
+      <p><strong>Ghost cycle:</strong> OFF → DIA → SPECTRUM → CRT → PLASMA → LED → OFF. OFF retains the rail; Ghost Null clears it.</p>
+      <p><strong>V-Sync cycle:</strong> OFF → SCANPHASING → COLOR HARMONY → SHARP → OFF. OFF retains the last live rail; V-Sync Null clears it.</p>
+      <p>Manual sliders provide a grace period before automation resumes. V-Sync stores independent rails for each active method, and user presets store those levels.</p>
+      <h2>Hotkeys</h2>
+      <table><tr><th>Key</th><th>Action</th></tr><tr><td>W / G / V</td><td>Cycle Warp / Ghost / V-Sync</td></tr><tr><td>A / R / T</td><td>Auto Glitch / Randomize / Timed Auto</td></tr><tr><td>C / Z</td><td>Crescendo / EMP Purge</td></tr><tr><td>M</td><td>Toggle microphone input</td></tr><tr><td>Y</td><td>Load featured YouTube playlist</td></tr><tr><td>E</td><td>Cycle Ear: AUTO / AUDIO / CANVAS</td></tr><tr><td>N</td><td>Share tab / window / full screen</td></tr><tr><td>H / S</td><td>HUD / frame export</td></tr><tr><td>1–9</td><td>Toggle first nine mixer rails</td></tr><tr><td>?</td><td>Open hotkeys dialog</td></tr></table>
+      <h2>Bundle</h2>
+      <p>Launch <code>media_page.html</code>, <code>ai_warp_engine.html</code>, or <code>index.html</code>. For YouTube and media APIs, serve the folder over HTTP. See the linked <a href="ai_warp_engine/README.md" target="_blank" rel="noopener">README.md</a> for the complete file map and implementation notes.</p>
+      <h2>License</h2>
+      <p>Dedicated to the <strong>Public Domain</strong> under CC0 1.0 / The Unlicense. Created by River Lyle Reuveni / imortalimp.nl with Arena.ai Agent Mode and AI collaboration.</p>
+    </div>
+  </details>
+</section>
+
+<script>
+(function() {
+  "use strict";
+  var folderBadge = document.getElementById("ai-warp-folder-badge");
+  var btnFull = document.getElementById("ai-warp-open-full");
+  var btnZip = document.getElementById("ai-warp-download-zip");
+  var chipApp = document.getElementById("ai-warp-chip-app");
+  var chipIndex = document.getElementById("ai-warp-chip-index");
+  var chipMedia = document.getElementById("ai-warp-chip-media");
+  var chipEngineJs = document.getElementById("ai-warp-chip-engine-js");
+  var chipGc3Js = document.getElementById("ai-warp-chip-gc3-js");
+  var chipR3System = document.getElementById("ai-warp-chip-r3-system");
+  var chipGlitchJs = document.getElementById("ai-warp-chip-glitch-js");
+  var chipMediaJs = document.getElementById("ai-warp-chip-media-js");
+  var chipCss = document.getElementById("ai-warp-chip-css");
+  var chipJson = document.getElementById("ai-warp-chip-json");
+  var chipShowcase = document.getElementById("ai-warp-chip-showcase");
+  var chipReadme = document.getElementById("ai-warp-chip-readme");
+  var chipNotes = document.getElementById("ai-warp-chip-notes");
+  var chipZip = document.getElementById("ai-warp-chip-zip");
+
+  var SUBFOLDER = "ai_warp_engine/";
+
+  function applyBase(prefix) {
+    var base = prefix ? prefix.replace(/\/+$/, "") + "/" : "";
+    if (folderBadge) folderBadge.textContent = "📁 " + (base || "ai_warp_engine/");
+    if (btnFull) btnFull.href = base + "index.html?v=6.4.38.21";
+    if (btnZip) btnZip.href = "https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-x64-setup.exe";
+    if (chipApp) chipApp.href = base + "ai_warp_engine.html?v=6.4.38.21";
+    if (chipIndex) chipIndex.href = base + "index.html?v=6.4.38.21";
+    if (chipMedia) chipMedia.href = base + "media_page.html?v=6.4.38.21";
+    if (chipEngineJs) chipEngineJs.href = base + "ai_warp_engine.js";
+    if (chipGc3Js) chipGc3Js.href = base + "r3_gc3_factories.js";
+    if (chipR3System) chipR3System.href = base + "r3_ghost_vsync.js";
+    if (chipGlitchJs) chipGlitchJs.href = base + "glitch_engine.js";
+    if (chipMediaJs) chipMediaJs.href = base + "media_page.js";
+    if (chipCss) chipCss.href = base + "media_page.css";
+    if (chipJson) chipJson.href = base + "media_page.json";
+    if (chipShowcase) chipShowcase.href = base + "ai_warp_showcase_section.html";
+    if (chipReadme) chipReadme.href = base + "README.md";
+    if (chipNotes) chipNotes.href = base + "REVISION_NOTES.md";
+    if (chipZip) chipZip.href = "https://github.com/TheImortalimp/AI-WARP-ENGINE/releases/download/v6.4.38.21/AI-WARP-ENGINE-6.4.38.21-x64-setup.exe";
+  }
+
+  applyBase(SUBFOLDER);
+
+  // Automatically probe and resolve candidates on http/https
+  if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+    var candidates = ["ai_warp_engine", "ai_warp_engine/ai_warp_engine", ""];
+    (function tryFolder(i) {
+      if (i >= candidates.length) return;
+      var pfx = candidates[i] ? candidates[i] + "/" : "";
+      fetch(pfx + "ai_warp_engine.html", { method: "HEAD", cache: "no-store" })
+        .then(function(r) {
+          if (r.ok) {
+            applyBase(pfx);
+          } else {
+            tryFolder(i + 1);
+          }
+        })
+        .catch(function() {
+          tryFolder(i + 1);
+        });
+    })(0);
+  }
+
+  // Toggle readme dropdown
+  var toggleBtn = document.getElementById("ai-warp-toggle-readme-btn");
+  var dropdown = document.getElementById("ai-warp-readme-dropdown");
+  if (toggleBtn && dropdown) {
+    toggleBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      dropdown.open = !dropdown.open;
+      toggleBtn.textContent = dropdown.open 
+        ? "📖 Close README.md Pane ▴" 
+        : "📖 Read README.md (Drop-down Pane) ▾";
+      if (dropdown.open) {
+        dropdown.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+    dropdown.addEventListener("toggle", function() {
+      toggleBtn.textContent = dropdown.open 
+        ? "📖 Close README.md Pane ▴" 
+        : "📖 Read README.md (Drop-down Pane) ▾";
+    });
+  }
+})();
+</script>
+<!-- ===== /IMORTALIMP — AI WARP ENGINE Spotlight Showcase & Documentation Panel ===== -->

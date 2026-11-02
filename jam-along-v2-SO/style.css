@@ -1,0 +1,515 @@
+/* ==========================================================================
+   Overscope SO — Phosphor Oscilloscope & Ambient Harmony Rig
+   Mobile, Tablet, and Public WiFi Enhanced Styles
+   ========================================================================== */
+
+:root {
+  --phosphor: #64ff9a;
+  --phosphor-dim: rgba(100, 255, 154, 0.55);
+  --phosphor-bright: #baffd0;
+  --phosphor-cyan: #00f0ff;
+  --panel-bg: rgba(4, 14, 8, 0.90);
+  --desk-bg: rgba(2, 10, 5, 0.94);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #020905;
+  font-family: "DejaVu Sans Mono", "Consolas", -apple-system, BlinkMacSystemFont, monospace;
+  color: var(--phosphor);
+  cursor: crosshair;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+canvas#grid, canvas#scope, canvas#hud {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100%;
+  height: 100dvh;
+}
+canvas#grid { z-index: 1; }
+canvas#scope { z-index: 2; }
+canvas#hud { z-index: 3; }
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    rgba(0, 0, 0, 0.16) 3px,
+    rgba(0, 0, 0, 0.16) 4px
+  );
+}
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* Custom Phosphor Scrollbar */
+#panel::-webkit-scrollbar,
+#desk::-webkit-scrollbar,
+.touch-dock::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+#panel::-webkit-scrollbar-track,
+#desk::-webkit-scrollbar-track,
+.touch-dock::-webkit-scrollbar-track {
+  background: rgba(0, 20, 10, 0.5);
+}
+#panel::-webkit-scrollbar-thumb,
+#desk::-webkit-scrollbar-thumb,
+.touch-dock::-webkit-scrollbar-thumb {
+  background: rgba(100, 255, 154, 0.3);
+  border-radius: 4px;
+}
+#panel::-webkit-scrollbar-thumb:hover,
+#desk::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 255, 154, 0.6);
+}
+
+/* ------------------------- TOP NAVIGATION BAR ------------------------- */
+
+.top-bar {
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: rgba(2, 10, 5, 0.88);
+  border: 1px solid rgba(100, 255, 154, 0.35);
+  border-radius: 99px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(100, 255, 154, 0.15);
+  max-width: calc(100vw - 20px);
+}
+
+.bar-btn {
+  width: auto;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  background: rgba(100, 255, 154, 0.08);
+  border: 1px solid rgba(100, 255, 154, 0.25);
+  color: var(--phosphor);
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: background 0.15s, box-shadow 0.15s, color 0.15s;
+}
+.bar-btn:hover {
+  background: rgba(100, 255, 154, 0.2);
+  color: #fff;
+}
+.bar-btn.active {
+  background: rgba(100, 255, 154, 0.25);
+  border-color: var(--phosphor);
+  color: #eafff0;
+  box-shadow: 0 0 8px rgba(100, 255, 154, 0.4);
+}
+.bar-btn.fs-btn {
+  padding: 6px 9px;
+  font-size: 12px;
+}
+
+/* ------------------------- CONTROL PANEL ------------------------- */
+
+#panel {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 10;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 14px 16px;
+  border: 1px solid rgba(100, 255, 154, 0.25);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 0 24px rgba(0, 255, 128, 0.08), inset 0 0 18px rgba(0, 255, 128, 0.04);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#panel.hidden { opacity: 0; transform: translateX(-16px); pointer-events: none; }
+
+.panel-head, .desk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.close-icon-btn {
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid rgba(100, 255, 154, 0.3);
+  background: rgba(100, 255, 154, 0.08);
+  color: var(--phosphor);
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+.close-icon-btn:hover {
+  background: rgba(100, 255, 154, 0.25);
+  border-color: var(--phosphor);
+  color: #fff;
+}
+
+#panel h1 { margin: 0; font-size: 15px; letter-spacing: 2px; text-shadow: 0 0 8px rgba(100,255,154,.6); }
+#panel h1 span { opacity: 0.6; }
+#panel h2 { margin: 14px 0 6px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--phosphor-dim); }
+
+.wifi-badge {
+  font-size: 8.5px;
+  letter-spacing: 0.5px;
+  color: #7cfc00;
+  background: rgba(124, 252, 0, 0.1);
+  border: 1px solid rgba(124, 252, 0, 0.3);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin: 6px 0 8px;
+  text-align: center;
+}
+.wifi-badge.insecure {
+  color: #ffd24a;
+  background: rgba(255, 210, 74, 0.12);
+  border-color: rgba(255, 210, 74, 0.4);
+}
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  border: 1px solid currentColor;
+  color: #ffd24a;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pill.live { color: #7cfc00; box-shadow: 0 0 12px rgba(124, 252, 0, 0.35); }
+.pill.simulated { color: #ffd24a; }
+.pill.error { color: #ff5555; }
+
+button {
+  width: 100%;
+  margin: 3px 0;
+  padding: 9px;
+  background: rgba(100, 255, 154, 0.07);
+  color: var(--phosphor);
+  border: 1px solid rgba(100, 255, 154, 0.35);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+button:hover { background: rgba(100, 255, 154, 0.16); box-shadow: 0 0 10px rgba(100,255,154,.25); }
+button.primary { border-color: #7cfc00; color: #7cfc00; }
+button.armed { border-color: #baffd0; color: #eafff0; background: rgba(100, 255, 154, 0.22); box-shadow: 0 0 12px rgba(100, 255, 154, 0.5); }
+button:active { transform: translateY(1px); }
+
+.row { display: flex; gap: 6px; }
+.row button { flex: 1; }
+
+/* Now-Playing Jam Block */
+.jam-block {
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(0, 255, 128, 0.04);
+  border: 1px solid rgba(100, 255, 154, 0.22);
+  border-radius: 8px;
+}
+.jam-subhead {
+  font-size: 8.5px;
+  letter-spacing: 1.5px;
+  color: var(--phosphor-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.jam-btn {
+  font-size: 10.5px;
+  margin: 3px 0;
+}
+.jam-btn.highlight {
+  border-color: #00f0ff;
+  color: #c0ffff;
+  background: rgba(0, 240, 255, 0.12);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+.jam-btn.highlight:hover {
+  background: rgba(0, 240, 255, 0.24);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.45);
+}
+
+#panel label { display: block; font-size: 10px; margin: 6px 0; color: var(--phosphor-dim); }
+#panel label input[type="range"] {
+  width: 100%;
+  accent-color: var(--phosphor);
+  margin-top: 3px;
+  height: 20px;
+  cursor: pointer;
+}
+#panel label.check { display: flex; align-items: center; gap: 8px; }
+#panel label.check input { accent-color: var(--phosphor); }
+
+.note { font-size: 9px; color: rgba(100, 255, 154, 0.55); margin: 8px 0 0; line-height: 1.5; }
+.hint { margin: 12px 0 0; font-size: 9px; color: rgba(100, 255, 154, 0.4); line-height: 1.4; }
+kbd { padding: 1px 5px; border: 1px solid rgba(100, 255, 154, 0.35); border-radius: 3px; font-size: 9px; }
+
+/* ------------------------- FM SYNTH DECK (D) ------------------------- */
+
+#desk {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 10;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 12px 14px;
+  border: 1px solid rgba(100, 255, 154, 0.45);
+  border-radius: 10px;
+  background: var(--desk-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--phosphor);
+  box-shadow: 0 0 28px rgba(100, 255, 154, 0.22), inset 0 0 22px rgba(100, 255, 154, 0.05);
+  text-shadow: 0 0 6px rgba(100, 255, 154, 0.5);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  user-select: text;
+  -webkit-user-select: text;
+}
+#desk.hidden { opacity: 0; transform: translateX(16px); pointer-events: none; }
+#desk h2 { margin: 0; font-size: 11px; letter-spacing: 3px; }
+#desk h2 span { opacity: 0.55; font-weight: normal; letter-spacing: 1px; }
+#desk-wires { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 10px; }
+.chip {
+  font-size: 8.5px;
+  letter-spacing: 1px;
+  padding: 3px 6px;
+  border: 1px solid rgba(100, 255, 154, 0.25);
+  border-radius: 4px;
+  color: rgba(100, 255, 154, 0.45);
+  transition: color 0.12s, background 0.12s, box-shadow 0.12s;
+  touch-action: manipulation;
+}
+.chip.live { color: #eafff0; border-color: #baffd0; background: rgba(100, 255, 154, 0.22); box-shadow: 0 0 12px rgba(100, 255, 154, 0.8); }
+.chip.fx { border-style: double; }
+#desk-song { font-size: 10px; letter-spacing: 1px; margin-bottom: 4px; }
+#desk-meta { font-size: 9px; color: var(--phosphor-dim); margin-bottom: 10px; min-height: 12px; }
+#desk-grid { display: flex; flex-direction: column; gap: 3px; }
+.drow { display: grid; grid-template-columns: 54px repeat(16, 1fr); gap: 2px; align-items: center; }
+.dlabel { font-size: 8px; letter-spacing: 0.5px; color: var(--phosphor-dim); white-space: nowrap; }
+.dcell {
+  height: 15px;
+  line-height: 15px;
+  font-size: 8px;
+  text-align: center;
+  border-radius: 3px;
+  overflow: hidden;
+  color: rgba(100, 255, 154, 0.22);
+  border: 1px solid rgba(100, 255, 154, 0.12);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.dcell:hover { border-color: rgba(186, 255, 208, 0.55); }
+.chip[data-instr] { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.chip[data-instr]:hover { border-color: rgba(186, 255, 208, 0.6); }
+.dcell.on { color: var(--phosphor); border-color: rgba(100, 255, 154, 0.4); background: rgba(100, 255, 154, 0.09); }
+.dcell.ghost { color: rgba(100, 255, 154, 0.45); border-style: dashed; }
+.drow.quiet .dcell { border-style: dashed; opacity: 0.45; }
+.dcell.now { border-color: #baffd0; box-shadow: 0 0 10px rgba(100, 255, 154, 0.85); }
+.dcell.on.now { background: rgba(100, 255, 154, 0.32); color: #eafff0; }
+
+/* ------------------------- QUICK TOUCH JAM DOCK ------------------------- */
+
+.touch-dock {
+  position: fixed;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: rgba(2, 10, 5, 0.88);
+  border: 1px solid rgba(100, 255, 154, 0.35);
+  border-radius: 99px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 14px rgba(100, 255, 154, 0.18);
+  max-width: calc(100vw - 20px);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.touch-dock.hidden {
+  opacity: 0;
+  transform: translate(-50%, 14px);
+  pointer-events: none;
+}
+.dock-btn {
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 99px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  background: rgba(100, 255, 154, 0.09);
+  border: 1px solid rgba(100, 255, 154, 0.3);
+  color: var(--phosphor);
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.dock-btn span { font-size: 13px; }
+.dock-btn:hover {
+  background: rgba(100, 255, 154, 0.22);
+  color: #fff;
+}
+.dock-btn:active {
+  background: rgba(100, 255, 154, 0.35);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(100, 255, 154, 0.7);
+  transform: scale(0.96);
+}
+
+/* ------------------------- RESPONSIVE BREAKPOINTS ------------------------- */
+
+/* Tablets and small laptops */
+@media (min-width: 641px) and (max-width: 1024px) {
+  #panel {
+    top: 52px;
+    left: 12px;
+    width: 290px;
+    max-height: calc(100dvh - 120px);
+  }
+  #desk {
+    top: 52px;
+    right: 12px;
+    width: 360px;
+    max-height: calc(100dvh - 120px);
+  }
+}
+
+/* Mobile Phones (Portrait & Landscape) */
+@media (max-width: 640px) {
+  .top-bar {
+    top: max(6px, env(safe-area-inset-top));
+    padding: 3px 5px;
+    gap: 4px;
+  }
+  .bar-btn {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  #panel {
+    top: 48px;
+    bottom: auto;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 110px);
+    padding: 12px 14px;
+    border-radius: 8px;
+  }
+  #desk {
+    top: 48px;
+    bottom: auto;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 110px);
+    padding: 12px 14px;
+    border-radius: 8px;
+  }
+
+  button {
+    min-height: 40px;
+    font-size: 11.5px;
+    margin: 4px 0;
+  }
+  .dock-btn {
+    min-height: 40px;
+    padding: 8px 13px;
+    font-size: 11px;
+  }
+
+  #panel label {
+    font-size: 10.5px;
+    margin: 8px 0;
+  }
+  #panel label input[type="range"] {
+    height: 26px;
+  }
+
+  .drow {
+    grid-template-columns: 46px repeat(16, 1fr);
+  }
+  .dcell {
+    height: 18px;
+    line-height: 18px;
+  }
+  .chip {
+    font-size: 8px;
+    padding: 3px 5px;
+  }
+}

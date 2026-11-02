@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="AI WARP ENGINE: a browser-based visual synthesizer with 29 warp modes, 34 glitch voices, Canvas effects, and YouTube tab capture.">
+<title>AI WARP ENGINE — Web Showcase</title>
+<style>
+  :root { color-scheme: dark; --bg:#070c12; --panel:#0d1722; --line:#20384a; --mint:#00ffaa; --cyan:#00dfff; --text:#e8f4f1; --muted:#a5b7c0; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px 14px; background:#03070b; color:var(--text); font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  a { color:var(--mint); }
+  #ai-warp-engine-showcase { width:min(1080px,100%); margin:0 auto; overflow:hidden; border:1px solid var(--line); border-top:4px solid var(--mint); border-radius:16px; background:linear-gradient(160deg,#0c1721,#060a10 70%); box-shadow:0 20px 55px #0009,0 0 28px #00ffaa12; }
+  .hero { padding:26px clamp(18px,4vw,42px) 22px; border-bottom:1px solid var(--line); background:radial-gradient(ellipse at 90% 0%,#00dfff13,transparent 45%); }
+  .eyebrow { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .pill { padding:4px 10px; border:1px solid #00ffaa55; border-radius:999px; color:var(--mint); background:#00ffaa10; font-size:.78rem; font-weight:750; letter-spacing:.04em; }
+  .pill.cyan { border-color:#00dfff66; color:var(--cyan); background:#00dfff10; }
+  h1 { margin:0; color:#f4fffb; font-size:clamp(1.7rem,4vw,2.6rem); line-height:1.1; letter-spacing:.025em; }
+  .lead { max-width:800px; margin:14px 0 0; color:#c0d1d4; font-size:1.05rem; }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; }
+  .button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:9px 15px; border:1px solid #00ffaa78; border-radius:9px; color:#03110c; background:var(--mint); font-weight:800; text-decoration:none; }
+  .button.secondary { color:var(--text); border-color:#00dfff66; background:#00dfff12; }
+  .content { padding:22px clamp(18px,4vw,42px) 30px; }
+  h2 { margin:25px 0 10px; color:var(--mint); font-size:1.2rem; }
+  h2:first-child { margin-top:0; }
+  p { margin:8px 0; color:#c5d3d7; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:15px 0; }
+  .card { padding:15px; border:1px solid var(--line); border-radius:11px; background:linear-gradient(145deg,#101c28,#0a1119); }
+  .card h3 { margin:0 0 6px; color:var(--cyan); font-size:1rem; }
+  .card p { margin:0; font-size:.92rem; }
+  .mode-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:6px 20px; padding-left:20px; color:#cfdddf; }
+  .note { margin:16px 0; padding:14px 16px; border-left:3px solid var(--cyan); border-radius:7px; background:#00dfff0c; color:#d7e7e9; }
+  .note strong { color:#fff; }
+  .warning { border-left-color:#ffca62; background:#ffca620d; }
+  .steps { padding-left:22px; color:#cbd9dc; }
+  .steps li { margin:6px 0; }
+  .footer { padding:14px clamp(18px,4vw,42px); border-top:1px solid var(--line); color:var(--muted); font-size:.85rem; }
+  code { color:#aaf8dc; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+  @media (max-width:520px) { body { padding:10px 7px; } .hero,.content { padding-left:16px; padding-right:16px; } .button { width:100%; } }
+</style>
+</head>
+<body>
+<section id="ai-warp-engine-showcase" aria-labelledby="showcase-title">
+  <header class="hero">
+    <div class="eyebrow">
+      <span class="pill">PURE WEB · v6.4.20</span>
+      <span class="pill cyan">29 WARP MODES</span>
+      <span class="pill">34 GLITCH VOICES</span>
+      <span class="pill">PUBLIC DOMAIN · CC0</span>
+    </div>
+    <h1 id="showcase-title">AI WARP ENGINE</h1>
+    <p class="lead">A browser-based visual synthesizer combining a live Canvas voice mixer, 29 animated warp modes, audio-reactive controls, and Ghost Protocol / V-Sync effects.</p>
+    <nav class="actions" aria-label="AI Warp Engine links">
+      <a class="button" href="https://www.imortalimp.nl/ai_warp_engine/" target="_blank" rel="noopener">⚡ Launch AI Warp Engine</a>
+      <a class="button secondary" href="https://www.imortalimp.nl/media_page/" target="_blank" rel="noopener">🎛 Open Media Page</a>
+      <a class="button secondary" href="https://github.com/TheImortalimp/AI-WARP-ENGINE" target="_blank" rel="noopener">⌘ Source on GitHub</a>
+    </nav>
+  </header>
+
+  <div class="content">
+    <h2>What runs through the effects pipeline</h2>
+    <div class="grid">
+      <article class="card"><h3>29 AI Warp modes</h3><p>Original Canvas deformations process the current canvas source and the graphics painted by enabled voice rails.</p></article>
+      <article class="card"><h3>34 independent voices</h3><p>17 core glitch voices plus 17 isolated <code>GC#(3)</code> voices. Set each rail’s level, size, and depth.</p></article>
+      <article class="card"><h3>Ghost + V-Sync R3</h3><p>Canvas-rendered DIA, Spectrum, CRT, Plasma, LED, Scanphasing, Color Harmony, and Sharp treatments.</p></article>
+      <article class="card"><h3>Audio-reactive + automation</h3><p>Audio analysis, presets, Auto Glitch, Timed Automation, Soft-Eye, and Crescendo can drive the visual stack.</p></article>
+    </div>
+
+    <h2>The 29 Warp modes</h2>
+    <ul class="mode-list">
+      <li>Liquid</li><li>Prism</li><li>Breathe</li><li>Fold</li><li>Aurora</li><li>Vortex</li>
+      <li>Cybergrid</li><li>Hyperdrive</li><li>Kaleidoscope</li><li>Quantum</li><li>Ripple</li><li>Analog CRT</li>
+      <li>NewBlue Roll</li><li>Active Cam</li><li>Shear</li><li>Wiggle</li><li>Zoom Blur</li><li>Video Tile</li>
+      <li>Twirl</li><li>Light Ring</li><li>Earthquake</li><li>Water Drop</li><li>RGB Shift</li><li>Quad Mirror</li>
+      <li>Fish Eye</li><li>Pinch</li><li>Solarize</li><li>Cathode Beam</li><li>Neon Edges</li>
+    </ul>
+
+    <h2>Use the modes on the voice canvas</h2>
+    <ol class="steps">
+      <li>Open the engine and enable one or more voice rails so they draw graphics on the Canvas.</li>
+      <li>Turn <strong>AI WARP</strong> on, set Warp Strength above zero, and choose a mode from the selector or cycle modes with <code>W</code>.</li>
+      <li>The render order is source → active voices → Ghost/V-Sync → AI Warp. Thus the Warp mode transforms the graphics produced by the active voice canvas.</li>
+    </ol>
+
+    <aside class="note warning"><strong>YouTube browser limitation:</strong> an embedded YouTube player is cross-origin. The browser does not allow its video pixels to be read by Canvas, so the 29 Canvas modes cannot directly warp the iframe’s pixels. When YouTube is embedded without capture, the CSS Warp Bus can style the player shell, while AI Warp modes process enabled voice-canvas graphics over the page. These are separate layers—not a claim that Canvas is processing the protected YouTube picture.</aside>
+
+    <aside class="note"><strong>To run the original pixel FX on YouTube itself:</strong> open the video in a separate tab or window, return to the engine, choose <strong>FULL FX: CAPTURE YT TAB</strong>, and select that source in the browser’s sharing picker. Include tab audio for audio-reactive effects. Do not capture the engine’s own tab, which can create recursive feedback.</aside>
+
+    <h2>Other features</h2>
+    <p>Play local media, use the YouTube knowledgebase, capture a browser tab/window, monitor microphone input, save user presets, export frames, and use keyboard shortcuts. Browser capture requires a secure context (HTTPS or localhost) and user permission.</p>
+  </div>
+  <footer class="footer">AI WARP ENGINE · R3 Canvas Edition · Public domain dedication: CC0 1.0 / Unlicense. See the project repository for source and release details.</footer>
+</section>
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon Poems · 8 Phases · All Locales | Imortalimp Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0c1a;
+            --card: rgba(20, 22, 40, 0.88);
+            --accent: #7dd3fc;
+            --moon: #fef9c3;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --cyan: #00ffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Space Grotesk', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #stars {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .twinkle {
+            position: absolute; width: 2px; height: 2px; background: #fff;
+            border-radius: 50%; animation: twinkle 2.6s infinite ease-in-out; opacity: 0.7;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.12; } 50% { opacity: 1; }
+        }
+        .container {
+            position: relative; z-index: 1; max-width: 960px;
+            margin: 0 auto; padding: 1.4rem 1rem 3.5rem;
+        }
+        header { text-align: center; margin-bottom: 1.5rem; }
+        header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2.1rem, 5.5vw, 3.2rem);
+            color: var(--moon);
+            text-shadow: 0 0 18px rgba(254,249,195,0.35);
+            margin-bottom: 0.25rem;
+        }
+        header p { color: var(--muted); font-size: 0.92rem; }
+        .controls {
+            display: flex; flex-wrap: wrap; gap: 0.9rem;
+            justify-content: center; align-items: center;
+            margin-bottom: 1.5rem;
+            background: var(--card);
+            border: 1px solid rgba(125,211,252,0.22);
+            border-radius: 16px; padding: 0.95rem 1.1rem;
+            backdrop-filter: blur(8px);
+        }
+        label { font-size: 0.82rem; color: var(--muted); margin-right: 0.35rem; }
+        select {
+            background: #1e2135; color: var(--text);
+            border: 1px solid rgba(125,211,252,0.35);
+            border-radius: 10px; padding: 0.5rem 0.85rem;
+            font-size: 0.92rem; cursor: pointer; outline: none; min-width: 190px;
+        }
+        select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(125,211,252,0.22); }
+        .clock-box { text-align: center; min-width: 150px; }
+        .clock-box .time {
+            font-size: 1.3rem; font-weight: 600; color: var(--cyan);
+            font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+        }
+        .clock-box .tz-name { font-size: 0.7rem; color: var(--muted); margin-top: 0.12rem; }
+        .phase-grid { display: grid; gap: 1rem; }
+        .phase-card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 1.05rem 1.2rem;
+            transition: border-color 0.22s, transform 0.22s;
+            backdrop-filter: blur(6px);
+        }
+        .phase-card:hover { border-color: rgba(125,211,252,0.32); transform: translateY(-2px); }
+        .phase-header { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.55rem; }
+        .phase-emoji { font-size: 1.55rem; line-height: 1; }
+        .phase-name { font-weight: 600; font-size: 1rem; color: var(--accent); }
+        .phase-poem {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.18rem; line-height: 1.52; color: #f1f5f9;
+            white-space: pre-line;
+        }
+        footer {
+            text-align: center; margin-top: 2.2rem;
+            color: var(--muted); font-size: 0.78rem;
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        @media (max-width: 620px) {
+            .controls { flex-direction: column; }
+            .phase-poem { font-size: 1.08rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+
+    <div class="container">
+        <header>
+            <h1>🌙 Moon Poems · 8 Phases</h1>
+            <p>Full redux of the original 15 locales + Americas set · Imortalimp test page</p>
+        </header>
+
+        <div class="controls">
+            <div>
+                <label for="regionSelect">Region / Locale</label>
+                <select id="regionSelect">
+                    <optgroup label="Europe (5)">
+                        <option value="en">UK &amp; Ireland 🇬🇧🇮🇪</option>
+                        <option value="de">Germany 🇩🇪</option>
+                        <option value="it">Italy 🇮🇹</option>
+                        <option value="hu">Hungary 🇭🇺</option>
+                        <option value="fi">Finland 🇫🇮</option>
+                    </optgroup>
+                    <optgroup label="Middle East · Russia · Central">
+                        <option value="ru">Russia 🇷🇺</option>
+                        <option value="ku">Kurdistan</option>
+                        <option value="he">Israel 🇮🇱</option>
+                        <option value="ar">Arab World</option>
+                    </optgroup>
+                    <optgroup label="India">
+                        <option value="hi">India 🇮🇳</option>
+                    </optgroup>
+                    <optgroup label="East Asia &amp; Pacific (5)">
+                        <option value="zn">China 🇨🇳</option>
+                        <option value="jp">Japan 🇯🇵</option>
+                        <option value="jv">Java (Indonesia) 🇮🇩</option>
+                        <option value="vi">Vietnam 🇻🇳</option>
+                        <option value="ko">Korea 🇰🇷</option>
+                    </optgroup>
+                    <optgroup label="Americas (previous set)">
+                        <option value="peru">Peru 🇵🇪</option>
+                        <option value="brazil">Brazil 🇧🇷</option>
+                        <option value="suriname">Suriname 🇸🇷</option>
+                        <option value="mexico">Mexico 🇲🇽</option>
+                        <option value="haiti">Haiti 🇭🇹</option>
+                        <option value="argentina">Argentina 🇦🇷</option>
+                        <option value="us">United States 🇺🇸</option>
+                        <option value="canada">Canada 🇨🇦</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="clock-box">
+                <div class="time" id="localTime">--:--:--</div>
+                <div class="tz-name" id="tzLabel">Local time</div>
+            </div>
+        </div>
+
+        <div class="phase-grid" id="poemContainer"></div>
+
+        <footer>
+            <p>Original animated moon → <a href="https://www.imortalimp.nl/moon.html" target="_blank">imortalimp.nl/moon.html</a></p>
+            <p style="margin-top:0.35rem;">Peace · HATE ALL HACKERS OF CODE · 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        const PHASES = [
+            { key: "new",        name: "New Moon",            emoji: "🌑" },
+            { key: "waxingCres", name: "Waxing Crescent",     emoji: "🌒" },
+            { key: "firstQ",     name: "First Quarter",       emoji: "🌓" },
+            { key: "waxingGib",  name: "Waxing Gibbous",      emoji: "🌔" },
+            { key: "full",       name: "Full Moon",           emoji: "🌕" },
+            { key: "waningGib",  name: "Waning Gibbous",      emoji: "🌖" },
+            { key: "lastQ",      name: "Last / Third Quarter",emoji: "🌗" },
+            { key: "waningCres", name: "Waning Crescent",     emoji: "🌘" }
+        ];
+
+        const regionMeta = {
+            /* Europe 5 */
+            en:  { label: "UK & Ireland", tz: "Europe/London",      tzName: "Europe/London · GMT/BST" },
+            de:  { label: "Germany",      tz: "Europe/Berlin",      tzName: "Europe/Berlin · CET/CEST" },
+            it:  { label: "Italy",        tz: "Europe/Rome",        tzName: "Europe/Rome · CET/CEST" },
+            hu:  { label: "Hungary",      tz: "Europe/Budapest",    tzName: "Europe/Budapest · CET/CEST" },
+            fi:  { label: "Finland",      tz: "Europe/Helsinki",    tzName: "Europe/Helsinki · EET/EEST" },
+            /* Middle East · Russia */
+            ru:  { label: "Russia",       tz: "Europe/Moscow",      tzName: "Europe/Moscow · MSK (UTC+3)" },
+            ku:  { label: "Kurdistan",    tz: "Asia/Baghdad",      tzName: "Asia/Baghdad · AST (UTC+3)" },
+            he:  { label: "Israel",       tz: "Asia/Jerusalem",     tzName: "Asia/Jerusalem · IST/IDT" },
+            ar:  { label: "Arab World",   tz: "Asia/Riyadh",        tzName: "Asia/Riyadh · AST (UTC+3)" },
+            /* India */
+            hi:  { label: "India",        tz: "Asia/Kolkata",       tzName: "Asia/Kolkata · IST (UTC+5:30)" },
+            /* East Asia & Pacific 5 */
+            zn:  { label: "China",        tz: "Asia/Shanghai",      tzName: "Asia/Shanghai · CST (UTC+8)" },
+            jp:  { label: "Japan",        tz: "Asia/Tokyo",         tzName: "Asia/Tokyo · JST (UTC+9)" },
+            jv:  { label: "Java",         tz: "Asia/Jakarta",       tzName: "Asia/Jakarta · WIB (UTC+7)" },
+            vi:  { label: "Vietnam",      tz: "Asia/Ho_Chi_Minh",   tzName: "Asia/Ho_Chi_Minh · ICT (UTC+7)" },
+            ko:  { label: "Korea",        tz: "Asia/Seoul",         tzName: "Asia/Seoul · KST (UTC+9)" },
+            /* Americas (previous) */
+            peru:      { label: "Peru",       tz: "America/Lima",                  tzName: "America/Lima · PET (UTC−5)" },
+            brazil:    { label: "Brazil",     tz: "America/Sao_Paulo",             tzName: "America/Sao_Paulo · BRT (UTC−3)" },
+            suriname:  { label: "Suriname",   tz: "America/Paramaribo",            tzName: "America/Paramaribo · SRT (UTC−3)" },
+            mexico:    { label: "Mexico",     tz: "America/Mexico_City",           tzName: "America/Mexico_City · CST (UTC−6)" },
+            haiti:     { label: "Haiti",      tz: "America/Port-au-Prince",        tzName: "America/Port-au-Prince · EST (UTC−5)" },
+            argentina: { label: "Argentina",  tz: "America/Argentina/Buenos_Aires",tzName: "America/Argentina/Buenos_Aires · ART (UTC−3)" },
+            us:        { label: "United States", tz: "America/New_York",           tzName: "America/New_York · Eastern" },
+            canada:    { label: "Canada",     tz: "America/Toronto",               tzName: "America/Toronto · Eastern" }
+        };
+
+        /* ================================================================
+           REDUX – Original 15 locales (8 phases each)
+           ================================================================ */
+        const poems = {
+            /* ---------- EUROPE 5 ---------- */
+            en: {
+                new:        "New Moon over the quiet British isles.\nThe old stones wait in velvet dark.\nIn the silence a new story starts —\nplant your wish where the ancient heart beats.",
+                waxingCres: "A silver curve above the Irish green.\nFirst light on the cliffs and the soft rain.\nWaxing Crescent — hope begins to climb.\nWhisper to the wind, it still has time.",
+                firstQ:     "Half moon over London’s restless lights.\nBalance of river and the endless nights.\nFirst Quarter asks the old and the young:\nwhich song will still be sung?",
+                waxingGib:  "Almost full above the Scottish highlands.\nHeather and stone under her growing hands.\nWaxing Gibbous — strength in the cool air.\nThese islands remember every prayer.",
+                full:       "Full Moon turns the Thames to living silver.\nFrom Cornwall to the northern river.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the Welsh green hills.\nStill kind, still quiet, still she fills.\nWaning Gibbous — give thanks and let go.\nWhat the sea takes, the sea will know.",
+                lastQ:      "Half left above the English mist.\nClear the path with a gentle fist.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Atlantic edge.\nLast smile before the dark again.\nRest now under the northern sky —\nthe next new moon will never lie."
+            },
+            de: {
+                new:        "New Moon über dem stillen deutschen Wald.\nDie alten Bäume halten den Atem an.\nIn der Dunkelheit wartet neues Leben —\npflanze deinen Wunsch, wo die Wurzeln schweben.",
+                waxingCres: "Ein silberner Bogen über dem Rhein.\nErstes Licht auf Wein und Stein.\nWaxing Crescent — Hoffnung steigt empor.\nFlüstere dem Wind, er hört dich noch.",
+                firstQ:     "Halbmond über den Berliner Lichtern.\nGleichgewicht von Gestern und den Richtern.\nFirst Quarter fragt das alte und das neue Land:\nwelche Geschichte bleibt bestehen?",
+                waxingGib:  "Fast voll über den bayerischen Alpen.\nSchnee und Fels unter ihren Händen.\nWaxing Gibbous — Kraft in der kühlen Luft.\nDieses Land erinnert sich an jede Schrift.",
+                full:       "Vollmond macht den Rhein zu fließendem Silber.\nVon der Nordsee bis zum südlichen Gipfel.\nEin Gesicht für jedes sterbliche Herz —\nwir teilen das Licht, wir teilen den Schmerz.",
+                waningGib:  "Sie wird weicher über den grünen Hügeln.\nNoch immer gütig, noch immer still.\nWaning Gibbous — danke und lass los.\nWas der Fluss nimmt, der Fluss schon weiß.",
+                lastQ:      "Halb übrig über dem deutschen Nebel.\nRäume den Weg mit sanfter Hand.\nLast Quarter: löse, was nicht mehr dient.\nDer nächste Vollmond bringt neuen Sinn.",
+                waningCres: "Dünne Sichel über dem Atlantikrand.\nLetztes Lächeln vor der Dunkelheit.\nRuhe jetzt unter dem nördlichen Himmel —\nder nächste Neumond lügt nie."
+            },
+            it: {
+                new:        "New Moon sopra le colline italiane.\nLe antiche pietre tengono il respiro.\nNel buio aspetta una nuova storia —\npianta il desiderio dove batte il cuore.",
+                waxingCres: "Una curva d’argento sopra il Tevere.\nPrima luce sulle rovine e sul mare.\nWaxing Crescent — la speranza sale.\nSussurra al vento, lui ancora ascolta.",
+                firstQ:     "Mezza luna sopra le luci di Roma.\nEquilibrio tra passato e domani.\nFirst Quarter chiede al vecchio e al nuovo:\nquale canzone resterà?",
+                waxingGib:  "Quasi piena sopra le Alpi e il mare.\nMarmo e ulivi sotto le sue mani.\nWaxing Gibbous — forza nell’aria fresca.\nQuesta terra ricorda ogni preghiera.",
+                full:       "Piena luna trasforma il Mediterraneo in argento.\nDa Venezia alla Sicilia, un solo volto.\nUn volto per ogni cuore mortale —\ncondividiamo la luce, condividiamo il dolore.",
+                waningGib:  "Si ammorbidisce sopra le colline toscane.\nAncora generosa, ancora quieta.\nWaning Gibbous — ringrazia e lascia andare.\nCiò che il mare prende, il mare già sa.",
+                lastQ:      "Metà rimasta sopra la nebbia padana.\nPulisci il sentiero con mano gentile.\nLast Quarter: lascia ciò che non serve più.\nLa prossima piena porterà nuovi nervi.",
+                waningCres: "Sottile falce sopra il bordo del mare.\nUltimo sorriso prima del buio.\nRiposa ora sotto il cielo italiano —\nla prossima luna nuova non mente mai."
+            },
+            hu: {
+                new:        "New Moon a csendes magyar táj felett.\nAz öreg fák visszatartják a lélegzetet.\nA sötétben új történet vár —\nültesd el a kívánságod, ahol a szív dobog.",
+                waxingCres: "Ezüst ív a Duna felett.\nElső fény a romokon és a vízen.\nWaxing Crescent — a remény emelkedik.\nSuttogj a szélnek, még hall téged.",
+                firstQ:     "Félhold a budapesti fények felett.\nEgyensúly tegnap és holnap között.\nFirst Quarter kérdezi a régit és az újat:\nmelyik dal marad meg?",
+                waxingGib:  "Majdnem teli a Kárpátok felett.\nHó és kő az ő kezei alatt.\nWaxing Gibbous — erő a hűvös levegőben.\nEz a föld emlékszik minden imára.",
+                full:       "Telihold ezüstté változtatja a Dunát.\nA Balatontól az Alföldig egy arc.\nEgy arc minden halandó szívnek —\nmegosztjuk a fényt, megosztjuk a fájdalmat.",
+                waningGib:  "Lágyul a zöld dombok felett.\nMég mindig bőkezű, még mindig csendes.\nWaning Gibbous — adj hálát és engedd el.\nAmit a folyó elvesz, a folyó már tudja.",
+                lastQ:      "Fél maradt a magyar köd felett.\nTisztítsd az utat gyengéd kézzel.\nLast Quarter: engedd el, ami már nem szolgál.\nA következő telihold új idegeket hoz.",
+                waningCres: "Vékony sarló az Atlanti szélén.\nUtolsó mosoly a sötétség előtt.\nPihenj most az északi ég alatt —\na következő újhold soha nem hazudik."
+            },
+            fi: {
+                new:        "New Moon yli hiljaisen suomalaisen metsän.\nVanhat puut pidättävät henkeään.\nPimeässä odottaa uusi tarina —\nistuta toiveesi sinne, missä sydän lyö.",
+                waxingCres: "Hopeinen kaari järven yllä.\nEnsimmäinen valo kallioilla ja vedessä.\nWaxing Crescent — toivo nousee.\nKuiskaa tuulelle, se vielä kuulee.",
+                firstQ:     "Puolikuu Helsingin valojen yllä.\nTasapaino eilisen ja huomisen välillä.\nFirst Quarter kysyy vanhaa ja uutta:\nmikä laulu jää jäljelle?",
+                waxingGib:  "Melkein täysi Lapin yllä.\nLumi ja kivi hänen käsiensä alla.\nWaxing Gibbous — voimaa viileässä ilmassa.\nTämä maa muistaa jokaisen rukouksen.",
+                full:       "Täysikuu muuttaa järvet hopeaksi.\nEtelästä pohjoiseen yksi kasvo.\nYksi kasvo jokaiselle kuolevaiselle sydämelle —\njaamme valon, jaamme kivun.",
+                waningGib:  "Hän pehmenee vihreiden kukkuloiden yllä.\nYhä antelias, yhä hiljainen.\nWaning Gibbous — kiitä ja päästä irti.\nMinkä joki ottaa, joki jo tietää.",
+                lastQ:      "Puoli jäljellä suomalaisen sumun yllä.\nPuhdista polku lempeällä kädellä.\nLast Quarter: päästä irti siitä, mikä ei enää palvele.\nSeuraava täysikuu tuo uusia hermoja.",
+                waningCres: "Ohut sirppi Atlantin reunalla.\nViimeinen hymy ennen pimeyttä.\nLepää nyt pohjoisen taivaan alla —\nseuraava uusikuu ei koskaan valehtele."
+            },
+
+            /* ---------- MIDDLE EAST · RUSSIA · CENTRAL ---------- */
+            ru: {
+                new:        "New Moon над тихой русской землёй.\nСтарые берёзы затаили дыхание.\nВ темноте ждёт новая история —\nпосади желание там, где бьётся сердце.",
+                waxingCres: "Серебряный серп над Москвой-рекой.\nПервый свет на куполах и снегу.\nWaxing Crescent — надежда поднимается.\nПрошепчи ветру, он ещё слышит.",
+                firstQ:     "Половина луны над огнями столицы.\nБаланс вчерашнего и завтрашнего.\nFirst Quarter спрашивает старое и новое:\nкакая песня останется?",
+                waxingGib:  "Почти полная над сибирской тайгой.\nСнег и лес под её руками.\nWaxing Gibbous — сила в холодном воздухе.\nЭта земля помнит каждую молитву.",
+                full:       "Полная луна превращает Волгу в серебро.\nОт Балтики до Тихого океана одно лицо.\nОдно лицо для каждого смертного сердца —\nмы делим свет, мы делим боль.",
+                waningGib:  "Она смягчается над зелёными холмами.\nВсё ещё щедрая, всё ещё тихая.\nWaning Gibbous — поблагодари и отпусти.\nЧто река забирает, река уже знает.",
+                lastQ:      "Половина осталась над русским туманом.\nОчисти путь мягкой рукой.\nLast Quarter: отпусти то, что больше не служит.\nСледующая полная луна принесёт новые нервы.",
+                waningCres: "Тонкий серп над краем океана.\nПоследняя улыбка перед темнотой.\nОтдохни теперь под северным небом —\nследующая новая луна никогда не лжёт."
+            },
+            ku: {
+                new:        "New Moon over the mountains of Kurdistan.\nThe old stones hold their breath in the dark.\nIn the silence a new fire waits —\nplant your wish where the eagles fly.",
+                waxingCres: "A silver curve above the Zagros peaks.\nFirst light on the villages and the streams.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the ancient lands.\nBalance of past and the open hands.\nFirst Quarter asks the old and the young:\nwhich song will still be sung?",
+                waxingGib:  "Almost full above the highland plains.\nSnow and stone under her growing light.\nWaxing Gibbous — strength in the cool air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the rivers to silver fire.\nFrom the mountains to the southern plain.\nOne face for every mortal heart —\nwe share the light, we share the pain.",
+                waningGib:  "She softens over the green valleys.\nStill generous, still quiet and true.\nWaning Gibbous — give thanks and let go.\nWhat the mountain takes, the mountain knows.",
+                lastQ:      "Half left above the misty ridges.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the eastern edge.\nLast smile before the dark returns.\nRest now under the Kurdish sky —\nthe next new moon will never lie."
+            },
+            he: {
+                new:        "New Moon over the hills of Jerusalem.\nThe ancient stones wait in the dark.\nIn the silence a new promise waits —\nplant your wish where the olive trees stand.",
+                waxingCres: "A silver curve above the Judean hills.\nFirst light on the walls and the sea.\nWaxing Crescent — hope begins to climb.\nWhisper to the wind, it still has time.",
+                firstQ:     "Half moon over the lights of Tel Aviv.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the desert night.\nSand and stone under her growing light.\nWaxing Gibbous — strength in the warm air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the Sea of Galilee to silver.\nFrom the north to the southern shore.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green valleys.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty hills.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Mediterranean edge.\nLast smile before the dark again.\nRest now under the Israeli sky —\nthe next new moon will never lie."
+            },
+            ar: {
+                new:        "New Moon over the quiet desert night.\nThe old dunes hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the stars still shine.",
+                waxingCres: "A silver curve above the ancient cities.\nFirst light on the minarets and the sea.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the night.\nBalance of past and the open light.\nFirst Quarter asks the old and the young:\nwhich song will still be sung?",
+                waxingGib:  "Almost full above the wide desert plain.\nSand and palm under her growing hand.\nWaxing Gibbous — strength in the warm air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the dunes to living silver.\nFrom the ocean to the inland river.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green oases.\nStill generous, still quiet and true.\nWaning Gibbous — give thanks and let go.\nWhat the desert takes, the desert knows.",
+                lastQ:      "Half left above the quiet hills.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the eastern edge.\nLast smile before the dark returns.\nRest now under the Arab sky —\nthe next new moon will never lie."
+            },
+
+            /* ---------- INDIA ---------- */
+            hi: {
+                new:        "New Moon over the quiet Indian night.\nThe old rivers hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the banyan stands.",
+                waxingCres: "A silver curve above the Ganga’s flow.\nFirst light on the ghats and the temples.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the cities.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the Himalayan peaks.\nSnow and stone under her growing light.\nWaxing Gibbous — strength in the cool air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the sacred rivers to silver.\nFrom the mountains to the southern shore.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green fields.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty plains.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Indian Ocean edge.\nLast smile before the dark again.\nRest now under the Indian sky —\nthe next new moon will never lie."
+            },
+
+            /* ---------- EAST ASIA & PACIFIC 5 ---------- */
+            zn: {
+                new:        "New Moon over the quiet Chinese night.\nThe old mountains hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the rivers begin.",
+                waxingCres: "A silver curve above the Yangtze flow.\nFirst light on the temples and the cities.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the east.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the high plateaus.\nSnow and stone under her growing light.\nWaxing Gibbous — strength in the cool air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the rivers to living silver.\nFrom the mountains to the southern sea.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green hills.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty plains.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the eastern edge.\nLast smile before the dark again.\nRest now under the Chinese sky —\nthe next new moon will never lie."
+            },
+            jp: {
+                new:        "New Moon over the quiet Japanese night.\nThe old shrines hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the cherry trees stand.",
+                waxingCres: "A silver curve above the quiet bay.\nFirst light on the temples and the sea.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the cities.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the mountain peaks.\nSnow and stone under her growing light.\nWaxing Gibbous — strength in the cool air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the lakes to living silver.\nFrom the north to the southern shore.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green hills.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty valleys.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Pacific edge.\nLast smile before the dark again.\nRest now under the Japanese sky —\nthe next new moon will never lie."
+            },
+            jv: {
+                new:        "New Moon over the quiet Javanese night.\nThe old volcanoes hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the rice fields stand.",
+                waxingCres: "A silver curve above the quiet sea.\nFirst light on the temples and the trees.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the island.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the highland green.\nMist and stone under her growing light.\nWaxing Gibbous — strength in the warm air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the rice fields to silver.\nFrom the mountains to the southern shore.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green valleys.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty hills.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Indian Ocean edge.\nLast smile before the dark again.\nRest now under the Javanese sky —\nthe next new moon will never lie."
+            },
+            vi: {
+                new:        "New Moon over the quiet Vietnamese night.\nThe old rivers hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the rice fields stand.",
+                waxingCres: "A silver curve above the quiet delta.\nFirst light on the temples and the sea.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the cities.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the highland green.\nMist and stone under her growing light.\nWaxing Gibbous — strength in the warm air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the rivers to living silver.\nFrom the mountains to the southern shore.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green valleys.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty hills.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the South China Sea.\nLast smile before the dark again.\nRest now under the Vietnamese sky —\nthe next new moon will never lie."
+            },
+            ko: {
+                new:        "New Moon over the quiet Korean night.\nThe old mountains hold their breath in the dark.\nIn the silence a new story waits —\nplant your wish where the pine trees stand.",
+                waxingCres: "A silver curve above the quiet bay.\nFirst light on the temples and the sea.\nWaxing Crescent — hope begins to rise.\nWhisper to the wind, it still hears you.",
+                firstQ:     "Half moon over the lights of the cities.\nBalance of past and the living stream.\nFirst Quarter asks the old and the new:\nwhich song will still be true?",
+                waxingGib:  "Almost full above the highland peaks.\nSnow and stone under her growing light.\nWaxing Gibbous — strength in the cool air.\nThis land remembers every prayer.",
+                full:       "Full Moon turns the rivers to living silver.\nFrom the north to the southern shore.\nOne face for every mortal heart —\nwe share the light, we share the dark.",
+                waningGib:  "She softens over the green hills.\nStill generous, still quiet and kind.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half left above the misty valleys.\nClear the path with a gentle hand.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the eastern sea.\nLast smile before the dark again.\nRest now under the Korean sky —\nthe next new moon will never lie."
+            },
+
+            /* ---------- AMERICAS (previous set – kept) ---------- */
+            peru: {
+                new:        "Dark over the Andes, the moon is born unseen.\nPachamama holds her breath in the high silence.\nNew beginnings hide in the black sky —\nplant your intention where the condors fly.",
+                waxingCres: "A silver fingernail appears above Cusco.\nThe first light of hope touches the ancient stones.\nWaxing slowly, she climbs the sacred peaks —\nwhisper your wishes to the mountain winds.",
+                firstQ:     "Half-lit over the Sacred Valley she stands.\nBalance of shadow and light on Inca lands.\nFirst Quarter asks: what will you choose?\nThe path of the sun or the path of the moon?",
+                waxingGib:  "Almost full, she floods the altiplano white.\nLlamas sleep under her growing light.\nWaxing Gibbous — the heart grows strong.\nThe Andes remember every ancient song.",
+                full:       "Full Moon over Machu Picchu burns bright.\nSilver rivers run through the endless night.\nPachamama and Inti both smile below —\nwe are mortals, yet the moon makes us whole.",
+                waningGib:  "She begins to fade above Lake Titicaca.\nStill generous, still soft on the water.\nWaning Gibbous teaches quiet release —\nlet go of what no longer brings peace.",
+                lastQ:      "Half remaining over the coastal fog.\nLima sleeps while the desert keeps watch.\nLast Quarter: time to clear the old ways.\nThe Pacific waits for cleaner days.",
+                waningCres: "A thin smile left in the pre-dawn sky.\nThe last crescent over Arequipa’s high.\nRest now, plant again when she is new —\nthe Andes will keep every promise true."
+            },
+            brazil: {
+                new:        "New Moon over the Amazon is pure dark.\nJaguars move silent through the black.\nIn the womb of the forest everything waits —\nnew life will rise when the moon creates.",
+                waxingCres: "A silver curve above the Rio Negro.\nFirst light dances on the water’s flow.\nWaxing Crescent — the samba begins soft.\nHope grows under the canopy loft.",
+                firstQ:     "Half moon over São Paulo’s restless lights.\nBalance between concrete and forest nights.\nFirst Quarter asks the city and the wild:\nwhich rhythm will you choose, which child?",
+                waxingGib:  "Almost full above Iguaçu’s roar.\nThe falls shine brighter than the day before.\nWaxing Gibbous — power gathering fast.\nBrazil’s heart beats under her vast.",
+                full:       "Full Moon turns the Pantanal to silver sea.\nCapivaras and caimans move free.\nCarnival of light from north to south —\none moon, one song, one open mouth.",
+                waningGib:  "She softens over Bahia’s warm shore.\nStill generous, still calling for more.\nWaning Gibbous — gratitude in the air.\nRelease what you no longer need to bear.",
+                lastQ:      "Half left above the dry sertão.\nThe land waits for rain that will come soon.\nLast Quarter: clear the dust from the path.\nPrepare the ground for the next full bath.",
+                waningCres: "Thin crescent over Fernando de Noronha.\nThe last light before the dark returns.\nRest, dream, and wait for the new —\nthe Atlantic keeps every secret true."
+            },
+            suriname: {
+                new:        "New Moon over the Suriname River is black.\nRainforest holds its breath in the dark.\nCreole and Maroon spirits wait near —\nnew stories will rise when the moon is here.",
+                waxingCres: "A thin silver smile above Paramaribo.\nFirst light on the wooden houses below.\nWaxing Crescent — the night begins to sing.\nHope grows with the forest’s green wing.",
+                firstQ:     "Half moon over the interior green.\nBalance between river and the unseen.\nFirst Quarter asks the old and the young:\nwhich ancestral song will still be sung?",
+                waxingGib:  "Almost full above the Brokopondo lake.\nSilver on the water, no need to take.\nWaxing Gibbous — strength in the quiet air.\nThe forest remembers every prayer.",
+                full:       "Full Moon turns the jungle to living light.\nHowler monkeys call through the night.\nOne river, one people, one silver face —\nmortal and immortal share the same space.",
+                waningGib:  "She softens over the coastal flats.\nStill kind, still watching the wooden boats.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half remaining above the border lands.\nClear the path with quiet hands.\nLast Quarter: release the old weight.\nThe rainforest waits for a cleaner fate.",
+                waningCres: "Thin crescent over the Atlantic edge.\nLast light before the new dark pledge.\nRest now under the Suriname sky —\nthe next new moon will never lie."
+            },
+            mexico: {
+                new:        "New Moon over the Sierra Madre is dark.\nThe jaguar dreams in the silent park.\nAztec and Maya both feel the void —\nnew fire waits where the old was destroyed.",
+                waxingCres: "A silver fingernail above Teotihuacán.\nFirst light on the Avenue of the Dead.\nWaxing Crescent — the heart begins to beat.\nWhisper to the stones what you need.",
+                firstQ:     "Half moon over the Yucatán green.\nBalance of cenote and the unseen.\nFirst Quarter asks the living and the gone:\nwhich path will the next dawn walk upon?",
+                waxingGib:  "Almost full above the Desert of Sonora.\nCactus and coyote under her aura.\nWaxing Gibbous — power rising slow.\nMexico’s soul continues to grow.",
+                full:       "Full Moon turns the pyramids to silver fire.\nQuetzalcoatl’s wings of pure desire.\nFrom Chiapas to the northern border line —\none moon for every heart and every time.",
+                waningGib:  "She softens over the Pacific coast.\nStill generous with her silver host.\nWaning Gibbous — gratitude and release.\nLet the old stories find their peace.",
+                lastQ:      "Half left above the Valley of Mexico.\nClear the smog, clear the old echo.\nLast Quarter: prepare the sacred ground.\nNew light will rise when the dark is found.",
+                waningCres: "Thin crescent over the Gulf’s warm tide.\nLast smile before she goes to hide.\nRest, dream, and wait for the new —\nthe ancient gods still walk with you."
+            },
+            haiti: {
+                new:        "New Moon over the hills of Haiti is deep.\nThe drums are quiet, the ancestors sleep.\nIn the dark the loa wait for the call —\nnew strength will rise when the moon is small.",
+                waxingCres: "A thin silver curve above Port-au-Prince.\nFirst light on the colourful streets.\nWaxing Crescent — hope begins to climb.\nThe mountain remembers every rhyme.",
+                firstQ:     "Half moon over the Citadelle’s stone.\nBalance of power and the unknown.\nFirst Quarter asks the living and the dead:\nwhich story will still be said?",
+                waxingGib:  "Almost full above the blue Caribbean.\nWaves shine brighter with every turn.\nWaxing Gibbous — courage gathering near.\nAyiti’s heart has nothing to fear.",
+                full:       "Full Moon turns the island to living silver.\nDrums answer her, the night delivers.\nFrom Cap-Haïtien to the southern shore —\none moon, one people, one open door.",
+                waningGib:  "She softens over the Artibonite plain.\nStill kind, still washing away the pain.\nWaning Gibbous — give thanks and let go.\nWhat the mountain takes, the mountain will know.",
+                lastQ:      "Half remaining above the western hills.\nClear the path with quiet wills.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Atlantic edge.\nLast light before the dark again.\nRest now under the Haitian sky —\nthe next new moon will never lie."
+            },
+            argentina: {
+                new:        "New Moon over the Pampas is pure black.\nGauchos sleep while the night holds back.\nIn the dark the tango waits for its beat —\nnew fire will rise when the moon is complete.",
+                waxingCres: "A silver curve above Buenos Aires lights.\nFirst hope on the Río de la Plata nights.\nWaxing Crescent — the heart begins to move.\nWhisper your dream to the southern groove.",
+                firstQ:     "Half moon over the Andes’ sharp spine.\nBalance of wine and the mountain’s design.\nFirst Quarter asks the city and the field:\nwhich passion will the next dawn yield?",
+                waxingGib:  "Almost full above Patagonia’s wide land.\nGlaciers shine under her growing hand.\nWaxing Gibbous — strength in the cold air.\nArgentina’s soul is always there.",
+                full:       "Full Moon turns the Iguazú to silver fire.\nTango and silence under one desire.\nFrom Ushuaia to the northern border line —\none moon for every heart and every time.",
+                waningGib:  "She softens over the wine valleys slow.\nStill generous with her silver glow.\nWaning Gibbous — gratitude and release.\nLet the old stories find their peace.",
+                lastQ:      "Half left above the southern wind.\nClear the path, begin again.\nLast Quarter: prepare the open ground.\nNew light will rise when the dark is found.",
+                waningCres: "Thin crescent over the South Atlantic tide.\nLast smile before she goes to hide.\nRest, dream, and wait for the new —\nthe Pampas will keep every promise true."
+            },
+            us: {
+                new:        "New Moon over the wide American dark.\nFrom desert to forest, no single mark.\nIn the quiet the dream still waits —\nnew freedom rises when the moon creates.",
+                waxingCres: "A thin silver smile above the eastern shore.\nFirst light on the cities that never sleep more.\nWaxing Crescent — hope begins to climb.\nThe land remembers every rhyme.",
+                firstQ:     "Half moon over the heartland plains.\nBalance of prairie and the mountain rains.\nFirst Quarter asks the many and the one:\nwhich story will still be sung?",
+                waxingGib:  "Almost full above the western range.\nRed rocks and canyons under her change.\nWaxing Gibbous — power gathering fast.\nAmerica’s heart is built to last.",
+                full:       "Full Moon turns the lakes and coasts to fire.\nFrom sea to shining sea, one desire.\nEagle and dreamer under the same face —\nmortal and free in the same shared space.",
+                waningGib:  "She softens over the southern nights.\nStill kind on the bayou and the city lights.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half remaining above the northern woods.\nClear the path through the old and the goods.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Pacific edge.\nLast light before the dark again.\nRest now under the wide open sky —\nthe next new moon will never lie."
+            },
+            canada: {
+                new:        "New Moon over the true north is deep black.\nLakes and tundra hold the silence back.\nIn the dark the first peoples still wait —\nnew stories will rise when the moon creates.",
+                waxingCres: "A thin silver curve above the eastern coast.\nFirst light on the maple and the rocky host.\nWaxing Crescent — hope begins to climb.\nThe land remembers every ancient rhyme.",
+                firstQ:     "Half moon over the prairie wide and free.\nBalance of wheat and the northern sea.\nFirst Quarter asks the many and the one:\nwhich path will the next dawn walk upon?",
+                waxingGib:  "Almost full above the Rocky spine.\nGlaciers and forests under her design.\nWaxing Gibbous — strength in the cold air.\nCanada’s soul is always there.",
+                full:       "Full Moon turns the northern lights to dance.\nFrom ocean to ocean, one silver chance.\nFirst Nations and settlers under one face —\nmortal and free in the same shared space.",
+                waningGib:  "She softens over the great lakes’ shore.\nStill kind on the cities and the quiet more.\nWaning Gibbous — give thanks and let go.\nWhat the river takes, the river will know.",
+                lastQ:      "Half remaining above the Arctic edge.\nClear the path through the frozen ledge.\nLast Quarter: release what no longer serves.\nThe next full moon will bring new nerves.",
+                waningCres: "Thin crescent over the Pacific rain.\nLast light before the dark again.\nRest now under the northern sky —\nthe next new moon will never lie."
+            }
+        };
+
+        /* ================================================================
+           RENDER + CLOCK
+           ================================================================ */
+        const select = document.getElementById("regionSelect");
+        const poemContainer = document.getElementById("poemContainer");
+        const localTimeEl = document.getElementById("localTime");
+        const tzLabelEl = document.getElementById("tzLabel");
+
+        function renderPoems(regionKey) {
+            const regionPoems = poems[regionKey];
+            const meta = regionMeta[regionKey];
+            if (!regionPoems || !meta) return;
+
+            poemContainer.innerHTML = PHASES.map(phase => {
+                const text = regionPoems[phase.key] || "—";
+                return `
+                    <article class="phase-card">
+                        <div class="phase-header">
+                            <span class="phase-emoji">${phase.emoji}</span>
+                            <span class="phase-name">${phase.name}</span>
+                        </div>
+                        <div class="phase-poem">${text}</div>
+                    </article>
+                `;
+            }).join("");
+
+            tzLabelEl.textContent = meta.tzName;
+            updateClock(regionKey);
+        }
+
+        function updateClock(regionKey) {
+            const tz = regionMeta[regionKey].tz;
+            const formatter = new Intl.DateTimeFormat("en-GB", {
+                timeZone: tz,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            });
+            localTimeEl.textContent = formatter.format(new Date());
+        }
+
+        function addStars() {
+            const stars = document.getElementById("stars");
+            for (let i = 0; i < 160; i++) {
+                const star = document.createElement("div");
+                star.className = "twinkle";
+                star.style.top = Math.random() * 100 + "%";
+                star.style.left = Math.random() * 100 + "%";
+                star.style.animationDuration = (1.4 + Math.random() * 3.2) + "s";
+                star.style.animationDelay = Math.random() * 5 + "s";
+                stars.appendChild(star);
+            }
+        }
+
+        select.addEventListener("change", () => renderPoems(select.value));
+        renderPoems(select.value);
+        addStars();
+        setInterval(() => updateClock(select.value), 1000);
+    </script>
+</body>
+</html>

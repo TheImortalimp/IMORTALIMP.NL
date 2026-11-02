@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ImortalImp Weather Probe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>ImortalImp Weather Probe</h1>
+  <p>Reads local weather using OpenWeather + browser geolocation.</p>
+
+  <button id="scanBtn">Scan My Weather</button>
+
+  <div id="output">Waiting for scan…</div>
+
+  <script>
+    const API_KEY = "aa2b8c5b609148ae4e17c2fbb217cd51";
+    const output = document.getElementById("output");
+
+    document.getElementById("scanBtn").addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        output.textContent = "Geolocation not supported.";
+        return;
+      }
+
+      output.textContent = "Requesting location…";
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        output.textContent = `Location: ${lat.toFixed(4)}, ${lon.toFixed(4)}\nFetching weather…`;
+
+        try {
+          const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`;
+
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("Weather API error: " + res.status);
+
+          const data = await res.json();
+
+          // Temperature
+          const tempC = data.main.temp;
+          const tempF = (tempC * 9/5 + 32).toFixed(1);
+
+          // Cloud cover (%)
+          const clouds = data.clouds.all;
+
+          // Rain chance approximation:
+          // OpenWeather free tier does NOT provide direct rain probability.
+          // We approximate: if "rain" exists → chance = 100%, else 0%.
+          let rainChance = 0;
+          if (data.rain) rainChance = 100;
+
+          const report = `
+📡 ImortalImp Weather Probe
+
+Temperature:
+  ${tempC.toFixed(1)} °C
+  ${tempF} °F
+
+Cloud Cover:
+  ${clouds}% 
+
+Rain Chance (approx):
+  ${rainChance}%
+
+Location:
+  ${data.name || "Unknown"} (${lat.toFixed(4)}, ${lon.toFixed(4)})
+
+Source:
+  OpenWeather API
+          `;
+
+          output.textContent = report;
+
+        } catch (err) {
+          output.textContent = "Error: " + err.message;
+        }
+
+      }, (err) => {
+        output.textContent = "Geolocation error: " + err.message;
+      });
+    });
+  </script>
+</body>
+</html>

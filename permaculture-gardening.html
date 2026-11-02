@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Permaculture Garden — Tips, Tricks & Timeless Principles</title>
+<style>
+  :root{
+    --cream:#faf6ee; --paper:#fffdf7; --ink:#22301f; --muted:#5c6b57;
+    --g900:#1b3a28; --g700:#2f6b3a; --g500:#5aa469; --g100:#e4f1e1; --g50:#f0f7ec;
+    --terra:#c96f3f; --terra-light:#f6e3d3; --sun:#e9b949; --sun-light:#fdf0cd;
+    --brown:#8a6d4f; --radius:18px; --shadow:0 10px 30px rgba(27,58,40,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.65}
+  h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;line-height:1.2;color:var(--g900)}
+  a{color:var(--g700)}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+  section{padding:64px 0}
+  .kicker{letter-spacing:.18em;text-transform:uppercase;font-size:.75rem;font-weight:700;color:var(--terra);text-align:center}
+  h2.section-title{font-size:clamp(1.8rem,4vw,2.6rem);text-align:center;margin:8px 0 10px}
+  .section-sub{text-align:center;color:var(--muted);max-width:680px;margin:0 auto 40px}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(250,246,238,.95);backdrop-filter:blur(6px);border-bottom:1px solid #e7ddc9}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .logo{font-family:Georgia,serif;font-size:1.25rem;font-weight:700;color:var(--g900);text-decoration:none}
+  .nav-links{display:flex;gap:18px;flex-wrap:wrap}
+  .nav-links a{text-decoration:none;font-size:.92rem;font-weight:600;color:var(--g700)}
+  .nav-links a:hover{color:var(--terra)}
+
+  /* HERO */
+  .hero{background:linear-gradient(180deg,#dcefc9 0%,#eef6dd 55%,var(--cream) 100%);padding:56px 0 30px;text-align:center;overflow:hidden}
+  .hero .badge{display:inline-block;background:var(--g900);color:#eaf4e4;padding:6px 16px;border-radius:999px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .hero h1{font-size:clamp(2.4rem,6vw,4.2rem);margin:18px auto 14px;max-width:800px}
+  .hero h1 em{color:var(--g700);font-style:italic}
+  .hero p.lead{font-size:1.15rem;color:#3d4f38;max-width:640px;margin:0 auto 26px}
+  .btn{display:inline-block;padding:13px 28px;border-radius:999px;font-weight:700;text-decoration:none;font-size:1rem;border:2px solid var(--g700);transition:.2s;cursor:pointer}
+  .btn-solid{background:var(--g700);color:#fff}
+  .btn-solid:hover{background:var(--g900)}
+  .btn-ghost{background:transparent;color:var(--g700);margin-left:10px}
+  .btn-ghost:hover{background:var(--g100)}
+  .hero-art{max-width:860px;margin:36px auto 0}
+  .hero-art svg{width:100%;height:auto;display:block}
+  .hero-stats{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:28px}
+  .stat{background:var(--paper);border:1px solid #e7ddc9;border-radius:14px;padding:14px 22px;box-shadow:var(--shadow)}
+  .stat b{font-family:Georgia,serif;font-size:1.4rem;color:var(--g700);display:block}
+  .stat span{font-size:.82rem;color:var(--muted)}
+
+  /* ETHICS */
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+  .card{background:var(--paper);border:1px solid #ece2cd;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow)}
+  .card .icon{font-size:2.2rem;margin-bottom:10px}
+  .card h3{margin-bottom:8px;font-size:1.3rem}
+  .card p{color:#44503f;font-size:.97rem}
+
+  /* PRINCIPLES */
+  .principles{background:var(--g900)}
+  .principles h2,.principles .kicker{color:#cfe8c8}
+  .principles .section-sub{color:#a9c4a2}
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+  .pcard{background:#24492f;border:1px solid #356043;border-radius:14px;padding:20px;color:#e6f2df}
+  .pcard .num{width:34px;height:34px;border-radius:50%;background:var(--sun);color:#3a2f08;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:.95rem}
+  .pcard h4{color:#fff;font-size:1.05rem;margin-bottom:6px}
+  .pcard p{font-size:.88rem;color:#bfd8b6}
+
+  /* ZONES */
+  .zones-flex{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
+  @media(max-width:800px){.zones-flex{grid-template-columns:1fr}}
+  .zone-buttons{display:flex;flex-direction:column;gap:10px}
+  .zbtn{text-align:left;background:var(--paper);border:2px solid #e2d7bf;border-radius:14px;padding:14px 18px;cursor:pointer;font-family:inherit;font-size:1rem;transition:.15s}
+  .zbtn:hover{border-color:var(--g500)}
+  .zbtn.active{border-color:var(--g700);background:var(--g50);box-shadow:var(--shadow)}
+  .zbtn b{color:var(--g700)}
+  .zone-detail{background:var(--g50);border:1px dashed var(--g500);border-radius:var(--radius);padding:22px;margin-top:16px}
+  .zone-detail h3{margin-bottom:6px}
+  .zone-svg circle{transition:opacity .2s}
+  .zone-svg text{font-family:Georgia,serif;font-weight:700;fill:#1b3a28}
+
+  /* STEPS */
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px}
+  .step{background:var(--paper);border-radius:var(--radius);padding:24px;border-top:6px solid var(--sun);box-shadow:var(--shadow);position:relative}
+  .step .n{font-family:Georgia,serif;font-size:2.4rem;color:var(--terra);font-weight:700}
+  .step h4{margin:4px 0 6px;font-size:1.1rem}
+  .step p{font-size:.9rem;color:#44503f}
+
+  /* TIPS */
+  .tips-section{background:#f3ecd9}
+  .filters{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:30px}
+  .fbtn{background:var(--paper);border:2px solid var(--g700);color:var(--g700);padding:8px 20px;border-radius:999px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.95rem}
+  .fbtn.active{background:var(--g700);color:#fff}
+  .tip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+  .tip{background:var(--paper);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid #ece2cd}
+  .tip .tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:10px}
+  .tag-soil{background:#ead9c2;color:#6b4e2e}.tag-water{background:#d3e8f5;color:#1f5a7a}
+  .tag-plant{background:var(--g100);color:var(--g700)}.tag-pest{background:#f6d9d3;color:#8f3a28}
+  .tag-energy{background:var(--sun-light);color:#7a5c0e}
+  .tip h3{font-size:1.15rem;margin-bottom:8px}
+  .tip p{font-size:.93rem;color:#44503f}
+  .tip .trick{margin-top:12px;background:var(--sun-light);border-left:4px solid var(--sun);padding:10px 14px;border-radius:0 10px 10px 0;font-size:.88rem}
+  .tip .trick b{color:#7a5c0e}
+  .hidden{display:none!important}
+
+  /* LASAGNA */
+  .lasagna-flex{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+  @media(max-width:800px){.lasagna-flex{grid-template-columns:1fr}}
+  .layer{border-radius:10px;padding:12px 18px;margin-bottom:6px;color:#fff;font-weight:600;font-size:.95rem;display:flex;justify-content:space-between}
+  .layer span{font-weight:400;font-size:.85rem;opacity:.9}
+
+  /* TABLE */
+  .table-wrap{overflow-x:auto;border-radius:var(--radius);box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;background:var(--paper);min-width:640px}
+  th{background:var(--g700);color:#fff;text-align:left;padding:14px 16px;font-size:.92rem}
+  td{padding:12px 16px;border-top:1px solid #eee4cf;font-size:.93rem}
+  tr:nth-child(even) td{background:var(--g50)}
+  .good{color:var(--g700);font-weight:600}.bad{color:#b1442c}
+
+  /* SEASONS */
+  .season-tabs{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+  .stab{border:2px solid var(--terra);background:var(--paper);color:var(--terra);padding:10px 24px;border-radius:999px;font-weight:700;cursor:pointer;font-family:inherit;font-size:1rem}
+  .stab.active{background:var(--terra);color:#fff}
+  .season-panel{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;border:1px solid #ece2cd}
+  .season-panel h3{font-size:1.5rem;margin-bottom:4px}
+  .season-panel .when{color:var(--terra);font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em}
+  .task-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px;margin-top:20px}
+  .task-cols h4{margin-bottom:8px;color:var(--g700)}
+  .task-cols ul{padding-left:20px;font-size:.93rem;color:#44503f}
+  .task-cols li{margin-bottom:6px}
+
+  /* MISTAKES / CHECKLIST */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  @media(max-width:800px){.two-col{grid-template-columns:1fr}}
+  .mistake{border-left:5px solid #d2604a;background:#fdf1ee;border-radius:0 12px 12px 0;padding:16px 20px;margin-bottom:14px}
+  .mistake h4{color:#8f3a28;margin-bottom:4px}
+  .mistake p{font-size:.92rem;color:#5c453f}
+  .checklist-card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;border:1px solid #ece2cd}
+  .check-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed #e7ddc9;cursor:pointer}
+  .check-item input{width:20px;height:20px;margin-top:3px;accent-color:var(--g700);cursor:pointer}
+  .check-item.done span{text-decoration:line-through;color:var(--muted)}
+  .progress{height:14px;background:var(--g100);border-radius:999px;overflow:hidden;margin:16px 0 8px}
+  .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--g500),var(--g700));transition:width .35s}
+  .progress-label{font-size:.88rem;color:var(--muted);text-align:center}
+
+  /* FAQ */
+  details{background:var(--paper);border:1px solid #ece2cd;border-radius:14px;padding:18px 22px;margin-bottom:12px;box-shadow:0 4px 14px rgba(27,58,40,.06)}
+  summary{font-family:Georgia,serif;font-weight:700;font-size:1.08rem;color:var(--g900);cursor:pointer}
+  details p{margin-top:10px;color:#44503f;font-size:.95rem}
+
+  /* QUOTE + FOOTER */
+  .quote{background:linear-gradient(135deg,var(--g700),var(--g900));color:#eef7e8;text-align:center;padding:64px 20px}
+  .quote blockquote{font-family:Georgia,serif;font-size:clamp(1.4rem,3.5vw,2.1rem);font-style:italic;max-width:760px;margin:0 auto 14px}
+  .quote cite{font-style:normal;color:#bcd8ae;font-size:.95rem}
+  footer{background:var(--g900);color:#a9c4a2;text-align:center;padding:36px 20px;font-size:.9rem}
+  footer b{color:#e6f2df}
+  .to-top{position:fixed;right:18px;bottom:18px;background:var(--g700);color:#fff;border:none;width:48px;height:48px;border-radius:50%;font-size:1.2rem;cursor:pointer;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#top">🌱 The Permaculture Garden</a>
+    <div class="nav-links">
+      <a href="#principles">Principles</a>
+      <a href="#zones">Zones</a>
+      <a href="#tips">Tips &amp; Tricks</a>
+      <a href="#companions">Companions</a>
+      <a href="#seasons">Seasons</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="badge">Work with nature, not against it</span>
+    <h1>Grow More, Work Less,<br><em>the Permaculture Way</em></h1>
+    <p class="lead">Permaculture is gardening designed like an ecosystem — abundant, self-fertile, water-wise and teeming with life. Whether you have a balcony or a hectare, these principles, tips and tricks will help your garden (almost) take care of itself.</p>
+    <a class="btn btn-solid" href="#tips">🌿 Browse the Tips &amp; Tricks</a>
+    <a class="btn btn-ghost" href="#start">I'm a beginner →</a>
+
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 860 300" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="740" cy="55" r="34" fill="#e9b949"/>
+        <circle cx="740" cy="55" r="46" fill="#e9b949" opacity="0.25"/>
+        <ellipse cx="150" cy="52" rx="60" ry="18" fill="#ffffff" opacity="0.85"/>
+        <ellipse cx="190" cy="44" rx="42" ry="15" fill="#ffffff" opacity="0.85"/>
+        <ellipse cx="500" cy="38" rx="50" ry="15" fill="#ffffff" opacity="0.7"/>
+        <!-- hills -->
+        <path d="M0 210 Q 200 150 430 200 T 860 185 V300 H0 Z" fill="#7fb069"/>
+        <path d="M0 240 Q 260 195 520 235 T 860 225 V300 H0 Z" fill="#5aa469"/>
+        <path d="M0 268 Q 300 240 560 262 T 860 258 V300 H0 Z" fill="#2f6b3a"/>
+        <!-- big tree -->
+        <rect x="118" y="150" width="14" height="70" rx="5" fill="#8a6d4f"/>
+        <circle cx="125" cy="115" r="52" fill="#2f6b3a"/>
+        <circle cx="88" cy="140" r="34" fill="#5aa469"/>
+        <circle cx="162" cy="140" r="34" fill="#5aa469"/>
+        <circle cx="108" cy="105" r="6" fill="#d2604a"/><circle cx="140" cy="128" r="6" fill="#d2604a"/><circle cx="126" cy="88" r="6" fill="#d2604a"/>
+        <!-- small tree -->
+        <rect x="664" y="168" width="10" height="48" rx="4" fill="#8a6d4f"/>
+        <circle cx="669" cy="140" r="36" fill="#5aa469"/>
+        <circle cx="645" cy="158" r="22" fill="#7fb069"/><circle cx="693" cy="158" r="22" fill="#7fb069"/>
+        <!-- garden beds -->
+        <g>
+          <rect x="280" y="228" width="120" height="26" rx="13" fill="#8a6d4f"/>
+          <rect x="430" y="238" width="120" height="26" rx="13" fill="#776149"/>
+          <circle cx="305" cy="222" r="12" fill="#2f6b3a"/><circle cx="340" cy="218" r="14" fill="#5aa469"/><circle cx="375" cy="222" r="12" fill="#2f6b3a"/>
+          <circle cx="458" cy="232" r="12" fill="#5aa469"/><circle cx="492" cy="228" r="14" fill="#2f6b3a"/><circle cx="525" cy="232" r="12" fill="#5aa469"/>
+          <circle cx="340" cy="216" r="5" fill="#e9b949"/><circle cx="492" cy="226" r="5" fill="#d2604a"/>
+        </g>
+        <!-- flowers & sprouts -->
+        <g fill="#e9b949"><circle cx="60" cy="252" r="6"/><circle cx="210" cy="262" r="6"/><circle cx="610" cy="250" r="6"/><circle cx="795" cy="240" r="6"/></g>
+        <g fill="#d2604a"><circle cx="92" cy="266" r="5"/><circle cx="640" cy="264" r="5"/><circle cx="765" cy="254" r="5"/></g>
+        <g stroke="#cfe8c8" stroke-width="3" stroke-linecap="round"><path d="M40 275 v-12 M220 282 v-12 M700 278 v-12 M820 268 v-12"/></g>
+        <!-- bee -->
+        <g><ellipse cx="420" cy="90" rx="14" ry="10" fill="#e9b949"/><path d="M414 82 v16 M424 82 v16" stroke="#3a2f08" stroke-width="4"/><ellipse cx="416" cy="76" rx="9" ry="6" fill="#ffffff" opacity="0.85"/><path d="M395 98 q-14 8 -26 2" stroke="#8a6d4f" stroke-width="2" fill="none" stroke-dasharray="4 4"/></g>
+        <!-- birds -->
+        <path d="M300 60 q8-8 16 0 q8-8 16 0" stroke="#2f6b3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M350 82 q6-6 12 0 q6-6 12 0" stroke="#2f6b3a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat"><b>3</b><span>Core ethics</span></div>
+      <div class="stat"><b>12</b><span>Design principles</span></div>
+      <div class="stat"><b>6</b><span>Garden zones</span></div>
+      <div class="stat"><b>−70%</b><span>Water use with mulch &amp; swales*</span></div>
+      <div class="stat"><b>0</b><span>Chemicals needed</span></div>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:10px">*Typical savings reported in mulched, well-designed beds vs. bare-soil watering.</p>
+  </div>
+</header>
+
+<!-- ETHICS -->
+<section>
+  <div class="wrap">
+    <p class="kicker">Start with why</p>
+    <h2 class="section-title">The Three Ethics</h2>
+    <p class="section-sub">Coined in the 1970s by Australians Bill Mollison and David Holmgren, permaculture rests on three simple ethics. Every design decision gets tested against them.</p>
+    <div class="grid3">
+      <div class="card"><div class="icon">🌍</div><h3>Earth Care</h3><p>Look after soil, water, forests and all living things. In the garden that means building soil instead of depleting it, catching rain, and planting for pollinators and wildlife — not just for ourselves.</p></div>
+      <div class="card"><div class="icon">🤲</div><h3>People Care</h3><p>Design for human needs — fresh food, shade, beauty, rest — without burning out the gardener. A permaculture garden should give you energy, not demand endless weekend labour.</p></div>
+      <div class="card"><div class="icon">⚖️</div><h3>Fair Share</h3><p>Take only what you need and share the surplus: seeds, cuttings, harvests and knowledge. Return excess to the system — compost the scraps, feed the soil, give away the extra courgettes (there are <em>always</em> extra courgettes).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section class="principles" id="principles">
+  <div class="wrap">
+    <p class="kicker">David Holmgren's</p>
+    <h2 class="section-title">12 Design Principles</h2>
+    <p class="section-sub">Think of these as a checklist for every garden decision — from where to put a bench to how to handle a slug invasion.</p>
+    <div class="pgrid">
+      <div class="pcard"><div class="num">1</div><h4>Observe &amp; Interact</h4><p>Spend time watching sun, wind, water and wildlife before you dig. "Beauty is in the eye of the beholder."</p></div>
+      <div class="pcard"><div class="num">2</div><h4>Catch &amp; Store Energy</h4><p>Harvest rain in barrels, sun in a greenhouse, fertility in compost. Make hay while the sun shines.</p></div>
+      <div class="pcard"><div class="num">3</div><h4>Obtain a Yield</h4><p>Design so something useful comes out — food, herbs, flowers, shade. You can't work on an empty stomach.</p></div>
+      <div class="pcard"><div class="num">4</div><h4>Apply Self-Regulation</h4><p>Accept feedback. If tomatoes always fail in that corner, the garden is telling you something. Listen.</p></div>
+      <div class="pcard"><div class="num">5</div><h4>Use Renewable Resources</h4><p>Compost over fertiliser bags, mulch over plastic, saved seed over bought seed. Let nature do the work.</p></div>
+      <div class="pcard"><div class="num">6</div><h4>Produce No Waste</h4><p>Every output is another element's input: kitchen scraps → compost → soil → dinner. A stitch in time saves nine.</p></div>
+      <div class="pcard"><div class="num">7</div><h4>Design from Patterns</h4><p>Step back and see the big patterns first — contours, seasons, water flow — then fill in the details.</p></div>
+      <div class="pcard"><div class="num">8</div><h4>Integrate, Don't Segregate</h4><p>Mix plants, stack functions, connect elements. Many hands make light work — for plants too.</p></div>
+      <div class="pcard"><div class="num">9</div><h4>Use Small, Slow Solutions</h4><p>Start with one bed, not ten. Small changes are easier to maintain and learn from. Slow and steady wins.</p></div>
+      <div class="pcard"><div class="num">10</div><h4>Use &amp; Value Diversity</h4><p>Many species = resilience. If one crop fails, others thrive. Don't put all your eggs in one basket.</p></div>
+      <div class="pcard"><div class="num">11</div><h4>Use Edges &amp; Marginals</h4><p>The most productive places are where two systems meet — pond edges, path borders, fences, walls.</p></div>
+      <div class="pcard"><div class="num">12</div><h4>Respond Creatively to Change</h4><p>Gardens evolve and so does the climate. Treat problems as design prompts, not disasters.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ZONES -->
+<section id="zones">
+  <div class="wrap">
+    <p class="kicker">Plan smart, walk less</p>
+    <h2 class="section-title">The Six Zones</h2>
+    <p class="section-sub">Place things according to how often you visit them. Herbs you snip daily go by the kitchen door; the wild corner you never touch goes furthest away. Click a zone to explore:</p>
+    <div class="zones-flex">
+      <div>
+        <svg class="zone-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <circle id="zc5" cx="200" cy="200" r="190" fill="#b7d7a8"/>
+          <circle id="zc4" cx="200" cy="200" r="155" fill="#8fc07f"/>
+          <circle id="zc3" cx="200" cy="200" r="122" fill="#7fb069"/>
+          <circle id="zc2" cx="200" cy="200" r="90" fill="#5aa469"/>
+          <circle id="zc1" cx="200" cy="200" r="58" fill="#2f6b3a"/>
+          <circle id="zc0" cx="200" cy="200" r="28" fill="#e9b949"/>
+          <text x="200" y="206" text-anchor="middle" font-size="16">0</text>
+          <text x="200" y="158" text-anchor="middle" font-size="15" fill="#fff">1</text>
+          <text x="200" y="126" text-anchor="middle" font-size="15">2</text>
+          <text x="200" y="94" text-anchor="middle" font-size="15">3</text>
+          <text x="200" y="62" text-anchor="middle" font-size="15">4</text>
+          <text x="200" y="28" text-anchor="middle" font-size="15">5</text>
+          <text x="200" y="388" text-anchor="middle" font-size="12" fill="#2f6b3a">🏠 = home at the centre</text>
+        </svg>
+      </div>
+      <div>
+        <div class="zone-buttons" id="zoneButtons"></div>
+        <div class="zone-detail">
+          <h3 id="zoneTitle">Zone 0 — The Home</h3>
+          <p id="zoneDesc">You! Your house, your energy, your time. Permaculture design starts with the gardener: a system you can't maintain isn't sustainable, however clever it looks on paper.</p>
+          <p id="zoneExamples" style="margin-top:8px"><b>Examples:</b> kitchen, seed-saving shelf, garden journal, a comfy chair for observing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- START STEPS -->
+<section id="start" style="padding-top:10px">
+  <div class="wrap">
+    <p class="kicker">New here?</p>
+    <h2 class="section-title">Start in 5 Small Steps</h2>
+    <p class="section-sub">You don't need a master plan or a digger. One season, five moves:</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h4>Observe for a bit</h4><p>Note where sun falls, where water pools after rain, which corner is sheltered. Even a week of watching beats guessing. Sketch it roughly.</p></div>
+      <div class="step"><div class="n">2</div><h4>Mulch one bed</h4><p>Cover soil with cardboard + compost or straw (the "lasagna" below). No digging, no weeding marathon. Plant straight into it.</p></div>
+      <div class="step"><div class="n">3</div><h4>Catch some water</h4><p>A single rain barrel under a downpipe can save thousands of litres a year — and plants prefer rainwater to tap water.</p></div>
+      <div class="step"><div class="n">4</div><h4>Plant perennials</h4><p>Rhubarb, herbs, berry bushes, asparagus: plant once, harvest for years. They're the backbone of a low-work garden.</p></div>
+      <div class="step"><div class="n">5</div><h4>Start composting</h4><p>A simple heap or bin turns kitchen scraps into free fertiliser. Aim for a mix of "greens" (scraps, clippings) and "browns" (leaves, cardboard).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section class="tips-section" id="tips">
+  <div class="wrap">
+    <p class="kicker">The good stuff</p>
+    <h2 class="section-title">🌿 Tips &amp; Tricks</h2>
+    <p class="section-sub">Fifteen field-tested ideas, each with a gardener's shortcut. Filter by what your garden needs most:</p>
+    <div class="filters">
+      <button class="fbtn active" data-filter="all">All tips</button>
+      <button class="fbtn" data-filter="soil">🟤 Soil</button>
+      <button class="fbtn" data-filter="water">💧 Water</button>
+      <button class="fbtn" data-filter="plant">🌱 Planting</button>
+      <button class="fbtn" data-filter="pest">🐞 Pests &amp; Wildlife</button>
+      <button class="fbtn" data-filter="energy">⚡ Time &amp; Energy</button>
+    </div>
+    <div class="tip-grid" id="tipGrid">
+      <article class="tip" data-cat="soil"><span class="tag tag-soil">Soil</span><h3>Never leave soil naked</h3><p>Bare soil erodes, bakes and loses life. Always cover it — with mulch, ground-cover plants or a green manure like clover or phacelia. Soil under cover stays moist, friable and full of worms.</p><div class="trick"><b>Trick:</b> Aim for 5–10 cm of straw, shredded leaves or wood chips. Top up little and often, like feeding a pet.</div></article>
+      <article class="tip" data-cat="soil"><span class="tag tag-soil">Soil</span><h3>Go no-dig</h3><p>Digging destroys fungal networks and brings weed seeds to the surface. Instead, lay compost on top and let worms pull it down. Charles Dowding's trials show equal or better yields with far less work.</p><div class="trick"><b>Trick:</b> Smother weeds with overlapping cardboard, wet it well, add 10–15 cm of compost, and plant the same day.</div></article>
+      <article class="tip" data-cat="soil"><span class="tag tag-soil">Soil</span><h3>Chop &amp; drop</h3><p>When a plant finishes or gets unruly, chop it and drop it right where it grew. The biomass feeds soil life in place — no hauling to the compost heap, no nutrients exported.</p><div class="trick"><b>Trick:</b> Grow comfrey near fruit trees. Cut it 4–5× a season and drop the potassium-rich leaves as mulch around the trunk.</div></article>
+      <article class="tip" data-cat="water"><span class="tag tag-water">Water</span><h3>Slow it, spread it, sink it</h3><p>Rain that runs off is wasted (and takes topsoil with it). Swales — shallow ditches on contour — catch runoff and sink it into the ground where roots can use it for weeks.</p><div class="trick"><b>Trick:</b> On flat ground, dig "banana circles" or simple mulched basins around trees and direct downpipes into them.</div></article>
+      <article class="tip" data-cat="water"><span class="tag tag-water">Water</span><h3>Water deep, not often</h3><p>A thorough soak once a week grows deep, drought-resistant roots. Daily sprinkling trains shallow roots that panic the moment you go on holiday.</p><div class="trick"><b>Trick:</b> Bury an unglazed terracotta pot (an <em>olla</em>) beside thirsty plants, fill weekly, and let it seep slowly to the roots.</div></article>
+      <article class="tip" data-cat="water"><span class="tag tag-water">Water</span><h3>Greywater &amp; rain chains</h3><p>Shower and washing-up water (with eco soap) can go on ornamentals and fruit trees. A 100 m² roof in a temperate climate harvests roughly 60,000+ litres a year — mostly free.</p><div class="trick"><b>Trick:</b> Put a bucket in the shower while it warms up. That's 5 litres a day for your thirstiest pot.</div></article>
+      <article class="tip" data-cat="plant"><span class="tag tag-plant">Planting</span><h3>Plant in guilds, not rows</h3><p>A guild is a team: a fruit tree + nitrogen-fixers (beans, clover) + nutrient miners (comfrey, dandelion) + ground cover + insect flowers. Each member helps the others.</p><div class="trick"><b>Trick:</b> Classic apple guild: apple tree, comfrey, chives (deter scab), daffodils (deter voles), clover, and a currant bush.</div></article>
+      <article class="tip" data-cat="plant"><span class="tag tag-plant">Planting</span><h3>Stack in seven layers</h3><p>A forest grows in layers — canopy, small trees, shrubs, herbs, ground cover, roots and climbers. Copy it and one patch of ground yields seven harvests instead of one.</p><div class="trick"><b>Trick:</b> Small garden? Do three: a dwarf fruit tree, berry shrubs beneath, strawberries and herbs carpeting the floor.</div></article>
+      <article class="tip" data-cat="plant"><span class="tag tag-plant">Planting</span><h3>Sow little &amp; often</h3><p>Succession sowing beats the glut-and-famine cycle. A short row of lettuce, radish or beans every two weeks means something is always just ready.</p><div class="trick"><b>Trick:</b> Let one lettuce and one coriander plant go to seed each year. Free seedlings forever ("volunteers").</div></article>
+      <article class="tip" data-cat="pest"><span class="tag tag-pest">Pests &amp; Wildlife</span><h3>Feed the pest-eaters</h3><p>Ladybirds, hoverflies, frogs, hedgehogs and birds do your pest control for free. Give them water, undisturbed corners, log piles and flowers from March to October.</p><div class="trick"><b>Trick:</b> A tiny pond — even a buried washing-up bowl with a ramp — brings frogs that hoover up slugs nightly.</div></article>
+      <article class="tip" data-cat="pest"><span class="tag tag-pest">Pests &amp; Wildlife</span><h3>Trap crops &amp; decoys</h3><p>Plant something pests love <em>more</em> than your crop, then let them have it. Nasturtiums lure aphids off beans; sacrificial cabbages draw caterpillars away.</p><div class="trick"><b>Trick:</b> Leave one nettle patch in a corner: it's aphid heaven, which means it's a ladybird restaurant by June.</div></article>
+      <article class="tip" data-cat="pest"><span class="tag tag-pest">Pests &amp; Wildlife</span><h3>The problem is the solution</h3><p>Too many slugs? You don't have a slug problem — you have a duck (or frog) deficiency. Too many weeds? That's free mulch and a soil report: docks signal compaction, nettles signal rich soil.</p><div class="trick"><b>Trick:</b> Beer traps work, but a plank on the soil works better — slugs hide under it by day, ready for the birds.</div></article>
+      <article class="tip" data-cat="energy"><span class="tag tag-energy">Time &amp; Energy</span><h3>Every element, 3 jobs</h3><p>Before adding anything, ask: what three functions can it serve? A hedge can be a windbreak + wildlife corridor + edible berries. A pond: irrigation + frog habitat + light reflector.</p><div class="trick"><b>Trick:</b> Train a grapevine over a sunny pergola — summer shade, autumn fruit, winter sun through bare vines.</div></article>
+      <article class="tip" data-cat="energy"><span class="tag tag-energy">Time &amp; Energy</span><h3>Perennials do the overtime</h3><p>Annual veg needs sowing every year; perennials just show up. Asparagus, artichokes, sorrel, tree onions, rhubarb and soft fruit give harvests for a decade from one planting.</p><div class="trick"><b>Trick:</b> Perennial kale (Daubenton's) lives 5+ years and propagates from side-shoots stuck straight in the soil.</div></article>
+      <article class="tip" data-cat="energy"><span class="tag tag-energy">Time &amp; Energy</span><h3>Keep a 2-minute journal</h3><p>Note sowing dates, first harvests, what flopped. Next year you'll garden with data instead of déjà vu. Photos from the same spot each month are gold.</p><div class="trick"><b>Trick:</b> Write the sow date on the seed packet and file packets in an old shoebox by month. Instant sowing calendar.</div></article>
+    </div>
+  </div>
+</section>
+
+<!-- LASAGNA -->
+<section>
+  <div class="wrap">
+    <p class="kicker">Recipe of the garden</p>
+    <h2 class="section-title">Build a No-Dig "Lasagna" Bed</h2>
+    <p class="section-sub">The fastest way to turn lawn or weedy ground into a fertile bed — no digging, plant the same weekend. Build layers bottom to top:</p>
+    <div class="lasagna-flex">
+      <div>
+        <div class="layer" style="background:#5aa469">🌿 Mulch — straw or leaf mould <span>5 cm · keep moist</span></div>
+        <div class="layer" style="background:#4a3728">🟫 Compost / topsoil <span>10–15 cm · plant into this</span></div>
+        <div class="layer" style="background:#8fae5d">🍃 Greens — grass clippings, comfrey <span>5 cm · nitrogen</span></div>
+        <div class="layer" style="background:#b9905a">🍂 Browns — straw, shredded leaves <span>10 cm · carbon</span></div>
+        <div class="layer" style="background:#6e5849">💩 Aged manure (optional) <span>3–5 cm · rocket fuel</span></div>
+        <div class="layer" style="background:#a98a68">📰 Cardboard / newspaper <span>overlapped, soaked, tape removed</span></div>
+        <div class="layer" style="background:#2f6b3a">🌱 Existing lawn or weeds <span>mow short — don't dig!</span></div>
+        <p style="font-size:.88rem;color:var(--muted);margin-top:10px">Water each layer as you go. The cardboard smothers weeds and rots away within a season while worms do the mixing.</p>
+      </div>
+      <div class="card">
+        <h3>💡 Lasagna golden rules</h3>
+        <p style="margin-bottom:12px"><b>1. Wet everything.</b> Each layer should be as damp as a wrung-out sponge — dry layers can repel water for months.</p>
+        <p style="margin-bottom:12px"><b>2. No gaps in the cardboard.</b> Couch grass and bindweed need only a keyhole of light. Overlap edges by 15 cm.</p>
+        <p style="margin-bottom:12px"><b>3. Plant smart on day one.</b> Transplants (courgettes, beans, potatoes pushed into the mulch) thrive immediately; fine seeds do better after the layers settle for a few weeks.</p>
+        <p style="margin-bottom:12px"><b>4. Expect shrinkage.</b> A 40 cm lasagna becomes 15 cm of rich soil by autumn. That's not failure — that's composting in place. Top up yearly.</p>
+        <p><b>5. Edges matter.</b> Mow or barrier the perimeter so lawn grass doesn't creep back in from the sides.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPANIONS -->
+<section id="companions" style="padding-top:10px">
+  <div class="wrap">
+    <p class="kicker">Good neighbours</p>
+    <h2 class="section-title">Companion Planting at a Glance</h2>
+    <p class="section-sub">Some plants help each other — fixing nitrogen, confusing pests, shading roots. A few famous friendships (and feuds):</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Crop</th><th>❤️ Loves</th><th>🚫 Avoid</th><th>Why it works</th></tr>
+        <tr><td><b>🍅 Tomato</b></td><td class="good">Basil, marigold, carrot, parsley</td><td class="bad">Potato, fennel, sweetcorn</td><td>Basil shades roots &amp; may repel whitefly; marigolds deter nematodes. Potatoes share blight.</td></tr>
+        <tr><td><b>🥕 Carrot</b></td><td class="good">Onion, leek, rosemary, lettuce</td><td class="bad">Parsnip, dill (nearby)</td><td>Onion scent confuses carrot fly; lettuce shades soil and keeps it cool.</td></tr>
+        <tr><td><b>🫘 Beans</b></td><td class="good">Sweetcorn, squash, carrot, radish</td><td class="bad">Onion, garlic, fennel</td><td>Beans fix nitrogen for hungry corn; alliums stunt legumes. Add squash = the "Three Sisters".</td></tr>
+        <tr><td><b>🥬 Cabbage family</b></td><td class="good">Onion, beetroot, aromatic herbs, nasturtium</td><td class="bad">Strawberry, tomato, beans</td><td>Strong scents hide brassicas from cabbage white butterflies; nasturtiums act as a trap crop.</td></tr>
+        <tr><td><b>🥒 Cucumber &amp; squash</b></td><td class="good">Beans, peas, radish, sunflower</td><td class="bad">Potato, sage</td><td>Legumes feed them nitrogen; sunflowers give light shade and a living trellis.</td></tr>
+        <tr><td><b>🍓 Strawberry</b></td><td class="good">Borage, lettuce, spinach, beans</td><td class="bad">Cabbage family, fennel</td><td>Borage brings pollinators and can boost fruit set; lettuce is a living mulch between plants.</td></tr>
+        <tr><td><b>🧅 Onion &amp; garlic</b></td><td class="good">Carrot, beetroot, lettuce, strawberry</td><td class="bad">Peas, beans</td><td>Allium scent masks carrots from fly; but it inhibits legume growth — keep them apart.</td></tr>
+      </table>
+    </div>
+    <p style="font-size:.85rem;color:var(--muted);margin-top:12px;text-align:center">🌼 <b>Universal helpers:</b> borage, phacelia, calendula and alyssum scattered everywhere bring pollinators and predatory insects to every bed.</p>
+  </div>
+</section>
+
+<!-- SEASONS -->
+<section id="seasons" style="background:#f3ecd9">
+  <div class="wrap">
+    <p class="kicker">Year-round rhythm · temperate / NW-Europe timing</p>
+    <h2 class="section-title">The Permaculture Year</h2>
+    <p class="section-sub">Work <em>with</em> the seasons and every job gets easier. Tap a season:</p>
+    <div class="season-tabs">
+      <button class="stab active" data-season="spring">🌸 Spring</button>
+      <button class="stab" data-season="summer">☀️ Summer</button>
+      <button class="stab" data-season="autumn">🍂 Autumn</button>
+      <button class="stab" data-season="winter">❄️ Winter</button>
+    </div>
+    <div class="season-panel" id="seasonPanel"></div>
+  </div>
+</section>
+
+<!-- MISTAKES + CHECKLIST -->
+<section>
+  <div class="wrap">
+    <p class="kicker">Learn the easy way</p>
+    <h2 class="section-title">Avoid the Classic Mistakes</h2>
+    <p class="section-sub">…and tick off your starter wins as you go.</p>
+    <div class="two-col">
+      <div>
+        <div class="mistake"><h4>❌ Doing everything in year one</h4><p>Earthworks, 20 beds and a food forest at once = burnout by August. Principle 9: small and slow. Master one area, then expand.</p></div>
+        <div class="mistake"><h4>❌ Planting before observing</h4><p>That "perfect" herb spot may be a frost pocket or winter pond. A few weeks of watching (or one rainy-day walk) saves a season of disappointment.</p></div>
+        <div class="mistake"><h4>❌ Importing fertility forever</h4><p>Buying compost to start is fine; depending on it forever isn't a system. Grow your own fertility: comfrey, clover, compost, leaf mould.</p></div>
+        <div class="mistake"><h4>❌ Fighting for tidiness</h4><p>Neat, bare, sprayed gardens are deserts. A little mess — seed heads standing, logs rotting, leaves lying — is habitat and free pest control.</p></div>
+        <div class="mistake"><h4>❌ Copying designs from other climates</h4><p>Swales are magic in drylands; in a rainy Dutch polder you may need drainage and raised beds instead. Design for <em>your</em> water, soil and seasons.</p></div>
+      </div>
+      <div class="checklist-card">
+        <h3 style="margin-bottom:6px">✅ Your First-Season Checklist</h3>
+        <p style="font-size:.92rem;color:var(--muted)">Tick them off — progress saves in this page while it's open.</p>
+        <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+        <p class="progress-label" id="progressLabel">0 of 10 done — every garden starts with a single seed 🌱</p>
+        <label class="check-item"><input type="checkbox" class="task"><span>Sketch my garden: sun, shade, wind, water</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Mulch or build one no-dig bed</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Install a rain barrel or water butt</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Start a compost heap or worm bin</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Plant 3 perennials (herbs, berries, rhubarb…)</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Sow pollinator flowers (borage, phacelia, calendula)</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Add one wildlife feature: pond, log pile or bug hotel</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Try one companion-planting combo</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Save seed from one plant</span></label>
+        <label class="check-item"><input type="checkbox" class="task"><span>Share a harvest, cutting or tip with a neighbour</span></label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding-top:10px">
+  <div class="wrap" style="max-width:800px">
+    <p class="kicker">Curious minds</p>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub">Quick answers to the questions every new permaculturist asks.</p>
+    <details><summary>Is permaculture just organic gardening?</summary><p>Organic gardening avoids chemicals; permaculture goes further — it's a <em>design system</em>. It plans where things go (zones), how they connect (guilds), and how energy and water flow, so the garden increasingly runs itself. A permaculture garden is organic, but an organic garden isn't automatically permaculture.</p></details>
+    <details><summary>I only have a balcony. Can I still do this?</summary><p>Absolutely. Zones shrink to metres (herbs by the door = Zone 1), stacking becomes vertical (climbers up the railing), a worm bin replaces the compost heap, and a bucket catches rain. Micro-permaculture is real permaculture.</p></details>
+    <details><summary>Does permaculture mean letting the garden go wild?</summary><p>No — it means <em>designed</em> abundance. Zone 5 is deliberately wild, but Zones 1–2 can look neat and highly productive. It's managed like a forest, not abandoned like a vacant lot. You guide succession instead of fighting it.</p></details>
+    <details><summary>How long until it "takes care of itself"?</summary><p>Honest answer: it gets easier every year, but no food garden is zero-work. Expect front-loaded effort in years 1–2 (beds, planting perennials, mulching), then a shift from <em>building</em> to <em>harvesting and tweaking</em> as soil life, perennials and predators take over the chores.</p></details>
+    <details><summary>What's the single highest-impact first step?</summary><p>Mulch. Covering bare soil simultaneously conserves water, suppresses weeds, feeds soil life, moderates temperature and builds fertility — five functions from one action. If you do nothing else this page suggests, do that.</p></details>
+    <details><summary>Which books should I read next?</summary><p>Great starters: <em>Gaia's Garden</em> by Toby Hemenway (home-scale, very practical), <em>Permaculture: Principles &amp; Pathways Beyond Sustainability</em> by David Holmgren (the philosophy), <em>The Vegetable Gardener's Guide to Permaculture</em> by Christopher Shein, and Charles Dowding's no-dig books for the veg patch. Your own garden journal will become the most relevant book of all.</p></details>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote">
+  <blockquote>"The problem is the solution. Everything works both ways — it is only how we see things that makes them advantageous or not."</blockquote>
+  <cite>— Bill Mollison, co-founder of permaculture</cite>
+</div>
+
+<footer>
+  <p><b>🌱 The Permaculture Garden</b> · Earth Care · People Care · Fair Share</p>
+  <p style="margin-top:8px">Made with compost, cardboard and patience. Now go observe your garden for five minutes — that's Principle #1.</p>
+</footer>
+
+<button class="to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
+<script>
+/* ---------- ZONES ---------- */
+const zones = [
+  {t:"Zone 0 — The Home", d:"You! Your house, your energy, your time. Permaculture design starts with the gardener: a system you can't maintain isn't sustainable, however clever it looks on paper.", e:"<b>Examples:</b> kitchen, seed-saving shelf, garden journal, a comfy chair for observing."},
+  {t:"Zone 1 — Daily visits", d:"The intensive area by your door, visited every day. Everything here needs frequent attention or harvesting, so keep it within a few steps of the kitchen.", e:"<b>Examples:</b> culinary herbs, salad greens, greenhouse, worm bin, rain barrel, tool shed."},
+  {t:"Zone 2 — Regular visits", d:"Managed a few times a week. Denser planting, mulch everywhere, small animals and the main veg beds live here.", e:"<b>Examples:</b> vegetable beds, berry bushes, compost heaps, chickens, beehives, small pond."},
+  {t:"Zone 3 — Occasional visits", d:"The farm zone: bigger, hardier plantings that mostly look after themselves between harvests and seasonal pruning.", e:"<b>Examples:</b> orchard, staple crops, nut trees, pasture, larger ponds, windbreak hedges."},
+  {t:"Zone 4 — Rare visits", d:"Semi-managed land, visited a few times a year for harvesting timber, firewood, mushrooms or grazing management.", e:"<b>Examples:</b> coppice woodland, timber trees, foraging areas, rough grazing."},
+  {t:"Zone 5 — Wilderness", d:"Leave it alone. This untouched zone is your teacher and wildlife refuge — a reservoir of predators, pollinators and genetic diversity that spills benefits into every other zone.", e:"<b>Examples:</b> wild woodland corner, untouched hedge, the 'messy bit' you only visit to learn."}
+];
+const zb = document.getElementById('zoneButtons');
+zones.forEach((z,i)=>{
+  const b=document.createElement('button');
+  b.className='zbtn'+(i===0?' active':'');
+  b.innerHTML='<b>'+z.t.split(' — ')[0]+'</b> — '+z.t.split(' — ')[1];
+  b.onclick=()=>{
+    document.querySelectorAll('.zbtn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('zoneTitle').textContent=z.t;
+    document.getElementById('zoneDesc').textContent=z.d;
+    document.getElementById('zoneExamples').innerHTML=z.e;
+    for(let k=0;k<=5;k++){ document.getElementById('zc'+k).setAttribute('opacity', k===i? '1':'0.35'); }
+  };
+  zb.appendChild(b);
+});
+
+/* ---------- TIP FILTERS ---------- */
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.filter;
+    document.querySelectorAll('.tip').forEach(t=>{
+      t.classList.toggle('hidden', f!=='all' && t.dataset.cat!==f);
+    });
+  };
+});
+
+/* ---------- SEASONS ---------- */
+const seasons={
+  spring:{h:"🌸 Spring — Wake & Sow", w:"Mar · Apr · May",
+    cols:[["🌱 Sow & plant",["Start tomatoes, peppers & basil indoors (Mar)","Direct-sow peas, broad beans, spinach, radish","Plant out hardened-off seedlings after last frost (~mid-May in NL)","Divide & replant perennials: rhubarb, mint, chives"]],
+          ["🪱 Soil & beds",["Top beds with 3–5 cm compost — no digging","Build new lasagna beds for summer crops","Sow phacelia on any bare patch"]],
+          ["🐞 Wildlife & care",["Leave dandelions for early bees","Put up bird boxes & refresh the pond","First comfrey cut → liquid feed for hungry plants"]]]},
+  summer:{h:"☀️ Summer — Mulch & Harvest", w:"Jun · Jul · Aug",
+    cols:[["🌱 Sow & plant",["Succession-sow lettuce, beans & radish every 2 weeks","Sow autumn/winter brassicas in June","Take softwood cuttings of herbs & currants"]],
+          ["💧 Water wisely",["Thicken mulch to 10 cm before heatwaves","Water deep, early morning, at the roots","Empty & refill rain barrels between storms"]],
+          ["🐞 Wildlife & care",["Chop & drop comfrey around fruit every 6 weeks","Leave one herb to flower for hoverflies","Harvest little & often to keep plants producing"]]]},
+  autumn:{h:"🍂 Autumn — Store & Sow Cover", w:"Sep · Oct · Nov",
+    cols:[["🌱 Sow & plant",["Plant garlic & overwintering onions (Oct)","Plant bare-root trees, shrubs & hedges","Sow broad beans & winter lettuce under cover"]],
+          ["🍂 Soil gold",["Collect fallen leaves → leaf mould bins","Sow winter rye / crimson clover on empty beds","Spread compost, let worms work all winter"]],
+          ["🏡 Store & save",["Save seed from your best plants","Preserve gluts: freeze, ferment, dry","Leave seed heads standing for birds"]]]},
+  winter:{h:"❄️ Winter — Observe & Design", w:"Dec · Jan · Feb",
+    cols:[["🗺️ Plan",["Review your journal: what thrived, what flopped?","Draw next year's beds & guilds","Order seed early — heirloom favourites sell out"]],
+          ["✂️ Tend",["Prune apples, pears & currants on dry days","Coppice hazel & willow for bean poles","Clean & oil tools, sharpen blades"]],
+          ["🦔 Wildlife & rest",["Keep bird feeders & unfrozen water topped up","Don't tidy! Hollow stems shelter overwintering insects","Rest — the garden (and gardener) needs it"]]]}
+};
+function showSeason(key){
+  const s=seasons[key];
+  let html='<p class="when">'+s.w+'</p><h3>'+s.h+'</h3><div class="task-cols">';
+  s.cols.forEach(c=>{ html+='<div><h4>'+c[0]+'</h4><ul>'+c[1].map(i=>'<li>'+i+'</li>').join('')+'</ul></div>'; });
+  html+='</div>';
+  document.getElementById('seasonPanel').innerHTML=html;
+}
+document.querySelectorAll('.stab').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.stab').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    showSeason(btn.dataset.season);
+  };
+});
+showSeason('spring');
+
+/* ---------- CHECKLIST ---------- */
+const tasks=document.querySelectorAll('.task');
+function updateProgress(){
+  const done=[...tasks].filter(t=>t.checked).length;
+  document.getElementById('progressBar').style.width=(done/tasks.length*100)+'%';
+  const msgs=["every garden starts with a single seed 🌱","you're sprouting! 🌿","rooting nicely… 🪱","growing strong! 🌻","half-way to a food forest! 🌳","almost there — smell that compost? 🍂","🎉 Full permaculturist status: unlocked!"];
+  document.getElementById('progressLabel').textContent=done+' of '+tasks.length+' done — '+msgs[Math.min(msgs.length-1, Math.floor(done/tasks.length*msgs.length))];
+}
+tasks.forEach(t=>t.addEventListener('change',()=>{
+  t.closest('.check-item').classList.toggle('done', t.checked);
+  updateProgress();
+}));
+updateProgress();
+</script>
+</body>
+</html>
